@@ -1,9 +1,24 @@
-The root cause of all build failures is agp = "9.0.1" in libs.versions.toml.
-AGP 9.0.1 does not exist. Change it to "8.7.3", which is the latest stable version
-compatible with Kotlin 2.0.21 and the rest of this project's dependencies.
+The data layer is ready (Instalacion.kt, InstalacionDao.kt, AppDatabase.kt).
+Gradle syncs successfully. Now set up Hilt and the Repository layer.
 
-Also restore kotlin-compose in both build.gradle.kts files if it was removed:
-- In app/build.gradle.kts plugins block, add back: alias(libs.plugins.kotlin.compose)
-- In root build.gradle.kts plugins block, add back: alias(libs.plugins.kotlin.compose) apply false
+Create the following files:
 
-Only change agp version and restore kotlin.compose. Nothing else.
+**1. `PlayOutApplication.kt`** at the root package `com.ernesto.playout`
+- Annotated with @HiltAndroidApp
+- Also update AndroidManifest.xml to register this Application class
+
+**2. `di/AppModule.kt`**
+- @Module @InstallIn(SingletonComponent::class)
+- Provides AppDatabase using createFromAsset("playout.db")
+- Provides InstalacionDao from the database
+- Both bindings as @Singleton
+
+**3. `data/repository/InstalacionRepository.kt`**
+- Constructor-injected with InstalacionDao via @Inject
+- Exposes the following suspend/flow functions:
+  - getAllInstalaciones(): Flow<List<Instalacion>>
+  - getInstalacionById(fid: Int): Flow<Instalacion?>
+  - getInstalacionesByCategoria(categoria: String): Flow<List<Instalacion>>
+
+Do not create any ViewModels or UI yet.
+Do not run any gradle or build commands.

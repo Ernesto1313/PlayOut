@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/build/
+*.keystore
+prompt.txt
+*.db
+*.log
+Thumbs.db
