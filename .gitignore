@@ -1,21 +1,25 @@
+# Android Studio
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.gradle/
 local.properties
+
+# Build outputs
+build/
 app/build/
+
+# Keystore
 *.keystore
-prompt.txt
-*.db
-*.log
+*.jks
+
+# Misc
+.DS_Store
 Thumbs.db
+prompt.txt
+*.log
+
+# Database assets (se añadirán manualmente cuando estén listos)
+*.db
+*.gpkg
+
+.claude/
