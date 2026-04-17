@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.ernesto.playout"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ernesto.playout"
         minSdk = 28
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -55,6 +55,7 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.navigation.compose)
     implementation(libs.maps.compose)
     implementation(libs.coil.compose)
