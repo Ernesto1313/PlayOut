@@ -1,0 +1,9 @@
+The root cause of all build failures is agp = "9.0.1" in libs.versions.toml.
+AGP 9.0.1 does not exist. Change it to "8.7.3", which is the latest stable version
+compatible with Kotlin 2.0.21 and the rest of this project's dependencies.
+
+Also restore kotlin-compose in both build.gradle.kts files if it was removed:
+- In app/build.gradle.kts plugins block, add back: alias(libs.plugins.kotlin.compose)
+- In root build.gradle.kts plugins block, add back: alias(libs.plugins.kotlin.compose) apply false
+
+Only change agp version and restore kotlin.compose. Nothing else.
