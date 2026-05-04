@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ernesto.playout.data.model.Instalacion
 
-private fun estadoToText(estado: Int): String = when (estado) {
+private fun estadoToText(estado: Int?): String = when (estado) {
     1 -> "Bueno"
     2 -> "Desgastado"
     3 -> "Roto"
@@ -26,11 +26,11 @@ fun InstalacionCard(
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = instalacion.nombre_sitio,
+                text = instalacion.nombre_sitio ?: "",
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = instalacion.categoria,
+                text = instalacion.categoria ?: "",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(

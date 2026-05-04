@@ -17,10 +17,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.DATABASE_NAME)
-            .createFromAsset(AppDatabase.DATABASE_NAME)
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        AppDatabase.appContext = context
+        return Room.databaseBuilder(context, AppDatabase::class.java, "playout6.db")
+            .addCallback(AppDatabase.callback)
+            .fallbackToDestructiveMigration()
             .build()
+    }
 
     @Provides
     @Singleton
