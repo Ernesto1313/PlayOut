@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -60,7 +59,7 @@ import com.ernesto.playout.data.model.Instalacion
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Ajedrez" -> R.drawable.ajedrez
-    "PingPong" -> R.drawable.pingpong
+    "Pingpong" -> R.drawable.pingpong
     "Futbol" -> R.drawable.futbol
     "Esgrima" -> R.drawable.esgrima
     "Patinaje" -> R.drawable.skate
@@ -363,7 +362,7 @@ private fun ProfileMode(
                     tint = Color.White
                 )
             }
-            Column(
+            Box(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(24.dp)
@@ -372,13 +371,6 @@ private fun ProfileMode(
                     painter = painterResource(categoryDrawable(inst.categoria)),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = inst.nombre_sitio ?: "",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
                 )
             }
         }
@@ -393,11 +385,6 @@ private fun ProfileMode(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = inst.nombre_sitio ?: "",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
