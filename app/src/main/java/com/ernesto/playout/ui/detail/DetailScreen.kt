@@ -53,28 +53,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Fútbol" -> R.drawable.futbol
-    "Baloncesto" -> R.drawable.baloncesto
-    "Volleyball" -> R.drawable.volleyball
     "Ajedrez" -> R.drawable.ajedrez
     "PingPong" -> R.drawable.pingpong
-    "Minigolf" -> R.drawable.minigolf
+    "Futbol" -> R.drawable.futbol
     "Esgrima" -> R.drawable.esgrima
     "Patinaje" -> R.drawable.skate
+    "Volleyball" -> R.drawable.volleyball
+    "Baloncesto" -> R.drawable.baloncesto
     "Calistenia" -> R.drawable.calistenia
-    "Petanca" -> R.drawable.balls
     "Atletismo" -> R.drawable.atletismo
+    "Otro" -> R.drawable.otro
+    "Minigolf" -> R.drawable.minigolf
+    "Petanca" -> R.drawable.petanca
     else -> R.drawable.otro
 }
 
 private fun categoryColor(categoria: String?): Color = when (categoria) {
-    "Fútbol" -> Color(0xFF2E7D32)
+    "Fútbol", "Futbol" -> Color(0xFF2E7D32)
     "Baloncesto" -> Color(0xFFE65100)
     "Volleyball" -> Color(0xFF1565C0)
     "Ajedrez" -> Color(0xFF37474F)
@@ -116,7 +117,11 @@ fun DetailScreen(
 
     val bgColor = categoryColor(inst.categoria)
     val descripcion = inst.descripcion ?: ""
-    val midPoint = descripcion.length / 2
+
+    val sentences = descripcion.split(".").map { it.trim() }.filter { it.isNotEmpty() }
+    val halfCount = sentences.size / 2
+    val descripcionSlide1 = sentences.take(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
+    val descripcionSlide2 = sentences.drop(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
 
     AnimatedContent(
         targetState = isImmersive,
@@ -136,8 +141,8 @@ fun DetailScreen(
                 inst = inst,
                 bgColor = bgColor,
                 currentSlide = currentSlide,
-                descripcionFirstHalf = descripcion.take(midPoint),
-                descripcionSecondHalf = descripcion.drop(midPoint),
+                descripcionSlide1 = descripcionSlide1,
+                descripcionSlide2 = descripcionSlide2,
                 onSlideLeft = { if (currentSlide > 0) currentSlide-- },
                 onSlideRight = { if (currentSlide < 3) currentSlide++ },
                 onSwipeUp = { isImmersive = false },
@@ -160,13 +165,20 @@ private fun ImmersiveMode(
     inst: Instalacion,
     bgColor: Color,
     currentSlide: Int,
-    descripcionFirstHalf: String,
-    descripcionSecondHalf: String,
+    descripcionSlide1: String,
+    descripcionSlide2: String,
     onSlideLeft: () -> Unit,
     onSlideRight: () -> Unit,
     onSwipeUp: () -> Unit,
     onBack: () -> Unit
 ) {
+    val photoPath = when (currentSlide) {
+        0 -> "file:///android_asset/photos/${inst.fid}_main.jpg"
+        1 -> "file:///android_asset/photos/${inst.fid}_extra1.jpg"
+        2 -> "file:///android_asset/photos/${inst.fid}_extra2.jpg"
+        else -> "file:///android_asset/photos/${inst.fid}_extra3.jpg"
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -185,9 +197,9 @@ private fun ImmersiveMode(
                 )
             }
     ) {
-        // Background photo (bgColor shows while image loads)
+        // Background photo — switches with currentSlide
         AsyncImage(
-            model = "file:///android_asset/photos/${inst.fid}_main.jpg",
+            model = photoPath,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -237,58 +249,66 @@ private fun ImmersiveMode(
             )
         }
 
-        // Slide content anchored to bottom
+        // Translucent bocadillo at bottom
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 40.dp)
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                .background(Color(0xFF2C332D).copy(alpha = 0.75f))
+                .padding(16.dp)
         ) {
             when (currentSlide) {
-                0 -> Column {
-                    Image(
-                        painter = painterResource(categoryDrawable(inst.categoria)),
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
+                0 -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = inst.nombre_sitio ?: "",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        text = inst.categoria ?: "",
+                        color = Color(0xFFF5F5F5),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Estado: ",
+                            color = Color(0xFFF5F5F5),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        EstadoText(inst.estado)
+                    }
                 }
                 1 -> Text(
-                    text = descripcionFirstHalf,
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge
+                    text = descripcionSlide1,
+                    color = Color(0xFFF5F5F5),
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 2 -> Text(
-                    text = descripcionSecondHalf,
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge
+                    text = descripcionSlide2,
+                    color = Color(0xFFF5F5F5),
+                    style = MaterialTheme.typography.bodyMedium
                 )
-                3 -> Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                3 -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (inst.agua == 1) {
                         Image(
                             painter = painterResource(R.drawable.gota),
-                            contentDescription = "Agua",
+                            contentDescription = null,
                             modifier = Modifier.size(32.dp)
                         )
                     }
                     if (inst.asientos == 1) {
                         Image(
                             painter = painterResource(R.drawable.banco),
-                            contentDescription = "Asientos",
+                            contentDescription = null,
                             modifier = Modifier.size(32.dp)
                         )
                     }
-                    EstadoText(inst.estado)
-                    StarRating(value = inst.experiencia_uso, starSize = 24)
+                    val stars = inst.experiencia_uso?.coerceIn(0, 5) ?: 0
+                    Text(
+                        text = "Experiencia de uso: ${"★".repeat(stars)}${"☆".repeat(5 - stars)}",
+                        color = Color(0xFFF5F5F5),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
