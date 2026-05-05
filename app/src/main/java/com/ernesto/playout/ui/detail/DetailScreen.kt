@@ -362,17 +362,6 @@ private fun ProfileMode(
                     tint = Color.White
                 )
             }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(24.dp)
-            ) {
-                Image(
-                    painter = painterResource(categoryDrawable(inst.categoria)),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
         }
 
         // Scrollable detail content
