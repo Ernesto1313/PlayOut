@@ -19,6 +19,7 @@ import com.ernesto.playout.ui.list.components.InstalacionCard
 
 @Composable
 fun ListScreen(
+    onInstalacionClick: (Int) -> Unit,
     viewModel: ListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -37,6 +38,7 @@ fun ListScreen(
                     items(state.instalaciones) { instalacion ->
                         InstalacionCard(
                             instalacion = instalacion,
+                            onInstalacionClick = onInstalacionClick,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }

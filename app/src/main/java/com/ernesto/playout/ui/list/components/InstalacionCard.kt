@@ -1,5 +1,6 @@
 package com.ernesto.playout.ui.list.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,9 +22,13 @@ private fun estadoToText(estado: Int?): String = when (estado) {
 @Composable
 fun InstalacionCard(
     instalacion: Instalacion,
+    onInstalacionClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .clickable { onInstalacionClick(instalacion.fid) }
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = instalacion.nombre_sitio ?: "",
