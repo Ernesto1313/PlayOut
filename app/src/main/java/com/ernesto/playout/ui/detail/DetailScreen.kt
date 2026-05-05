@@ -1,5 +1,6 @@
 package com.ernesto.playout.ui.detail
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -7,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,9 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -42,16 +43,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
+
+@DrawableRes
+private fun categoryDrawable(categoria: String?): Int = when (categoria) {
+    "Fútbol" -> R.drawable.futbol
+    "Baloncesto" -> R.drawable.baloncesto
+    "Volleyball" -> R.drawable.volleyball
+    "Ajedrez" -> R.drawable.ajedrez
+    "PingPong" -> R.drawable.pingpong
+    "Minigolf" -> R.drawable.minigolf
+    "Esgrima" -> R.drawable.esgrima
+    "Patinaje" -> R.drawable.skate
+    "Calistenia" -> R.drawable.calistenia
+    "Petanca" -> R.drawable.balls
+    "Atletismo" -> R.drawable.atletismo
+    else -> R.drawable.otro
+}
 
 private fun categoryColor(categoria: String?): Color = when (categoria) {
     "Fútbol" -> Color(0xFF2E7D32)
@@ -68,33 +88,13 @@ private fun categoryColor(categoria: String?): Color = when (categoria) {
     else -> Color(0xFF37474F)
 }
 
-private fun categoryEmoji(categoria: String?): String = when (categoria) {
-    "Fútbol" -> "⚽"
-    "Baloncesto" -> "🏀"
-    "Volleyball" -> "🏐"
-    "Ajedrez" -> "♟️"
-    "PingPong" -> "🏓"
-    "Minigolf" -> "⛳"
-    "Esgrima" -> "🤺"
-    "Patinaje" -> "⛸️"
-    "Calistenia" -> "💪"
-    "Petanca" -> "🎯"
-    "Atletismo" -> "🏃"
-    else -> "🏟️"
-}
-
-private fun estadoColor(estado: Int?): Color = when (estado) {
-    1 -> Color(0xFF4CAF50)
-    2 -> Color(0xFFFFC107)
-    3 -> Color(0xFFF44336)
-    else -> Color.Gray
-}
-
-private fun estadoText(estado: Int?): String = when (estado) {
-    1 -> "Verde"
-    2 -> "Amarillo"
-    3 -> "Rojo"
-    else -> "-"
+@Composable
+private fun EstadoText(estado: Int?, modifier: Modifier = Modifier) {
+    when (estado) {
+        1 -> Text("Bueno", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold, modifier = modifier)
+        2 -> Text("Desgastado", color = Color(0xFFFFC107), fontWeight = FontWeight.Bold, modifier = modifier)
+        3 -> Text("Roto", color = Color(0xFFF44336), fontWeight = FontWeight.Bold, modifier = modifier)
+    }
 }
 
 @Composable
@@ -115,7 +115,6 @@ fun DetailScreen(
     }
 
     val bgColor = categoryColor(inst.categoria)
-    val emoji = categoryEmoji(inst.categoria)
     val descripcion = inst.descripcion ?: ""
     val midPoint = descripcion.length / 2
 
@@ -136,7 +135,6 @@ fun DetailScreen(
             ImmersiveMode(
                 inst = inst,
                 bgColor = bgColor,
-                emoji = emoji,
                 currentSlide = currentSlide,
                 descripcionFirstHalf = descripcion.take(midPoint),
                 descripcionSecondHalf = descripcion.drop(midPoint),
@@ -149,7 +147,6 @@ fun DetailScreen(
             ProfileMode(
                 inst = inst,
                 bgColor = bgColor,
-                emoji = emoji,
                 descripcion = descripcion,
                 onSwipeDown = { isImmersive = true },
                 onBack = onBack
@@ -162,7 +159,6 @@ fun DetailScreen(
 private fun ImmersiveMode(
     inst: Instalacion,
     bgColor: Color,
-    emoji: String,
     currentSlide: Int,
     descripcionFirstHalf: String,
     descripcionSecondHalf: String,
@@ -189,20 +185,18 @@ private fun ImmersiveMode(
                 )
             }
     ) {
-        // Tap zones — rendered first so interactive elements above capture clicks first
+        // Background photo (bgColor shows while image loads)
+        AsyncImage(
+            model = "file:///android_asset/photos/${inst.fid}_main.jpg",
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Tap zones — rendered before UI chrome so chrome captures clicks first
         Row(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clickable { onSlideLeft() }
-            )
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clickable { onSlideRight() }
-            )
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSlideLeft() })
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSlideRight() })
         }
 
         // Progress bar
@@ -243,7 +237,7 @@ private fun ImmersiveMode(
             )
         }
 
-        // Slide content — anchored to bottom
+        // Slide content anchored to bottom
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -252,7 +246,11 @@ private fun ImmersiveMode(
         ) {
             when (currentSlide) {
                 0 -> Column {
-                    Text(text = emoji, fontSize = 56.sp)
+                    Image(
+                        painter = painterResource(categoryDrawable(inst.categoria)),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = inst.nombre_sitio ?: "",
@@ -275,22 +273,21 @@ private fun ImmersiveMode(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "💧",
-                        fontSize = 28.sp,
-                        modifier = Modifier.alpha(if (inst.agua == 1) 1f else 0.3f)
-                    )
-                    Text(
-                        text = "🪑",
-                        fontSize = 28.sp,
-                        modifier = Modifier.alpha(if (inst.asientos == 1) 1f else 0.3f)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(estadoColor(inst.estado))
-                    )
+                    if (inst.agua == 1) {
+                        Image(
+                            painter = painterResource(R.drawable.gota),
+                            contentDescription = "Agua",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    if (inst.asientos == 1) {
+                        Image(
+                            painter = painterResource(R.drawable.banco),
+                            contentDescription = "Asientos",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    EstadoText(inst.estado)
                     StarRating(value = inst.experiencia_uso, starSize = 24)
                 }
             }
@@ -302,13 +299,12 @@ private fun ImmersiveMode(
 private fun ProfileMode(
     inst: Instalacion,
     bgColor: Color,
-    emoji: String,
     descripcion: String,
     onSwipeDown: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Fixed photo area — swipe down here to return to immersive
+        // Fixed photo area — swipe down to return to immersive
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -328,6 +324,12 @@ private fun ProfileMode(
                     )
                 }
         ) {
+            AsyncImage(
+                model = "file:///android_asset/photos/${inst.fid}_main.jpg",
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
@@ -346,7 +348,11 @@ private fun ProfileMode(
                     .align(Alignment.BottomStart)
                     .padding(24.dp)
             ) {
-                Text(text = emoji, fontSize = 48.sp)
+                Image(
+                    painter = painterResource(categoryDrawable(inst.categoria)),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = inst.nombre_sitio ?: "",
@@ -358,6 +364,7 @@ private fun ProfileMode(
         }
 
         // Scrollable detail content
+        val fid = inst.fid
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -371,46 +378,98 @@ private fun ProfileMode(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "$emoji ${inst.categoria ?: "-"}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            HorizontalDivider()
-            Text(
-                text = descripcion,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            HorizontalDivider()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(14.dp)
-                        .clip(CircleShape)
-                        .background(estadoColor(inst.estado))
+                Image(
+                    painter = painterResource(categoryDrawable(inst.categoria)),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
-                Text(
-                    text = "Estado: ${estadoText(inst.estado)}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Text(text = inst.categoria ?: "-", style = MaterialTheme.typography.titleMedium)
+            }
+            HorizontalDivider()
+            Text(text = descripcion, style = MaterialTheme.typography.bodyMedium)
+            HorizontalDivider()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text("Estado: ", style = MaterialTheme.typography.bodyMedium)
+                EstadoText(inst.estado)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Experiencia: ", style = MaterialTheme.typography.bodyMedium)
+                Text("Experiencia de uso: ", style = MaterialTheme.typography.bodyMedium)
                 StarRating(value = inst.experiencia_uso, starSize = 20)
             }
-            Text(
-                text = if (inst.agua == 1) "💧 Agua: Sí" else "💧 Agua: No",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = if (inst.asientos == 1) "🪑 Asientos: Sí" else "🪑 Asientos: No",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (inst.agua == 1) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.gota),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text("Agua disponible", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            if (inst.asientos == 1) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.banco),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text("Asientos disponibles", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            HorizontalDivider()
+            // 2x2 photo gallery
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    AsyncImage(
+                        model = "file:///android_asset/photos/${fid}_main.jpg",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.weight(1f).aspectRatio(1f)
+                    )
+                    AsyncImage(
+                        model = "file:///android_asset/photos/${fid}_extra1.jpg",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.weight(1f).aspectRatio(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    AsyncImage(
+                        model = "file:///android_asset/photos/${fid}_extra2.jpg",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.weight(1f).aspectRatio(1f)
+                    )
+                    AsyncImage(
+                        model = "file:///android_asset/photos/${fid}_extra3.jpg",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.weight(1f).aspectRatio(1f)
+                    )
+                }
+            }
         }
     }
 }
