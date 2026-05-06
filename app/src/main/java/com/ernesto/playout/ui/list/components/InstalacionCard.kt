@@ -5,11 +5,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -58,15 +62,16 @@ fun InstalacionCard(
             .fillMaxWidth()
             .clickable { onInstalacionClick(instalacion.fid) },
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C2230))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
-        Row {
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
             AsyncImage(
                 model = "file:///android_asset/photos/${instalacion.fid}_main.jpg",
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(80.dp)
+                    .width(100.dp)
+                    .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
             )
             Column(
@@ -87,7 +92,7 @@ fun InstalacionCard(
                     Text(
                         text = instalacion.categoria ?: "",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFF5F5F5)
+                        color = Color(0xFF2C332D)
                     )
                 }
                 Row {

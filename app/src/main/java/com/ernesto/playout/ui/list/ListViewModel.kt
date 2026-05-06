@@ -1,6 +1,7 @@
 package com.ernesto.playout.ui.list
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ernesto.playout.data.location.LocationDataSource
@@ -68,8 +69,9 @@ class ListViewModel @Inject constructor(
 
     fun distanceTo(instalacion: Instalacion): Float? {
         val loc = _userLocation.value ?: return null
-        val lat = instalacion.latitud ?: return null
-        val lon = instalacion.longitud ?: return null
+        val lat = instalacion.latitud?.toDouble() ?: return null
+        val lon = instalacion.longitud?.toDouble() ?: return null
+        Log.d("PlayOut_Distance", "Calculating distance to: lat=${instalacion.latitud} lng=${instalacion.longitud} userLat=${_userLocation.value?.latitude} userLng=${_userLocation.value?.longitude}")
         val results = FloatArray(1)
         Location.distanceBetween(loc.latitude, loc.longitude, lat, lon, results)
         return results[0]

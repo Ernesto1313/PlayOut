@@ -395,20 +395,20 @@ private fun ProfileMode(
                 )
                 val context = LocalContext.current
                 Image(
-                    painter = painterResource(R.drawable.Google_Maps_icon_svg),
+                    painter = painterResource(R.drawable.google_maps_icon),
                     contentDescription = "Abrir en Google Maps",
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {
-                            val uri = "geo:${inst.latitud},${inst.longitud}?q=${inst.latitud},${inst.longitud}"
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-                                .apply { setPackage("com.google.android.apps.maps") }
+                            val lat = inst.latitud ?: 0.0
+                            val lng = inst.longitud ?: 0.0
+                            val uri = Uri.parse("geo:$lat,$lng?q=$lat,$lng")
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            intent.setPackage("com.google.android.apps.maps")
                             try {
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                context.startActivity(
-                                    Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-                                )
+                                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                             }
                         }
                 )
