@@ -107,6 +107,7 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel()
 ) {
     val instalacion by viewModel.instalacion.collectAsStateWithLifecycle()
+    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     var isImmersive by remember { mutableStateOf(true) }
     var currentSlide by remember { mutableStateOf(0) }
 
@@ -156,6 +157,7 @@ fun DetailScreen(
                 inst = inst,
                 bgColor = bgColor,
                 descripcion = descripcion,
+                userLocation = userLocation,
                 onSwipeDown = { isImmersive = true },
                 onBack = onBack
             )
@@ -323,6 +325,7 @@ private fun ProfileMode(
     inst: Instalacion,
     bgColor: Color,
     descripcion: String,
+    userLocation: android.location.Location?,
     onSwipeDown: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -429,6 +432,28 @@ private fun ProfileMode(
             ) {
                 Text("Experiencia de uso: ", style = MaterialTheme.typography.bodyMedium)
                 StarRating(value = inst.experiencia_uso, starSize = 20)
+            }
+            val distance = userLocation?.let { loc ->
+                val results = FloatArray(1)
+                android.location.Location.distanceBetween(
+                    loc.latitude, loc.longitude,
+                    inst.latitud ?: 0.0,
+                    inst.longitud ?: 0.0,
+                    results
+                )
+                results[0]
+            }
+            if (distance != null) {
+                val distanceText = if (distance < 1000f) {
+                    "${distance.toInt()} m"
+                } else {
+                    "${"%.1f".format(distance / 1000f)} km"
+                }
+                Text(
+                    "Distancia: $distanceText",
+                    color = Color(0xFF2C332D),
+                    fontSize = 14.sp
+                )
             }
             if (inst.agua == 1) {
                 Row(

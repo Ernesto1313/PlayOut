@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
-import java.util.Locale
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
@@ -148,15 +147,12 @@ fun InstalacionCard(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     if (distance != null) {
-                        Text(
-                            text = if (distance < 1000f) {
-                                "${distance.toInt()}m"
-                            } else {
-                                String.format(Locale.getDefault(), "%.1fkm", distance / 1000f)
-                            },
-                            fontSize = 12.sp,
-                            color = Color(0xFF8B949E)
-                        )
+                        val distanceText = if (distance < 1000f) {
+                            "${distance.toInt()} m"
+                        } else {
+                            "${"%.1f".format(distance / 1000f)} km"
+                        }
+                        Text(distanceText, color = Color(0xFF8B949E), fontSize = 12.sp)
                     }
                 }
             }
