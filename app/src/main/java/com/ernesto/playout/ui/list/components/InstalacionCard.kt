@@ -3,7 +3,9 @@ package com.ernesto.playout.ui.list.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -70,7 +72,7 @@ fun InstalacionCard(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .width(100.dp)
+                    .width(80.dp)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
             )
@@ -95,14 +97,23 @@ fun InstalacionCard(
                         color = Color(0xFF2C332D)
                     )
                 }
-                Row {
-                    val stars = instalacion.experiencia_uso?.coerceIn(0, 5) ?: 0
-                    repeat(5) { index ->
-                        Text(
-                            text = if (index < stars) "★" else "☆",
-                            fontSize = 14.sp,
-                            color = Color(0xFFFFC107)
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFF2C332D).copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(8.dp)
                         )
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Row {
+                        val stars = instalacion.experiencia_uso?.coerceIn(0, 5) ?: 0
+                        repeat(5) { index ->
+                            Text(
+                                text = if (index < stars) "★" else "☆",
+                                fontSize = 14.sp,
+                                color = Color(0xFFFFC107)
+                            )
+                        }
                     }
                 }
                 val (estadoText, estadoColor) = when (instalacion.estado) {
@@ -111,7 +122,16 @@ fun InstalacionCard(
                     3 -> "Roto" to Color(0xFFF44336)
                     else -> "Desconocido" to Color(0xFF8B949E)
                 }
-                Text(text = estadoText, fontSize = 12.sp, color = estadoColor)
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFF2C332D).copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Text(text = estadoText, fontSize = 12.sp, color = estadoColor)
+                }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()

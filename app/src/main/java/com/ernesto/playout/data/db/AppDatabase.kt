@@ -12,7 +12,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun instalacionDao(): InstalacionDao
 
     companion object {
-        const val DATABASE_NAME = "playout.db"
+        const val DATABASE_NAME = "playout1.db"
 
         lateinit var appContext: Context
 
