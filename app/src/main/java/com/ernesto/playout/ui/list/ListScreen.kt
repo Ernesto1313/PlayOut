@@ -39,7 +39,7 @@ fun ListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2C332D))
+            .background(Color(0xFF0D1117))
             .statusBarsPadding()
     ) {
         SortBar(sortOrder = sortOrder, onSortSelected = viewModel::setSortOrder)
@@ -48,6 +48,7 @@ fun ListScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                .background(Color(0xFF2C332D))
         ) {
             when (val state = uiState) {
                 is ListUiState.Loading -> {
