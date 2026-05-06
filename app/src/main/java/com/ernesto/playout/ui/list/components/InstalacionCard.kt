@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -64,6 +64,7 @@ fun InstalacionCard(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
+        Box(modifier = Modifier.fillMaxSize()) {
         Row {
             AsyncImage(
                 model = "file:///android_asset/photos/${instalacion.fid}_main.jpg",
@@ -145,17 +146,24 @@ fun InstalacionCard(
                             modifier = Modifier.size(16.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (distance != null) {
-                        val distanceText = if (distance < 1000f) {
-                            "${distance.toInt()} m"
-                        } else {
-                            "${"%.1f".format(distance / 1000f)} km"
-                        }
-                        Text(distanceText, color = Color(0xFF8B949E), fontSize = 12.sp)
-                    }
                 }
             }
+        }
+        if (distance != null) {
+            val distanceText = if (distance < 1000f) {
+                "${distance.toInt()} m"
+            } else {
+                "${"%.1f".format(distance / 1000f)} km"
+            }
+            Text(
+                text = distanceText,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 6.dp, bottom = 4.dp),
+                color = Color(0xFF8B949E),
+                fontSize = 11.sp
+            )
+        }
         }
     }
 }

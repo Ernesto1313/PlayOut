@@ -293,26 +293,29 @@ private fun ImmersiveMode(
                     color = Color(0xFFF5F5F5),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                3 -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                3 -> Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     if (inst.agua == 1) {
                         Image(
                             painter = painterResource(R.drawable.gota),
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                     if (inst.asientos == 1) {
                         Image(
                             painter = painterResource(R.drawable.banco),
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
-                    val stars = inst.experiencia_uso?.coerceIn(0, 5) ?: 0
+                    val stars = inst.experiencia_uso ?: 0
                     Text(
-                        text = "Experiencia de uso: ${"★".repeat(stars)}${"☆".repeat(5 - stars)}",
-                        color = Color(0xFFF5F5F5),
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "★".repeat(stars) + "☆".repeat(5 - stars),
+                        color = Color(0xFFFFC107),
+                        fontSize = 20.sp
                     )
                 }
             }
