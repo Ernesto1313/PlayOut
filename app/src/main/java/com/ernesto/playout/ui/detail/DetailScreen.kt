@@ -413,8 +413,6 @@ private fun ProfileMode(
                         }
                 )
             }
-            Text("lat: ${inst.latitud}", color = Color.Yellow)
-            Text("lng: ${inst.longitud}", color = Color.Yellow)
             HorizontalDivider()
             Text(text = descripcion, style = MaterialTheme.typography.bodyMedium)
             HorizontalDivider()

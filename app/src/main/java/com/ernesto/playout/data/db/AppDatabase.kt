@@ -58,8 +58,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     '$foto','$categoria',
                                     '$descripcion',${map["estado"]},
                                     ${map["agua"]},${map["asientos"]},
-                                    ${map["experiencia_uso"]},${map["xcoord"]},
-                                    ${map["ycoord"]})""")
+                                    ${map["experiencia_uso"]},${map["longitud"]},
+                                    ${map["latitud"]})""")
                                 count++
                                 Log.d("PlayOut_DB", "Inserted row $count")
                             } catch (e: Exception) {

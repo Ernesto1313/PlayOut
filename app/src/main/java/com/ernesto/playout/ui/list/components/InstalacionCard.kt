@@ -7,10 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -62,18 +60,19 @@ fun InstalacionCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .height(100.dp)
             .clickable { onInstalacionClick(instalacion.fid) },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+        Row {
             AsyncImage(
                 model = "file:///android_asset/photos/${instalacion.fid}_main.jpg",
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .width(80.dp)
-                    .fillMaxHeight()
+                    .height(100.dp)
                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
             )
             Column(
@@ -100,7 +99,7 @@ fun InstalacionCard(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0xFF2C332D).copy(alpha = 0.7f),
+                            color = Color(0xFFFFC107).copy(alpha = 0.15f),
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 6.dp, vertical = 3.dp)
@@ -116,18 +115,15 @@ fun InstalacionCard(
                         }
                     }
                 }
-                val (estadoText, estadoColor) = when (instalacion.estado) {
-                    1 -> "Bueno" to Color(0xFF4CAF50)
-                    2 -> "Desgastado" to Color(0xFFFFC107)
-                    3 -> "Roto" to Color(0xFFF44336)
-                    else -> "Desconocido" to Color(0xFF8B949E)
+                val (estadoText, estadoColor, estadoBg) = when (instalacion.estado) {
+                    1 -> Triple("Bueno", Color(0xFF4CAF50), Color(0xFF4CAF50).copy(alpha = 0.15f))
+                    2 -> Triple("Desgastado", Color(0xFFFFC107), Color(0xFFFFC107).copy(alpha = 0.15f))
+                    3 -> Triple("Roto", Color(0xFFF44336), Color(0xFFF44336).copy(alpha = 0.15f))
+                    else -> Triple("Desconocido", Color(0xFF8B949E), Color(0xFF8B949E).copy(alpha = 0.15f))
                 }
                 Box(
                     modifier = Modifier
-                        .background(
-                            color = Color(0xFF2C332D).copy(alpha = 0.7f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
+                        .background(color = estadoBg, shape = RoundedCornerShape(8.dp))
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(text = estadoText, fontSize = 12.sp, color = estadoColor)
