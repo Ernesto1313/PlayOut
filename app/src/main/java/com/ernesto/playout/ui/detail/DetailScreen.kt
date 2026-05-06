@@ -8,6 +8,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -50,6 +53,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -376,14 +380,38 @@ private fun ProfileMode(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
                     painter = painterResource(categoryDrawable(inst.categoria)),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )
-                Text(text = inst.categoria ?: "-", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = inst.categoria ?: "-",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                val context = LocalContext.current
+                Image(
+                    painter = painterResource(R.drawable.Google_Maps_icon_svg),
+                    contentDescription = "Abrir en Google Maps",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            val uri = "geo:${inst.latitud},${inst.longitud}?q=${inst.latitud},${inst.longitud}"
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                                .apply { setPackage("com.google.android.apps.maps") }
+                            try {
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+                                )
+                            }
+                        }
+                )
             }
             HorizontalDivider()
             Text(text = descripcion, style = MaterialTheme.typography.bodyMedium)
