@@ -28,7 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,13 +37,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.ernesto.playout.R
 import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.list.ListScreen
 import com.ernesto.playout.ui.map.MapScreen
@@ -60,9 +59,116 @@ sealed class Screen(val route: String) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapListScaffold(
+    currentRoute: String,
+    navController: NavController,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val onMap = currentRoute == Screen.Map.route
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.futbol),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Text(
+                            text = "PlayOut",
+                            color = Color(0xFFF5F5F5),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF2C332D)
+                )
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color(0xFF2C332D),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = {
+                        if (onMap) {
+                            navController.navigate(Screen.List.route) {
+                                popUpTo(Screen.Map.route)
+                                launchSingleTop = true
+                            }
+                        } else {
+                            navController.navigate(Screen.Map.route) {
+                                popUpTo(Screen.Map.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = if (onMap) Icons.Default.FormatListBulleted else Icons.Default.Place,
+                            contentDescription = if (onMap) "Lista" else "Mapa",
+                            tint = Color(0xFF8B949E)
+                        )
+                    }
+                    Text(
+                        text = if (onMap) "Lista" else "Mapa",
+                        color = Color(0xFF8B949E),
+                        fontSize = 10.sp
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    FloatingActionButton(
+                        onClick = { /* no-op */ },
+                        modifier = Modifier.size(48.dp),
+                        containerColor = Color(0xFF4CAF50),
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Añadir")
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = { /* no-op */ }) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Ajustes",
+                            tint = Color(0xFF8B949E)
+                        )
+                    }
+                    Text(
+                        text = "Ajustes",
+                        color = Color(0xFF8B949E),
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        content(innerPadding)
+    }
+}
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -102,134 +208,42 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     val mainNavController = rememberNavController()
-                    val currentBackStackEntry by mainNavController.currentBackStackEntryAsState()
-                    val currentRoute = currentBackStackEntry?.destination?.route
 
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(
-                                title = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.futbol),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(32.dp)
-                                        )
-                                        Text(
-                                            text = "PlayOut",
-                                            color = Color(0xFFF5F5F5),
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 20.sp
-                                        )
-                                    }
-                                },
-                                colors = TopAppBarDefaults.topAppBarColors(
-                                    containerColor = Color(0xFF2C332D)
-                                )
-                            )
-                        },
-                        bottomBar = {
-                            BottomAppBar(
-                                containerColor = Color(0xFF2C332D),
-                                contentPadding = PaddingValues(0.dp)
-                            ) {
-                                val onMap = currentRoute == Screen.Map.route || currentRoute == null
-
-                                Column(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    IconButton(onClick = {
-                                        if (onMap) {
-                                            mainNavController.navigate(Screen.List.route) {
-                                                popUpTo(Screen.Map.route)
-                                                launchSingleTop = true
-                                            }
-                                        } else {
-                                            mainNavController.navigate(Screen.Map.route) {
-                                                popUpTo(Screen.Map.route) { inclusive = true }
-                                                launchSingleTop = true
-                                            }
-                                        }
-                                    }) {
-                                        Icon(
-                                            imageVector = if (onMap) Icons.Default.FormatListBulleted else Icons.Default.Place,
-                                            contentDescription = if (onMap) "Lista" else "Mapa",
-                                            tint = Color(0xFF8B949E)
-                                        )
-                                    }
-                                    Text(
-                                        text = if (onMap) "Lista" else "Mapa",
-                                        color = Color(0xFF8B949E),
-                                        fontSize = 10.sp
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier.weight(1f),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    FloatingActionButton(
-                                        onClick = { /* no-op */ },
-                                        modifier = Modifier.size(48.dp),
-                                        containerColor = Color(0xFF4CAF50),
-                                        contentColor = Color.White
-                                    ) {
-                                        Icon(Icons.Default.Add, contentDescription = "Añadir")
-                                    }
-                                }
-
-                                Column(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    IconButton(onClick = { /* no-op */ }) {
-                                        Icon(
-                                            Icons.Default.Settings,
-                                            contentDescription = "Ajustes",
-                                            tint = Color(0xFF8B949E)
-                                        )
-                                    }
-                                    Text(
-                                        text = "Ajustes",
-                                        color = Color(0xFF8B949E),
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
-                    ) { innerPadding ->
-                        NavHost(
-                            navController = mainNavController,
-                            startDestination = Screen.Map.route,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            composable(Screen.Map.route) {
+                    NavHost(
+                        navController = mainNavController,
+                        startDestination = Screen.Map.route,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        composable(Screen.Map.route) {
+                            MapListScaffold(
+                                currentRoute = Screen.Map.route,
+                                navController = mainNavController
+                            ) { padding ->
                                 MapScreen(
                                     onInstalacionClick = { fid ->
                                         mainNavController.navigate(Screen.Detail.createRoute(fid))
                                     },
-                                    contentPadding = innerPadding
+                                    contentPadding = padding
                                 )
                             }
-                            composable(Screen.List.route) {
-                                Box(modifier = Modifier.padding(innerPadding)) {
+                        }
+                        composable(Screen.List.route) {
+                            MapListScaffold(
+                                currentRoute = Screen.List.route,
+                                navController = mainNavController
+                            ) { padding ->
+                                Box(modifier = Modifier.padding(padding)) {
                                     ListScreen(onInstalacionClick = { fid ->
                                         mainNavController.navigate(Screen.Detail.createRoute(fid))
                                     })
                                 }
                             }
-                            composable(
-                                route = Screen.Detail.route,
-                                arguments = listOf(navArgument("fid") { type = NavType.IntType })
-                            ) {
-                                Box(modifier = Modifier.padding(innerPadding)) {
-                                    DetailScreen(onBack = { mainNavController.navigateUp() })
-                                }
-                            }
+                        }
+                        composable(
+                            route = Screen.Detail.route,
+                            arguments = listOf(navArgument("fid") { type = NavType.IntType })
+                        ) {
+                            DetailScreen(onBack = { mainNavController.navigateUp() })
                         }
                     }
                 }
