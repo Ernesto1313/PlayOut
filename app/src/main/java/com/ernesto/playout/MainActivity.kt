@@ -119,14 +119,9 @@ fun MapListScaffold(
                         Icon(
                             imageVector = if (onMap) Icons.Default.FormatListBulleted else Icons.Default.Place,
                             contentDescription = if (onMap) "Lista" else "Mapa",
-                            tint = Color(0xFF8B949E)
+                            tint = Color(0xFFF5F5F5)
                         )
                     }
-                    Text(
-                        text = if (onMap) "Lista" else "Mapa",
-                        color = Color(0xFF8B949E),
-                        fontSize = 10.sp
-                    )
                 }
 
                 Box(
@@ -151,14 +146,9 @@ fun MapListScaffold(
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "Ajustes",
-                            tint = Color(0xFF8B949E)
+                            tint = Color(0xFFF5F5F5)
                         )
                     }
-                    Text(
-                        text = "Ajustes",
-                        color = Color(0xFF8B949E),
-                        fontSize = 10.sp
-                    )
                 }
             }
         }
