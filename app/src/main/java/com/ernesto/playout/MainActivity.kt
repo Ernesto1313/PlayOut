@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
@@ -135,27 +136,34 @@ class MainActivity : ComponentActivity() {
                                 containerColor = Color(0xFF2C332D),
                                 contentPadding = PaddingValues(0.dp)
                             ) {
-                                val onList = currentRoute == Screen.List.route
+                                val onMap = currentRoute == Screen.Map.route || currentRoute == null
 
                                 Column(
                                     modifier = Modifier.weight(1f),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     IconButton(onClick = {
-                                        mainNavController.navigate(Screen.List.route) {
-                                            popUpTo(Screen.Map.route)
-                                            launchSingleTop = true
+                                        if (onMap) {
+                                            mainNavController.navigate(Screen.List.route) {
+                                                popUpTo(Screen.Map.route)
+                                                launchSingleTop = true
+                                            }
+                                        } else {
+                                            mainNavController.navigate(Screen.Map.route) {
+                                                popUpTo(Screen.Map.route) { inclusive = true }
+                                                launchSingleTop = true
+                                            }
                                         }
                                     }) {
                                         Icon(
-                                            Icons.Default.Place,
-                                            contentDescription = "Lista",
-                                            tint = if (onList) Color(0xFF4CAF50) else Color(0xFF8B949E)
+                                            imageVector = if (onMap) Icons.Default.FormatListBulleted else Icons.Default.Place,
+                                            contentDescription = if (onMap) "Lista" else "Mapa",
+                                            tint = Color(0xFF8B949E)
                                         )
                                     }
                                     Text(
-                                        text = "Lista",
-                                        color = if (onList) Color(0xFF4CAF50) else Color(0xFF8B949E),
+                                        text = if (onMap) "Lista" else "Mapa",
+                                        color = Color(0xFF8B949E),
                                         fontSize = 10.sp
                                     )
                                 }

@@ -1,7 +1,10 @@
 package com.ernesto.playout.ui.map
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Paint
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,12 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ernesto.playout.R
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MarkerInfoWindow
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
@@ -64,19 +68,30 @@ private fun categoryDrawable(categoria: String?): Int = when (categoria) {
     else -> R.drawable.otro
 }
 
-private fun categoryHue(categoria: String?): Float = when (categoria) {
-    "Futbol", "Fútbol" -> BitmapDescriptorFactory.HUE_GREEN
-    "Baloncesto" -> BitmapDescriptorFactory.HUE_ORANGE
-    "Pingpong" -> BitmapDescriptorFactory.HUE_CYAN
-    "Volleyball" -> BitmapDescriptorFactory.HUE_YELLOW
-    "Ajedrez" -> BitmapDescriptorFactory.HUE_VIOLET
-    "Esgrima" -> BitmapDescriptorFactory.HUE_ROSE
-    "Patinaje" -> BitmapDescriptorFactory.HUE_AZURE
-    "Calistenia" -> BitmapDescriptorFactory.HUE_GREEN
-    "Atletismo" -> BitmapDescriptorFactory.HUE_ORANGE
-    "Minigolf" -> BitmapDescriptorFactory.HUE_YELLOW
-    "Petanca" -> BitmapDescriptorFactory.HUE_MAGENTA
-    else -> BitmapDescriptorFactory.HUE_RED
+@Composable
+private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes: Int): BitmapDescriptor {
+    return remember(iconRes) {
+        val size = 80
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        val paint = Paint().apply { isAntiAlias = true }
+
+        paint.color = android.graphics.Color.WHITE
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
+
+        paint.style = Paint.Style.STROKE
+        paint.color = android.graphics.Color.argb(255, 44, 51, 45)
+        paint.strokeWidth = 4f
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
+
+        val drawable = ContextCompat.getDrawable(context, iconRes)!!
+        val iconSize = size / 2
+        val offset = (size - iconSize) / 2
+        drawable.setBounds(offset, offset, offset + iconSize, offset + iconSize)
+        drawable.draw(canvas)
+
+        BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
 }
 
 private val allCategories = listOf(
@@ -117,10 +132,13 @@ fun MapScreen(
                 val lat = instalacion.latitud
                 val lng = instalacion.longitud
                 if (lat != null && lng != null) {
-                    MarkerInfoWindow(
+                    val iconRes = categoryDrawable(
+                        instalacion.categoria?.replaceFirstChar { it.uppercase() }
+                    )
+                    val markerIcon = rememberCategoryMarkerBitmap(context, iconRes)
+                    Marker(
                         state = MarkerState(position = LatLng(lat, lng)),
-                        title = instalacion.nombre_sitio,
-                        icon = BitmapDescriptorFactory.defaultMarker(categoryHue(instalacion.categoria)),
+                        icon = markerIcon,
                         onClick = { _ ->
                             onInstalacionClick(instalacion.fid)
                             true
