@@ -2,51 +2,213 @@ package com.ernesto.playout.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ernesto.playout.R
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
+@DrawableRes
+private fun categoryDrawable(categoria: String?): Int = when (categoria) {
+    "Ajedrez" -> R.drawable.ajedrez
+    "Pingpong" -> R.drawable.pingpong
+    "Futbol" -> R.drawable.futbol
+    "Esgrima" -> R.drawable.esgrima
+    "Patinaje" -> R.drawable.skate
+    "Volleyball" -> R.drawable.volleyball
+    "Baloncesto" -> R.drawable.baloncesto
+    "Calistenia" -> R.drawable.calistenia
+    "Atletismo" -> R.drawable.atletismo
+    "Minigolf" -> R.drawable.minigolf
+    "Petanca" -> R.drawable.petanca
+    else -> R.drawable.otro
+}
+
+private fun categoryHue(categoria: String?): Float = when (categoria) {
+    "Futbol", "Fútbol" -> BitmapDescriptorFactory.HUE_GREEN
+    "Baloncesto" -> BitmapDescriptorFactory.HUE_ORANGE
+    "Pingpong" -> BitmapDescriptorFactory.HUE_CYAN
+    "Volleyball" -> BitmapDescriptorFactory.HUE_YELLOW
+    "Ajedrez" -> BitmapDescriptorFactory.HUE_VIOLET
+    "Esgrima" -> BitmapDescriptorFactory.HUE_ROSE
+    "Patinaje" -> BitmapDescriptorFactory.HUE_AZURE
+    "Calistenia" -> BitmapDescriptorFactory.HUE_GREEN
+    "Atletismo" -> BitmapDescriptorFactory.HUE_ORANGE
+    "Minigolf" -> BitmapDescriptorFactory.HUE_YELLOW
+    "Petanca" -> BitmapDescriptorFactory.HUE_MAGENTA
+    else -> BitmapDescriptorFactory.HUE_RED
+}
+
+private val allCategories = listOf(
+    "Futbol", "Baloncesto", "Pingpong", "Volleyball",
+    "Ajedrez", "Esgrima", "Patinaje", "Calistenia",
+    "Atletismo", "Minigolf", "Petanca", "Otro"
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
-    val instalaciones by viewModel.instalaciones.collectAsState()
+fun MapScreen(
+    onInstalacionClick: (Int) -> Unit = {},
+    contentPadding: PaddingValues = PaddingValues(),
+    viewModel: MapViewModel = hiltViewModel()
+) {
+    val filteredInstalaciones by viewModel.filteredInstalaciones.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
     val context = LocalContext.current
 
-    val aachen = LatLng(50.7753, 6.0839)
+    var showFilterSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(aachen, 13f)
+        position = CameraPosition.fromLatLngZoom(LatLng(50.7753, 6.0839), 13f)
     }
 
     val locationPermissionGranted = ContextCompat.checkSelfPermission(
         context, Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties = MapProperties(isMyLocationEnabled = locationPermissionGranted)
-    ) {
-        instalaciones.forEach { instalacion ->
-            val lat = instalacion.latitud
-            val lng = instalacion.longitud
-            if (lat != null && lng != null) {
-                Marker(
-                    state = MarkerState(position = LatLng(lat, lng)),
-                    title = instalacion.categoria?.replaceFirstChar { it.uppercase() },
-                    icon = BitmapDescriptorFactory.defaultMarker()
+    Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = locationPermissionGranted)
+        ) {
+            filteredInstalaciones.forEach { instalacion ->
+                val lat = instalacion.latitud
+                val lng = instalacion.longitud
+                if (lat != null && lng != null) {
+                    MarkerInfoWindow(
+                        state = MarkerState(position = LatLng(lat, lng)),
+                        title = instalacion.nombre_sitio,
+                        icon = BitmapDescriptorFactory.defaultMarker(categoryHue(instalacion.categoria)),
+                        onClick = { _ ->
+                            onInstalacionClick(instalacion.fid)
+                            true
+                        }
+                    )
+                }
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { showFilterSheet = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                    end = 16.dp
+                ),
+            containerColor = Color(0xFF4CAF50)
+        ) {
+            if (selectedCategory != null) {
+                Image(
+                    painter = painterResource(categoryDrawable(selectedCategory)),
+                    contentDescription = selectedCategory,
+                    modifier = Modifier.size(24.dp)
                 )
+            } else {
+                Icon(
+                    Icons.Default.FilterList,
+                    contentDescription = "Filtrar deportes",
+                    tint = Color.White
+                )
+            }
+        }
+    }
+
+    if (showFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showFilterSheet = false },
+            sheetState = sheetState
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp)
+            ) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.setCategory(null)
+                                showFilterSheet = false
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.FilterList,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text("Todos", style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+                items(allCategories) { cat ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.setCategory(cat)
+                                showFilterSheet = false
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(categoryDrawable(cat)),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = if (cat == "Futbol") "Fútbol" else cat,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
         }
     }

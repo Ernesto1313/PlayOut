@@ -6,30 +6,35 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ernesto.playout.ui.detail.DetailScreen
@@ -50,6 +55,7 @@ sealed class Screen(val route: String) {
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -70,7 +76,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
                         }
-                        composable(Screen.Map.route) { MapScreen() }
+                        composable(Screen.Map.route) {
+                            MapScreen(onInstalacionClick = { fid ->
+                                navController.navigate(Screen.Detail.createRoute(fid))
+                            })
+                        }
                         composable(Screen.List.route) {
                             ListScreen(onInstalacionClick = { fid ->
                                 navController.navigate(Screen.Detail.createRoute(fid))
@@ -84,16 +94,54 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 } else {
-                    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+                    val mainNavController = rememberNavController()
+                    val currentBackStackEntry by mainNavController.currentBackStackEntryAsState()
+                    val currentRoute = currentBackStackEntry?.destination?.route
+
+                    val navItemColors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFF4CAF50),
+                        selectedTextColor = Color(0xFF4CAF50),
+                        unselectedIconColor = Color(0xFF8B949E),
+                        unselectedTextColor = Color(0xFF8B949E),
+                        indicatorColor = Color.Transparent
+                    )
 
                     Scaffold(
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = {
+                                    Text(
+                                        text = "PlayOut",
+                                        color = Color(0xFFF5F5F5),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                navigationIcon = {
+                                    Box(modifier = Modifier.size(48.dp))
+                                },
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = Color(0xFF2C332D)
+                                )
+                            )
+                        },
                         bottomBar = {
-                            NavigationBar {
+                            NavigationBar(containerColor = Color(0xFF2C332D)) {
                                 NavigationBarItem(
-                                    selected = selectedTab == 0,
-                                    onClick = { selectedTab = 0 },
-                                    icon = { Icon(Icons.Default.Map, contentDescription = "Mapa") },
-                                    label = { Text("Mapa") }
+                                    selected = currentRoute == Screen.List.route,
+                                    onClick = {
+                                        mainNavController.navigate(Screen.List.route) {
+                                            popUpTo(Screen.Map.route)
+                                            launchSingleTop = true
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            Icons.Default.FormatListBulleted,
+                                            contentDescription = "Lista"
+                                        )
+                                    },
+                                    label = { Text("Lista") },
+                                    colors = navItemColors
                                 )
                                 NavigationBarItem(
                                     selected = false,
@@ -113,44 +161,50 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     },
-                                    label = {}
+                                    label = {},
+                                    colors = navItemColors
                                 )
                                 NavigationBarItem(
-                                    selected = selectedTab == 2,
-                                    onClick = { selectedTab = 2 },
-                                    icon = { Icon(Icons.Default.List, contentDescription = "Lista") },
-                                    label = { Text("Lista") }
+                                    selected = false,
+                                    onClick = { /* no-op */ },
+                                    icon = {
+                                        Icon(
+                                            Icons.Default.Settings,
+                                            contentDescription = "Ajustes"
+                                        )
+                                    },
+                                    label = { Text("Ajustes") },
+                                    colors = navItemColors
                                 )
                             }
                         }
                     ) { innerPadding ->
-                        val mainNavController = rememberNavController()
-
                         NavHost(
                             navController = mainNavController,
-                            startDestination = Screen.Map.route
+                            startDestination = Screen.Map.route,
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            composable(Screen.Map.route) { MapScreen() }
+                            composable(Screen.Map.route) {
+                                MapScreen(
+                                    onInstalacionClick = { fid ->
+                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
+                                    },
+                                    contentPadding = innerPadding
+                                )
+                            }
                             composable(Screen.List.route) {
-                                ListScreen(onInstalacionClick = { fid ->
-                                    mainNavController.navigate(Screen.Detail.createRoute(fid))
-                                })
+                                Box(modifier = Modifier.padding(innerPadding)) {
+                                    ListScreen(onInstalacionClick = { fid ->
+                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
+                                    })
+                                }
                             }
                             composable(
                                 route = Screen.Detail.route,
                                 arguments = listOf(navArgument("fid") { type = NavType.IntType })
                             ) {
-                                DetailScreen(onBack = { mainNavController.navigateUp() })
-                            }
-                        }
-
-                        androidx.compose.runtime.LaunchedEffect(selectedTab) {
-                            when (selectedTab) {
-                                0 -> mainNavController.navigate(Screen.Map.route) {
-                                    popUpTo(Screen.Map.route) { inclusive = true }
-                                }
-                                2 -> mainNavController.navigate(Screen.List.route) {
-                                    popUpTo(Screen.Map.route)
+                                Box(modifier = Modifier.padding(innerPadding)) {
+                                    DetailScreen(onBack = { mainNavController.navigateUp() })
                                 }
                             }
                         }
