@@ -1,7 +1,9 @@
 package com.ernesto.playout.ui.add
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,9 +32,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +49,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +71,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -76,6 +84,14 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
+
+private fun createCameraUri(context: Context): Uri {
+    val file = java.io.File(
+        context.cacheDir,
+        "camera_temp_${System.currentTimeMillis()}.jpg"
+    )
+    return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+}
 
 @DrawableRes
 private fun categoryDrawable(name: String): Int = when (name) {
@@ -117,6 +133,7 @@ fun AddInstalacionScreen(
     val validationError by viewModel.validationError.collectAsStateWithLifecycle()
     val currentLocation by viewModel.location.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(saveSuccess) {
@@ -130,11 +147,18 @@ fun AddInstalacionScreen(
         }
     }
 
-    var currentPhotoIndex by remember { mutableStateOf(0) }
-    val photoLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { viewModel.savePhoto(currentPhotoIndex, it) }
+    var activeSlotIndex by remember { mutableStateOf(0) }
+    var showPhotoSourceDialog by remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri -> uri?.let { viewModel.savePhoto(activeSlotIndex, it) } }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraUri?.let { viewModel.savePhoto(activeSlotIndex, it) }
+        }
     }
 
     var showMapPicker by remember { mutableStateOf(false) }
@@ -230,8 +254,8 @@ fun AddInstalacionScreen(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Color(0xFF1C2230))
                                 .clickable {
-                                    currentPhotoIndex = index
-                                    photoLauncher.launch("image/*")
+                                    activeSlotIndex = index
+                                    showPhotoSourceDialog = true
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -428,6 +452,37 @@ fun AddInstalacionScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+
+        if (showPhotoSourceDialog) {
+            AlertDialog(
+                onDismissRequest = { showPhotoSourceDialog = false },
+                containerColor = Color(0xFF2C332D),
+                title = { Text("Añadir foto", color = Color(0xFFF5F5F5)) },
+                text = {
+                    Column {
+                        TextButton(onClick = {
+                            showPhotoSourceDialog = false
+                            val uri = createCameraUri(context)
+                            cameraUri = uri
+                            cameraLauncher.launch(uri)
+                        }) {
+                            Icon(Icons.Default.CameraAlt, null, tint = Color(0xFF4CAF50))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Cámara", color = Color(0xFFF5F5F5))
+                        }
+                        TextButton(onClick = {
+                            showPhotoSourceDialog = false
+                            galleryLauncher.launch("image/*")
+                        }) {
+                            Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF4CAF50))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Galería", color = Color(0xFFF5F5F5))
+                        }
+                    }
+                },
+                confirmButton = {}
+            )
+        }
 
         if (showMapPicker) {
             MapPickerScreen(

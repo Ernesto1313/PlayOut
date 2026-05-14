@@ -20,6 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,11 +74,16 @@ fun InstalacionCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
         Row {
+            val photoModel: Any = remember(instalacion.fid, instalacion.foto) {
+                val foto = instalacion.foto
+                if (foto != null && foto.startsWith("/")) {
+                    java.io.File(foto)
+                } else {
+                    "file:///android_asset/photos/${instalacion.fid}_main.jpg"
+                }
+            }
             AsyncImage(
-                model = getPhotoModel(
-                    if (instalacion.foto?.startsWith("/") == true) instalacion.foto
-                    else "${instalacion.fid}_main.jpg"
-                ),
+                model = photoModel,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
