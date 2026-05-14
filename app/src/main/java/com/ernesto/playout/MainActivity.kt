@@ -47,6 +47,7 @@ import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.list.ListScreen
 import com.ernesto.playout.ui.map.MapScreen
 import com.ernesto.playout.ui.onboarding.PermissionScreen
+import com.ernesto.playout.ui.settings.SettingsScreen
 import com.ernesto.playout.ui.theme.PlayOutTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -146,7 +147,7 @@ fun MapListScaffold(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    IconButton(onClick = { /* no-op */ }) {
+                    IconButton(onClick = { navController.navigate("settings") }) {
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "Ajustes",
@@ -238,6 +239,9 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("fid") { type = NavType.IntType })
                         ) {
                             DetailScreen(onBack = { mainNavController.navigateUp() })
+                        }
+                        composable("settings") {
+                            SettingsScreen(onBack = { mainNavController.navigateUp() })
                         }
                     }
                 }

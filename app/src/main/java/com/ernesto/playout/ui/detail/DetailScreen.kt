@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -157,6 +158,7 @@ fun DetailScreen(
                 inst = inst,
                 bgColor = bgColor,
                 descripcion = descripcion,
+                currentSlide = currentSlide,
                 userLocation = userLocation,
                 onSwipeDown = { isImmersive = true },
                 onBack = onBack
@@ -328,6 +330,7 @@ private fun ProfileMode(
     inst: Instalacion,
     bgColor: Color,
     descripcion: String,
+    currentSlide: Int,
     userLocation: android.location.Location?,
     onSwipeDown: () -> Unit,
     onBack: () -> Unit
@@ -353,8 +356,16 @@ private fun ProfileMode(
                     )
                 }
         ) {
+            val profilePhotoSuffix = when (currentSlide) {
+                0 -> "main"
+                1 -> "extra1"
+                2 -> "extra2"
+                3 -> "extra3"
+                else -> "main"
+            }
+            val profilePhotoPath = "file:///android_asset/photos/${inst.fid}_$profilePhotoSuffix.jpg"
             AsyncImage(
-                model = "file:///android_asset/photos/${inst.fid}_main.jpg",
+                model = profilePhotoPath,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -391,7 +402,8 @@ private fun ProfileMode(
                 Image(
                     painter = painterResource(categoryDrawable(inst.categoria)),
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    colorFilter = ColorFilter.tint(Color(0xFFF5F5F5))
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
