@@ -29,6 +29,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -125,15 +127,36 @@ fun MapScreen(
         position = CameraPosition.fromLatLngZoom(LatLng(50.7753, 6.0839), 13f)
     }
 
-    val locationPermissionGranted = ContextCompat.checkSelfPermission(
-        context, Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            hasLocationPermission = true
+            userLocation?.let { loc ->
+                scope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(loc.latitude, loc.longitude), 15f
+                        )
+                    )
+                }
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = locationPermissionGranted),
+            properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
             uiSettings = MapUiSettings(myLocationButtonEnabled = false)
         ) {
             filteredInstalaciones.forEach { instalacion ->
@@ -158,19 +181,23 @@ fun MapScreen(
 
         FloatingActionButton(
             onClick = {
-                userLocation?.let { loc ->
-                    scope.launch {
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(loc.latitude, loc.longitude), 15f
+                if (hasLocationPermission) {
+                    userLocation?.let { loc ->
+                        scope.launch {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(loc.latitude, loc.longitude), 15f
+                                )
                             )
-                        )
+                        }
                     }
+                } else {
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
             },
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 80.dp),
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 96.dp),
             containerColor = Color(0xFFF5F5F5),
             contentColor = Color(0xFF2C332D)
         ) {

@@ -451,9 +451,13 @@ private fun MapPickerScreen(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    val hasLocationPermission = ContextCompat.checkSelfPermission(
-        context, Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
     val scope = rememberCoroutineScope()
 
     Dialog(
@@ -463,6 +467,24 @@ private fun MapPickerScreen(
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
         }
+
+        val locationPermissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            if (granted) {
+                hasLocationPermission = true
+                currentLocation?.let { loc ->
+                    scope.launch {
+                        cameraPositionState.animate(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(loc.latitude, loc.longitude), 16f
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         Box(Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
@@ -496,19 +518,23 @@ private fun MapPickerScreen(
 
             FloatingActionButton(
                 onClick = {
-                    currentLocation?.let { loc ->
-                        scope.launch {
-                            cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(loc.latitude, loc.longitude), 16f
+                    if (hasLocationPermission) {
+                        currentLocation?.let { loc ->
+                            scope.launch {
+                                cameraPositionState.animate(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        LatLng(loc.latitude, loc.longitude), 16f
+                                    )
                                 )
-                            )
+                            }
                         }
+                    } else {
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
                 },
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 96.dp),
+                    .align(Alignment.BottomStart)
+                    .padding(start = 16.dp, bottom = 96.dp),
                 containerColor = Color(0xFFF5F5F5),
                 contentColor = Color(0xFF2C332D)
             ) {
@@ -522,8 +548,7 @@ private fun MapPickerScreen(
                 },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(24.dp)
-                    .fillMaxWidth(),
+                    .padding(bottom = 32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
             ) {
                 Text("Confirmar ubicación", color = Color.White, fontWeight = FontWeight.Bold)
