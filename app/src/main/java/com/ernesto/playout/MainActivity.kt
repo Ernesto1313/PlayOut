@@ -69,30 +69,34 @@ fun MapListScaffold(
     val onMap = currentRoute == Screen.Map.route
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.futbol),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp)
+
+            topBar = {
+                if (onMap) {
+                    TopAppBar(
+                        title = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.futbol),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Text(
+                                    text = "PlayOut",
+                                    color = Color(0xFFF5F5F5),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color(0xFF2C332D)
                         )
-                        Text(
-                            text = "PlayOut",
-                            color = Color(0xFFF5F5F5),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2C332D)
-                )
-            )
+                    )
+                }
+
         },
         bottomBar = {
             BottomAppBar(

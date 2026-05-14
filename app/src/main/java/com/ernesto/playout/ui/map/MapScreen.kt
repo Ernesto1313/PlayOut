@@ -71,7 +71,7 @@ private fun categoryDrawable(categoria: String?): Int = when (categoria) {
 @Composable
 private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes: Int): BitmapDescriptor {
     return remember(iconRes) {
-        val size = 80
+        val size = 120
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = android.graphics.Canvas(bitmap)
         val paint = Paint().apply { isAntiAlias = true }
