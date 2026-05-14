@@ -50,5 +50,10 @@ class InstalacionRepository @Inject constructor(
     fun getInstalacionesByCategoria(categoria: String): Flow<List<Instalacion>> =
         dao.getByCategoria(categoria)
 
+    fun getAllCustomInstalaciones(): Flow<List<InstalacionCustom>> =
+        instalacionCustomDao.getAll()
+
     suspend fun insertCustom(inst: InstalacionCustom) = instalacionCustomDao.insert(inst)
+
+    suspend fun deleteCustom(inst: InstalacionCustom) = instalacionCustomDao.delete(inst)
 }

@@ -1,13 +1,21 @@
 package com.ernesto.playout.ui.settings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
@@ -16,19 +24,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ernesto.playout.R
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
+    val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF2C332D))
+            .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
         IconButton(onClick = onBack) {
@@ -86,6 +106,87 @@ fun SettingsScreen(onBack: () -> Unit) {
                 tint = Color(0xFF4CAF50)
             )
             Text(text = "Ernesto Gimeno García", color = Color(0xFFF5F5F5), fontSize = 16.sp)
+        }
+
+        HorizontalDivider(
+            color = Color(0xFF4CAF50),
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+
+        Text(
+            "Mis instalaciones",
+            color = Color(0xFFF5F5F5),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (customInstalaciones.isEmpty()) {
+            Text(
+                "No has añadido ninguna instalación todavía.",
+                color = Color(0xFF8B949E),
+                fontSize = 14.sp
+            )
+        } else {
+            customInstalaciones.forEach { inst ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        val iconRes = when (inst.categoria?.replaceFirstChar { it.uppercase() }) {
+                            "Fútbol", "Futbol" -> R.drawable.futbol
+                            "Baloncesto" -> R.drawable.baloncesto
+                            "Pingpong" -> R.drawable.pingpong
+                            "Volleyball" -> R.drawable.volleyball
+                            "Ajedrez" -> R.drawable.ajedrez
+                            "Esgrima" -> R.drawable.esgrima
+                            "Patinaje" -> R.drawable.skate
+                            "Calistenia" -> R.drawable.calistenia
+                            "Atletismo" -> R.drawable.atletismo
+                            "Minigolf" -> R.drawable.minigolf
+                            "Petanca" -> R.drawable.petanca
+                            else -> R.drawable.otro
+                        }
+                        Image(
+                            painterResource(iconRes),
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp),
+                            colorFilter = ColorFilter.tint(Color(0xFF4CAF50))
+                        )
+                        Column {
+                            Text(
+                                inst.categoria?.replaceFirstChar { it.uppercase() } ?: "Sin categoría",
+                                color = Color(0xFFF5F5F5),
+                                fontSize = 15.sp
+                            )
+                            val estadoText = when (inst.estado) {
+                                1 -> "Bueno"; 2 -> "Desgastado"; 3 -> "Roto"; else -> ""
+                            }
+                            if (estadoText.isNotEmpty()) {
+                                Text(estadoText, color = Color(0xFF8B949E), fontSize = 12.sp)
+                            }
+                        }
+                    }
+                    IconButton(onClick = { viewModel.delete(inst) }) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint = Color(0xFFF44336)
+                        )
+                    }
+                }
+                HorizontalDivider(color = Color(0xFF2C332D), thickness = 1.dp)
+            }
         }
     }
 }
