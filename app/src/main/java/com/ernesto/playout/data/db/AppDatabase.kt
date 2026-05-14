@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ernesto.playout.data.model.Instalacion
 import com.ernesto.playout.data.model.InstalacionCustom
 
-@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 2, exportSchema = false)
+@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun instalacionDao(): InstalacionDao
     abstract fun instalacionCustomDao(): InstalacionCustomDao
@@ -34,6 +34,29 @@ abstract class AppDatabase : RoomDatabase() {
                         latitud REAL
                     )
                 """)
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS instalaciones_custom")
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS instalaciones_custom (
+                        fid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        nombre_sitio TEXT NOT NULL DEFAULT 'custom',
+                        foto TEXT,
+                        categoria TEXT,
+                        descripcion TEXT,
+                        estado INTEGER,
+                        agua INTEGER,
+                        asientos INTEGER,
+                        experiencia_uso INTEGER,
+                        longitud REAL,
+                        latitud REAL
+                    )
+                """)
+                database.execSQL("INSERT INTO instalaciones_custom (fid) VALUES (9999)")
+                database.execSQL("DELETE FROM instalaciones_custom WHERE fid = 9999")
             }
         }
 

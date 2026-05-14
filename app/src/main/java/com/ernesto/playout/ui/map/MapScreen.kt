@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,15 +44,18 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ernesto.playout.R
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
@@ -109,7 +114,9 @@ fun MapScreen(
 ) {
     val filteredInstalaciones by viewModel.filteredInstalaciones.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val userLocation by viewModel.userLocation.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var showFilterSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -126,7 +133,8 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(isMyLocationEnabled = locationPermissionGranted)
+            properties = MapProperties(isMyLocationEnabled = locationPermissionGranted),
+            uiSettings = MapUiSettings(myLocationButtonEnabled = false)
         ) {
             filteredInstalaciones.forEach { instalacion ->
                 val lat = instalacion.latitud
@@ -146,6 +154,27 @@ fun MapScreen(
                     )
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = {
+                userLocation?.let { loc ->
+                    scope.launch {
+                        cameraPositionState.animate(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(loc.latitude, loc.longitude), 15f
+                            )
+                        )
+                    }
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 80.dp),
+            containerColor = Color(0xFFF5F5F5),
+            contentColor = Color(0xFF2C332D)
+        ) {
+            Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
         }
 
         FloatingActionButton(

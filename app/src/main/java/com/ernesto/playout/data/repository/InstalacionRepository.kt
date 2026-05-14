@@ -35,12 +35,14 @@ class InstalacionRepository @Inject constructor(
         }
 
     fun getInstalacionById(fid: Int): Flow<Instalacion?> = flow {
-        val inst = dao.getById(fid) ?: run {
+        val inst = if (fid >= 10000) {
             instalacionCustomDao.getById(fid)
                 ?.let { c ->
                     Instalacion(c.fid, c.nombre_sitio, c.foto, c.categoria, c.descripcion,
                         c.estado, c.agua, c.asientos, c.experiencia_uso, c.longitud, c.latitud)
                 }
+        } else {
+            dao.getById(fid)
         }
         emit(inst)
     }
