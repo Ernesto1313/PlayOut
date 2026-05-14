@@ -71,14 +71,13 @@ abstract class AppDatabase : RoomDatabase() {
                             val map = headers.zip(values).toMap()
                             try {
                                 val nombreSitio = map["nombre_sitio"].orEmpty().replace("'", "''")
-                                val foto = map["foto"].orEmpty().replace("'", "''")
                                 val categoria = map["categoria"].orEmpty().replace("'", "''")
                                 val descripcion = map["descripcion"].orEmpty().replace("'", "''")
                                 db.execSQL("""INSERT INTO instalaciones (
-                                    fid,nombre_sitio,foto,categoria,descripcion,
+                                    fid,nombre_sitio,categoria,descripcion,
                                     estado,agua,asientos,experiencia_uso,longitud,latitud)
                                     VALUES (${map["fid"]},'$nombreSitio',
-                                    '$foto','$categoria',
+                                    '$categoria',
                                     '$descripcion',${map["estado"]},
                                     ${map["agua"]},${map["asientos"]},
                                     ${map["experiencia_uso"]},${map["longitud"]},

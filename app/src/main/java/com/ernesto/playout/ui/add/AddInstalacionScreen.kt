@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +55,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -60,9 +64,7 @@ import com.ernesto.playout.R
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 
 @DrawableRes
 private fun categoryDrawable(name: String): Int = when (name) {
@@ -123,19 +125,7 @@ fun AddInstalacionScreen(
         uri?.let { viewModel.savePhoto(currentPhotoIndex, it) }
     }
 
-    val defaultPosition = LatLng(50.7753, 6.0839)
-    val initialPosition = pinLatLng ?: defaultPosition
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
-    }
-    val markerState = rememberMarkerState(position = initialPosition)
-
-    LaunchedEffect(pinLatLng) {
-        pinLatLng?.let {
-            markerState.position = it
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
-        }
-    }
+    var showMapPicker by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -340,12 +330,12 @@ fun AddInstalacionScreen(
                             contentDescription = null,
                             modifier = Modifier.size(32.dp),
                             colorFilter = ColorFilter.tint(
-                                if (agua) Color(0xFF4CAF50) else Color(0xFF8B949E)
+                                if (agua) Color(0xFF1E88E5) else Color(0xFF8B949E)
                             )
                         )
                         Text(
                             "Agua",
-                            color = if (agua) Color(0xFF4CAF50) else Color(0xFF8B949E),
+                            color = if (agua) Color(0xFF1E88E5) else Color(0xFF8B949E),
                             fontSize = 12.sp
                         )
                     }
@@ -358,12 +348,12 @@ fun AddInstalacionScreen(
                             contentDescription = null,
                             modifier = Modifier.size(32.dp),
                             colorFilter = ColorFilter.tint(
-                                if (asientos) Color(0xFF4CAF50) else Color(0xFF8B949E)
+                                if (asientos) Color(0xFF8D6E63) else Color(0xFF8B949E)
                             )
                         )
                         Text(
                             "Asientos",
-                            color = if (asientos) Color(0xFF4CAF50) else Color(0xFF8B949E),
+                            color = if (asientos) Color(0xFF8D6E63) else Color(0xFF8B949E),
                             fontSize = 12.sp
                         )
                     }
@@ -371,35 +361,23 @@ fun AddInstalacionScreen(
 
                 // Location
                 Text("Ubicación", color = Color(0xFFF5F5F5), fontSize = 14.sp)
-                Text(
-                    "Arrastra el pin para ajustar la posición exacta.",
-                    color = Color(0xFF8B949E),
-                    fontSize = 12.sp
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                Button(
+                    onClick = { showMapPicker = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (pinLatLng != null) Color(0xFF4CAF50) else Color(0xFF1C2230)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    GoogleMap(
-                        modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = cameraPositionState
-                    ) {
-                        Marker(
-                            state = markerState,
-                            draggable = true,
-                            onDragEnd = {
-                                viewModel.pinLatLng.value = markerState.position
-                            }
-                        )
-                    }
-                }
-                val displayPin = pinLatLng
-                if (displayPin != null) {
+                    Icon(Icons.Default.Place, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.size(4.dp))
                     Text(
-                        "Lat: ${"%.6f".format(displayPin.latitude)}, " +
-                            "Lng: ${"%.6f".format(displayPin.longitude)}",
+                        if (pinLatLng != null) "Ubicación seleccionada ✓" else "Seleccionar ubicación",
+                        color = Color.White
+                    )
+                }
+                if (pinLatLng != null) {
+                    Text(
+                        "${pinLatLng!!.latitude}, ${pinLatLng!!.longitude}",
                         color = Color(0xFF8B949E),
                         fontSize = 12.sp
                     )
@@ -413,7 +391,7 @@ fun AddInstalacionScreen(
                         .padding(top = 16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = categoria != null && estado != null && pinLatLng != null && !isSaving
+                    enabled = !isSaving
                 ) {
                     if (isSaving) {
                         CircularProgressIndicator(
@@ -438,5 +416,75 @@ fun AddInstalacionScreen(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+
+        if (showMapPicker) {
+            MapPickerScreen(
+                initialPosition = pinLatLng ?: LatLng(50.7753, 6.0839),
+                onConfirm = { latLng ->
+                    viewModel.pinLatLng.value = latLng
+                    showMapPicker = false
+                },
+                onDismiss = { showMapPicker = false }
+            )
+        }
+    }
+}
+
+@Composable
+private fun MapPickerScreen(
+    initialPosition: LatLng,
+    onConfirm: (LatLng) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        val cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
+        }
+        Box(Modifier.fillMaxSize()) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState
+            )
+
+            Icon(
+                Icons.Default.Place,
+                contentDescription = null,
+                tint = Color(0xFF4CAF50),
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
+                    .offset(y = (-24).dp)
+            )
+
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF2C332D))
+                    .statusBarsPadding()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    "Mueve el mapa para posicionar el pin",
+                    color = Color(0xFFF5F5F5)
+                )
+            }
+
+            Button(
+                onClick = {
+                    val center = cameraPositionState.position.target
+                    onConfirm(center)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+            ) {
+                Text("Confirmar ubicación", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }

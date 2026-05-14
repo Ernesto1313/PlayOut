@@ -75,12 +75,16 @@ class AddInstalacionViewModel @Inject constructor(
                 validationError.value = "Selecciona el estado"
                 return
             }
-            pinLatLng.value == null -> {
-                validationError.value = "Marca la ubicación en el mapa"
+            experiencia.value == 0 -> {
+                validationError.value = "Añade una valoración"
                 return
             }
-            experiencia.value == 0 -> {
-                validationError.value = "Añade una puntuación de experiencia"
+            photoPaths.value[0] == null -> {
+                validationError.value = "Añade al menos la foto principal"
+                return
+            }
+            pinLatLng.value == null -> {
+                validationError.value = "Selecciona una ubicación"
                 return
             }
         }

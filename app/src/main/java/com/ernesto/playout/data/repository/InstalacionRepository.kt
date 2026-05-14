@@ -6,7 +6,6 @@ import com.ernesto.playout.data.model.Instalacion
 import com.ernesto.playout.data.model.InstalacionCustom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -37,8 +36,7 @@ class InstalacionRepository @Inject constructor(
 
     fun getInstalacionById(fid: Int): Flow<Instalacion?> = flow {
         val inst = dao.getById(fid) ?: run {
-            instalacionCustomDao.getAll().first()
-                .find { it.fid == fid }
+            instalacionCustomDao.getById(fid)
                 ?.let { c ->
                     Instalacion(c.fid, c.nombre_sitio, c.foto, c.categoria, c.descripcion,
                         c.estado, c.agua, c.asientos, c.experiencia_uso, c.longitud, c.latitud)
