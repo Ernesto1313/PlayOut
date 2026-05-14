@@ -61,6 +61,21 @@ import coil3.compose.AsyncImage
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
 
+private fun getPhotoModel(path: String?): Any {
+    if (path == null) return R.drawable.otro
+    return if (path.startsWith("/")) java.io.File(path)
+    else "file:///android_asset/photos/$path"
+}
+
+private fun slidePath(inst: Instalacion, suffix: String): String? {
+    return if (inst.foto?.startsWith("/") == true) {
+        val dir = java.io.File(inst.foto!!).parent
+        "$dir/${inst.fid}_$suffix.jpg"
+    } else {
+        "${inst.fid}_$suffix.jpg"
+    }
+}
+
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Ajedrez" -> R.drawable.ajedrez
@@ -179,12 +194,10 @@ private fun ImmersiveMode(
     onSwipeUp: () -> Unit,
     onBack: () -> Unit
 ) {
-    val photoPath = when (currentSlide) {
-        0 -> "file:///android_asset/photos/${inst.fid}_main.jpg"
-        1 -> "file:///android_asset/photos/${inst.fid}_extra1.jpg"
-        2 -> "file:///android_asset/photos/${inst.fid}_extra2.jpg"
-        else -> "file:///android_asset/photos/${inst.fid}_extra3.jpg"
+    val slideSuffix = when (currentSlide) {
+        0 -> "main"; 1 -> "extra1"; 2 -> "extra2"; else -> "extra3"
     }
+    val photoModel = getPhotoModel(slidePath(inst, slideSuffix))
 
     Box(
         modifier = Modifier
@@ -206,7 +219,7 @@ private fun ImmersiveMode(
     ) {
         // Background photo — switches with currentSlide
         AsyncImage(
-            model = photoPath,
+            model = photoModel,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -356,16 +369,11 @@ private fun ProfileMode(
                     )
                 }
         ) {
-            val profilePhotoSuffix = when (currentSlide) {
-                0 -> "main"
-                1 -> "extra1"
-                2 -> "extra2"
-                3 -> "extra3"
-                else -> "main"
+            val profileSuffix = when (currentSlide) {
+                0 -> "main"; 1 -> "extra1"; 2 -> "extra2"; 3 -> "extra3"; else -> "main"
             }
-            val profilePhotoPath = "file:///android_asset/photos/${inst.fid}_$profilePhotoSuffix.jpg"
             AsyncImage(
-                model = profilePhotoPath,
+                model = getPhotoModel(slidePath(inst, profileSuffix)),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -386,7 +394,6 @@ private fun ProfileMode(
         }
 
         // Scrollable detail content
-        val fid = inst.fid
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -504,13 +511,13 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = "file:///android_asset/photos/${fid}_main.jpg",
+                        model = getPhotoModel(slidePath(inst, "main")),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = "file:///android_asset/photos/${fid}_extra1.jpg",
+                        model = getPhotoModel(slidePath(inst, "extra1")),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
@@ -521,13 +528,13 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = "file:///android_asset/photos/${fid}_extra2.jpg",
+                        model = getPhotoModel(slidePath(inst, "extra2")),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = "file:///android_asset/photos/${fid}_extra3.jpg",
+                        model = getPhotoModel(slidePath(inst, "extra3")),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)

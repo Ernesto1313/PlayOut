@@ -33,6 +33,12 @@ import coil3.compose.AsyncImage
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
 
+private fun getPhotoModel(path: String?): Any {
+    if (path == null) return R.drawable.otro
+    return if (path.startsWith("/")) java.io.File(path)
+    else "file:///android_asset/photos/$path"
+}
+
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Ajedrez" -> R.drawable.ajedrez
@@ -68,7 +74,10 @@ fun InstalacionCard(
         Box(modifier = Modifier.fillMaxSize()) {
         Row {
             AsyncImage(
-                model = "file:///android_asset/photos/${instalacion.fid}_main.jpg",
+                model = getPhotoModel(
+                    if (instalacion.foto?.startsWith("/") == true) instalacion.foto
+                    else "${instalacion.fid}_main.jpg"
+                ),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

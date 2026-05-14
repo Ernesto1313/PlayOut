@@ -43,6 +43,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ernesto.playout.ui.add.AddInstalacionScreen
 import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.list.ListScreen
 import com.ernesto.playout.ui.map.MapScreen
@@ -134,7 +135,7 @@ fun MapListScaffold(
                     contentAlignment = Alignment.Center
                 ) {
                     FloatingActionButton(
-                        onClick = { /* no-op */ },
+                        onClick = { navController.navigate("add") },
                         modifier = Modifier.size(48.dp),
                         containerColor = Color(0xFF4CAF50),
                         contentColor = Color.White
@@ -242,6 +243,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("settings") {
                             SettingsScreen(onBack = { mainNavController.navigateUp() })
+                        }
+                        composable("add") {
+                            AddInstalacionScreen(onBack = { mainNavController.navigateUp() })
                         }
                     }
                 }

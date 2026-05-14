@@ -4,15 +4,38 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ernesto.playout.data.model.Instalacion
+import com.ernesto.playout.data.model.InstalacionCustom
 
-@Database(entities = [Instalacion::class], version = 1, exportSchema = false)
+@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun instalacionDao(): InstalacionDao
+    abstract fun instalacionCustomDao(): InstalacionCustomDao
 
     companion object {
         const val DATABASE_NAME = "playout1.db"
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS instalaciones_custom (
+                        fid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        nombre_sitio TEXT NOT NULL DEFAULT 'custom',
+                        foto TEXT,
+                        categoria TEXT,
+                        descripcion TEXT,
+                        estado INTEGER,
+                        agua INTEGER,
+                        asientos INTEGER,
+                        experiencia_uso INTEGER,
+                        longitud REAL,
+                        latitud REAL
+                    )
+                """)
+            }
+        }
 
         lateinit var appContext: Context
 

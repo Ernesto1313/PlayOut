@@ -3,6 +3,7 @@ package com.ernesto.playout.di
 import android.content.Context
 import androidx.room.Room
 import com.ernesto.playout.data.db.AppDatabase
+import com.ernesto.playout.data.db.InstalacionCustomDao
 import com.ernesto.playout.data.db.InstalacionDao
 import dagger.Module
 import dagger.Provides
@@ -21,6 +22,7 @@ object AppModule {
         AppDatabase.appContext = context
         return Room.databaseBuilder(context, AppDatabase::class.java, "playout1.db")
             .addCallback(AppDatabase.callback)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .fallbackToDestructiveMigration()
             .build()
     }
@@ -28,4 +30,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideInstalacionDao(db: AppDatabase): InstalacionDao = db.instalacionDao()
+
+    @Provides
+    @Singleton
+    fun provideInstalacionCustomDao(db: AppDatabase): InstalacionCustomDao = db.instalacionCustomDao()
 }
