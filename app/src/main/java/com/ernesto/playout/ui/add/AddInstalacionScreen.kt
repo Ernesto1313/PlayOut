@@ -95,18 +95,18 @@ private fun createCameraUri(context: Context): Uri {
 
 @DrawableRes
 private fun categoryDrawable(name: String): Int = when (name) {
-    "Futbol" -> R.drawable.futbol
-    "Baloncesto" -> R.drawable.baloncesto
-    "Pingpong" -> R.drawable.pingpong
-    "Volleyball" -> R.drawable.volleyball
-    "Ajedrez" -> R.drawable.ajedrez
-    "Esgrima" -> R.drawable.esgrima
-    "Patinaje" -> R.drawable.skate
-    "Calistenia" -> R.drawable.calistenia
-    "Atletismo" -> R.drawable.atletismo
-    "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanca
-    else -> R.drawable.otro
+    "Futbol" -> R.drawable.football_white
+    "Baloncesto" -> R.drawable.basketball_white
+    "Pingpong" -> R.drawable.pingpong_white
+    "Volleyball" -> R.drawable.volleyball_white
+    "Ajedrez" -> R.drawable.chess_white
+    "Esgrima" -> R.drawable.fencing_white
+    "Patinaje" -> R.drawable.skate_white
+    "Calistenia" -> R.drawable.calisthenics_white
+    "Atletismo" -> R.drawable.atletism_white
+    "Minigolf" -> R.drawable.minigolf_white
+    "Petanca" -> R.drawable.petanque_white
+    else -> R.drawable.other_white
 }
 
 private val categories = listOf(
@@ -362,7 +362,7 @@ fun AddInstalacionScreen(
                         modifier = Modifier.clickable { viewModel.agua.value = !agua }
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.gota),
+                            painter = painterResource(R.drawable.drop),
                             contentDescription = null,
                             modifier = Modifier.size(32.dp),
                             colorFilter = ColorFilter.tint(
@@ -380,7 +380,7 @@ fun AddInstalacionScreen(
                         modifier = Modifier.clickable { viewModel.asientos.value = !asientos }
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.banco),
+                            painter = painterResource(R.drawable.bench),
                             contentDescription = null,
                             modifier = Modifier.size(32.dp),
                             colorFilter = ColorFilter.tint(

@@ -66,18 +66,34 @@ import kotlinx.coroutines.launch
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.ajedrez
+    "Ajedrez" -> R.drawable.chess
     "Pingpong" -> R.drawable.pingpong
-    "Fútbol", "Futbol" -> R.drawable.futbol
-    "Esgrima" -> R.drawable.esgrima
+    "Fútbol", "Futbol" -> R.drawable.football
+    "Esgrima" -> R.drawable.fencing
     "Patinaje" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto" -> R.drawable.baloncesto
-    "Calistenia" -> R.drawable.calistenia
-    "Atletismo" -> R.drawable.atletismo
+    "Baloncesto" -> R.drawable.basketball
+    "Calistenia" -> R.drawable.calisthenics
+    "Atletismo" -> R.drawable.atletism
     "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanca
-    else -> R.drawable.otro
+    "Petanca" -> R.drawable.petanque
+    else -> R.drawable.other
+}
+
+@DrawableRes
+private fun categoryDrawableWhite(categoria: String?): Int = when (categoria) {
+    "Ajedrez" -> R.drawable.chess_white
+    "Pingpong" -> R.drawable.pingpong_white
+    "Fútbol", "Futbol" -> R.drawable.football_white
+    "Esgrima" -> R.drawable.fencing_white
+    "Patinaje" -> R.drawable.skate_white
+    "Volleyball" -> R.drawable.volleyball_white
+    "Baloncesto" -> R.drawable.basketball_white
+    "Calistenia" -> R.drawable.calisthenics_white
+    "Atletismo" -> R.drawable.atletism_white
+    "Minigolf" -> R.drawable.minigolf_white
+    "Petanca" -> R.drawable.petanque_white
+    else -> R.drawable.other_white
 }
 
 @Composable
@@ -289,7 +305,7 @@ fun MapScreen(
                 HorizontalDivider(color = Color(0xFF4CAF50).copy(alpha = 0.3f))
 
                 categories.forEach { cat ->
-                    val iconRes = categoryDrawable(cat)
+                    val iconRes = categoryDrawableWhite(cat)
                     Row(
                         Modifier
                             .fillMaxWidth()

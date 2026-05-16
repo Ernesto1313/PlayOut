@@ -81,7 +81,7 @@ fun MapListScaffold(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Image(
-                                    painter = painterResource(R.drawable.futbol),
+                                    painter = painterResource(R.drawable.football),
                                     contentDescription = null,
                                     modifier = Modifier.size(32.dp)
                                 )

@@ -144,18 +144,18 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         val iconRes = when (inst.categoria?.replaceFirstChar { it.uppercase() }) {
-                            "Fútbol", "Futbol" -> R.drawable.futbol
-                            "Baloncesto" -> R.drawable.baloncesto
+                            "Fútbol", "Futbol" -> R.drawable.football
+                            "Baloncesto" -> R.drawable.basketball
                             "Pingpong" -> R.drawable.pingpong
                             "Volleyball" -> R.drawable.volleyball
-                            "Ajedrez" -> R.drawable.ajedrez
-                            "Esgrima" -> R.drawable.esgrima
+                            "Ajedrez" -> R.drawable.chess
+                            "Esgrima" -> R.drawable.fencing
                             "Patinaje" -> R.drawable.skate
-                            "Calistenia" -> R.drawable.calistenia
-                            "Atletismo" -> R.drawable.atletismo
+                            "Calistenia" -> R.drawable.calisthenics
+                            "Atletismo" -> R.drawable.atletism
                             "Minigolf" -> R.drawable.minigolf
-                            "Petanca" -> R.drawable.petanca
-                            else -> R.drawable.otro
+                            "Petanca" -> R.drawable.petanque
+                            else -> R.drawable.other
                         }
                         Image(
                             painterResource(iconRes),

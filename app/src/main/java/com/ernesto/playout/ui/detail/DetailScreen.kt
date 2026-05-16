@@ -62,7 +62,7 @@ import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Instalacion
 
 private fun getPhotoModel(path: String?): Any {
-    if (path == null) return R.drawable.otro
+    if (path == null) return R.drawable.other
     return if (path.startsWith("/")) java.io.File(path)
     else "file:///android_asset/photos/$path"
 }
@@ -78,19 +78,19 @@ private fun slidePath(inst: Instalacion, suffix: String): String? {
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.ajedrez
+    "Ajedrez" -> R.drawable.chess
     "Pingpong" -> R.drawable.pingpong
-    "Futbol" -> R.drawable.futbol
-    "Esgrima" -> R.drawable.esgrima
+    "Futbol" -> R.drawable.football
+    "Esgrima" -> R.drawable.fencing
     "Patinaje" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto" -> R.drawable.baloncesto
-    "Calistenia" -> R.drawable.calistenia
-    "Atletismo" -> R.drawable.atletismo
-    "Otro" -> R.drawable.otro
+    "Baloncesto" -> R.drawable.basketball
+    "Calistenia" -> R.drawable.calisthenics
+    "Atletismo" -> R.drawable.atletism
+    "Otro" -> R.drawable.other
     "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanca
-    else -> R.drawable.otro
+    "Petanca" -> R.drawable.petanque
+    else -> R.drawable.other
 }
 
 private fun categoryColor(categoria: String?): Color = when (categoria) {
@@ -314,14 +314,14 @@ private fun ImmersiveMode(
                 ) {
                     if (inst.agua == 1) {
                         Image(
-                            painter = painterResource(R.drawable.gota),
+                            painter = painterResource(R.drawable.drop),
                             contentDescription = null,
                             modifier = Modifier.size(28.dp)
                         )
                     }
                     if (inst.asientos == 1) {
                         Image(
-                            painter = painterResource(R.drawable.banco),
+                            painter = painterResource(R.drawable.bench),
                             contentDescription = null,
                             modifier = Modifier.size(28.dp)
                         )
@@ -483,7 +483,7 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.gota),
+                        painter = painterResource(R.drawable.drop),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
@@ -496,7 +496,7 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.banco),
+                        painter = painterResource(R.drawable.bench),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )

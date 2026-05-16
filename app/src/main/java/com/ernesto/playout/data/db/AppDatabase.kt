@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ernesto.playout.data.model.Instalacion
 import com.ernesto.playout.data.model.InstalacionCustom
 
-@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 3, exportSchema = false)
+@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun instalacionDao(): InstalacionDao
     abstract fun instalacionCustomDao(): InstalacionCustomDao
@@ -84,7 +84,7 @@ abstract class AppDatabase : RoomDatabase() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
                 try {
-                    appContext.assets.open("instalaciones.csv").bufferedReader().use { reader ->
+                    appContext.assets.open("facilities.csv").bufferedReader().use { reader ->
                         val lines = reader.readLines()
                         if (lines.isEmpty()) return
                         val headers = lines.first().split(",").map { it.trim() }
@@ -93,18 +93,18 @@ abstract class AppDatabase : RoomDatabase() {
                             val values = parseCsvLine(line)
                             val map = headers.zip(values).toMap()
                             try {
-                                val nombreSitio = map["nombre_sitio"].orEmpty().replace("'", "''")
-                                val categoria = map["categoria"].orEmpty().replace("'", "''")
-                                val descripcion = map["descripcion"].orEmpty().replace("'", "''")
+                                val nombreSitio = map["name"].orEmpty().replace("'", "''")
+                                val categoria = map["sport"].orEmpty().replace("'", "''")
+                                val descripcion = map["description"].orEmpty().replace("'", "''")
                                 db.execSQL("""INSERT INTO instalaciones (
                                     fid,nombre_sitio,categoria,descripcion,
                                     estado,agua,asientos,experiencia_uso,longitud,latitud)
                                     VALUES (${map["fid"]},'$nombreSitio',
                                     '$categoria',
-                                    '$descripcion',${map["estado"]},
-                                    ${map["agua"]},${map["asientos"]},
-                                    ${map["experiencia_uso"]},${map["longitud"]},
-                                    ${map["latitud"]})""")
+                                    '$descripcion',${map["condition"]},
+                                    ${map["water"]},${map["seats"]},
+                                    ${map["expirience"]},${map["longitude"]},
+                                    ${map["latitude"]})""")
                                 count++
                                 Log.d("PlayOut_DB", "Inserted row $count")
                             } catch (e: Exception) {
