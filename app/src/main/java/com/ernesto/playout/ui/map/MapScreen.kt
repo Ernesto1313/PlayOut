@@ -241,7 +241,10 @@ fun MapScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 16.dp),
+                .padding(
+                    start = 16.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 16.dp
+                ),
             containerColor = Color(0xFFF5F5F5),
             contentColor = Color(0xFF2C332D)
         ) {
@@ -253,7 +256,10 @@ fun MapScreen(
             onClick = { showFilterSheet = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 16.dp),
+                .padding(
+                    end = 16.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 16.dp
+                ),
             containerColor = Color(0xFF4CAF50),
             contentColor = Color.White
         ) {
