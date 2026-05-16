@@ -15,7 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun instalacionCustomDao(): InstalacionCustomDao
 
     companion object {
-        const val DATABASE_NAME = "playout1.db"
+        const val DATABASE_NAME = "playout3.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
