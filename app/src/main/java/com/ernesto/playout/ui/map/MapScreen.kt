@@ -238,13 +238,31 @@ fun MapScreen(
                 if (!isLocationEnabled) {
                     showLocationSettingsDialog = true
                 } else if (hasLocationPermission) {
-                    userLocation?.let { loc ->
+                    if (userLocation != null) {
                         scope.launch {
                             cameraPositionState.animate(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(loc.latitude, loc.longitude), 15f
+                                    LatLng(userLocation!!.latitude, userLocation!!.longitude), 15f
                                 )
                             )
+                        }
+                    } else {
+                        try {
+                            val fusedClient = com.google.android.gms.location
+                                .LocationServices.getFusedLocationProviderClient(context)
+                            fusedClient.lastLocation.addOnSuccessListener { location ->
+                                location?.let {
+                                    scope.launch {
+                                        cameraPositionState.animate(
+                                            CameraUpdateFactory.newLatLngZoom(
+                                                LatLng(it.latitude, it.longitude), 15f
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        } catch (e: SecurityException) {
+                            // Permission was revoked
                         }
                     }
                 } else {

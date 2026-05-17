@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "instalaciones_custom")
 data class InstalacionCustom(
-    @PrimaryKey(autoGenerate = true) val fid: Int = 0,
+    @PrimaryKey val fid: Int = 0,
     val nombre_sitio: String = "custom",
     val foto: String? = null,
     val categoria: String?,

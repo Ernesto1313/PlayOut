@@ -69,8 +69,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("INSERT INTO instalaciones_custom (fid) VALUES (9999)")
-                database.execSQL("DELETE FROM instalaciones_custom WHERE fid = 9999")
+                // No schema change, fid management moved to repository
             }
         }
 

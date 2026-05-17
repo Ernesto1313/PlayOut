@@ -65,7 +65,13 @@ class InstalacionRepository @Inject constructor(
     fun getAllCustomInstalaciones(): Flow<List<InstalacionCustom>> =
         instalacionCustomDao.getAll()
 
-    suspend fun insertCustom(inst: InstalacionCustom) = instalacionCustomDao.insert(inst)
+    suspend fun insertCustom(inst: InstalacionCustom): Long {
+        val maxFid = instalacionCustomDao.getMaxFid() ?: 9999
+        val newFid = if (maxFid < 10000) 10000 else maxFid + 1
+        val withFid = inst.copy(fid = newFid)
+        instalacionCustomDao.insert(withFid)
+        return newFid.toLong()
+    }
 
     suspend fun deleteCustom(inst: InstalacionCustom) = instalacionCustomDao.delete(inst)
 
