@@ -91,17 +91,17 @@ private fun SortBar(sortOrder: SortOrder, onSortSelected: (SortOrder) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         SortChip(
-            label = "Distancia",
+            label = "Distance",
             selected = sortOrder is SortOrder.ByDistance,
             onClick = { onSortSelected(SortOrder.ByDistance) }
         )
         SortChip(
-            label = "Valoración",
+            label = "Rating",
             selected = sortOrder is SortOrder.ByRating,
             onClick = { onSortSelected(SortOrder.ByRating) }
         )
         SortChip(
-            label = "Categoría",
+            label = "Category",
             selected = sortOrder is SortOrder.ByCategory,
             onClick = { onSortSelected(SortOrder.ByCategory) }
         )

@@ -78,42 +78,42 @@ private fun slidePath(inst: Instalacion, suffix: String): String? {
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.chess
-    "Pingpong" -> R.drawable.pingpong
-    "Futbol" -> R.drawable.football
-    "Esgrima" -> R.drawable.fencing
-    "Patinaje" -> R.drawable.skate
+    "Ajedrez", "Chess" -> R.drawable.chess
+    "Pingpong", "Ping-Pong" -> R.drawable.pingpong
+    "Futbol", "Fútbol", "Football" -> R.drawable.football
+    "Esgrima", "Fencing" -> R.drawable.fencing
+    "Patinaje", "Skating" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto" -> R.drawable.basketball
-    "Calistenia" -> R.drawable.calisthenics
-    "Atletismo" -> R.drawable.atletism
-    "Otro" -> R.drawable.other
-    "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanque
+    "Baloncesto", "Basketball" -> R.drawable.basketball
+    "Calistenia", "Calisthenics" -> R.drawable.calisthenics
+    "Atletismo", "Athletics" -> R.drawable.atletism
+    "Otro", "Other" -> R.drawable.other
+    "Minigolf", "Mini Golf" -> R.drawable.minigolf
+    "Petanca", "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
 
 private fun categoryColor(categoria: String?): Color = when (categoria) {
-    "Fútbol", "Futbol" -> Color(0xFF2E7D32)
-    "Baloncesto" -> Color(0xFFE65100)
+    "Fútbol", "Futbol", "Football" -> Color(0xFF2E7D32)
+    "Baloncesto", "Basketball" -> Color(0xFFE65100)
     "Volleyball" -> Color(0xFF1565C0)
-    "Ajedrez" -> Color(0xFF37474F)
-    "PingPong" -> Color(0xFF558B2F)
-    "Minigolf" -> Color(0xFF00695C)
-    "Esgrima" -> Color(0xFF6A1B9A)
-    "Patinaje" -> Color(0xFF00838F)
-    "Calistenia" -> Color(0xFF4527A0)
-    "Petanca" -> Color(0xFF4E342E)
-    "Atletismo" -> Color(0xFFC62828)
+    "Ajedrez", "Chess" -> Color(0xFF37474F)
+    "PingPong", "Pingpong", "Ping-Pong" -> Color(0xFF558B2F)
+    "Minigolf", "Mini Golf" -> Color(0xFF00695C)
+    "Esgrima", "Fencing" -> Color(0xFF6A1B9A)
+    "Patinaje", "Skating" -> Color(0xFF00838F)
+    "Calistenia", "Calisthenics" -> Color(0xFF4527A0)
+    "Petanca", "Pétanque" -> Color(0xFF4E342E)
+    "Atletismo", "Athletics" -> Color(0xFFC62828)
     else -> Color(0xFF37474F)
 }
 
 @Composable
 private fun EstadoText(estado: Int?, modifier: Modifier = Modifier) {
     when (estado) {
-        1 -> Text("Bueno", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold, modifier = modifier)
-        2 -> Text("Desgastado", color = Color(0xFFFFC107), fontWeight = FontWeight.Bold, modifier = modifier)
-        3 -> Text("Roto", color = Color(0xFFF44336), fontWeight = FontWeight.Bold, modifier = modifier)
+        1 -> Text("Good", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold, modifier = modifier)
+        2 -> Text("Fair", color = Color(0xFFFFC107), fontWeight = FontWeight.Bold, modifier = modifier)
+        3 -> Text("Broken", color = Color(0xFFF44336), fontWeight = FontWeight.Bold, modifier = modifier)
     }
 }
 
@@ -291,7 +291,7 @@ private fun ImmersiveMode(
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = "Estado: ",
+                            text = "Condition: ",
                             color = Color(0xFFF5F5F5),
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -445,14 +445,14 @@ private fun ProfileMode(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Estado: ", style = MaterialTheme.typography.bodyMedium)
+                Text("Condition: ", style = MaterialTheme.typography.bodyMedium)
                 EstadoText(inst.estado)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Experiencia de uso: ", style = MaterialTheme.typography.bodyMedium)
+                Text("Experience: ", style = MaterialTheme.typography.bodyMedium)
                 StarRating(value = inst.experiencia_uso, starSize = 20)
             }
             val distance = userLocation?.let { loc ->
@@ -472,7 +472,7 @@ private fun ProfileMode(
                     "${"%.1f".format(distance / 1000f)} km"
                 }
                 Text(
-                    "Distancia: $distanceText",
+                    "Distance: $distanceText",
                     color = Color(0xFF2C332D),
                     fontSize = 14.sp
                 )
@@ -487,7 +487,7 @@ private fun ProfileMode(
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Agua disponible", style = MaterialTheme.typography.bodyMedium)
+                    Text("Water available", style = MaterialTheme.typography.bodyMedium)
                 }
             }
             if (inst.asientos == 1) {
@@ -500,7 +500,7 @@ private fun ProfileMode(
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Asientos disponibles", style = MaterialTheme.typography.bodyMedium)
+                    Text("Seats available", style = MaterialTheme.typography.bodyMedium)
                 }
             }
             HorizontalDivider()

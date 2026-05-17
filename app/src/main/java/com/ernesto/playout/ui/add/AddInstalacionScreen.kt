@@ -95,24 +95,24 @@ private fun createCameraUri(context: Context): Uri {
 
 @DrawableRes
 private fun categoryDrawable(name: String): Int = when (name) {
-    "Futbol" -> R.drawable.football_white
-    "Baloncesto" -> R.drawable.basketball_white
-    "Pingpong" -> R.drawable.pingpong_white
+    "Futbol", "Fútbol", "Football" -> R.drawable.football_white
+    "Baloncesto", "Basketball" -> R.drawable.basketball_white
+    "Pingpong", "Ping-Pong" -> R.drawable.pingpong_white
     "Volleyball" -> R.drawable.volleyball_white
-    "Ajedrez" -> R.drawable.chess_white
-    "Esgrima" -> R.drawable.fencing_white
-    "Patinaje" -> R.drawable.skate_white
-    "Calistenia" -> R.drawable.calisthenics_white
-    "Atletismo" -> R.drawable.atletism_white
-    "Minigolf" -> R.drawable.minigolf_white
-    "Petanca" -> R.drawable.petanque_white
+    "Ajedrez", "Chess" -> R.drawable.chess_white
+    "Esgrima", "Fencing" -> R.drawable.fencing_white
+    "Patinaje", "Skating" -> R.drawable.skate_white
+    "Calistenia", "Calisthenics" -> R.drawable.calisthenics_white
+    "Atletismo", "Athletics" -> R.drawable.atletism_white
+    "Minigolf", "Mini Golf" -> R.drawable.minigolf_white
+    "Petanca", "Pétanque" -> R.drawable.petanque_white
     else -> R.drawable.other_white
 }
 
 private val categories = listOf(
-    "Futbol", "Baloncesto", "Pingpong", "Volleyball",
-    "Ajedrez", "Esgrima", "Patinaje", "Calistenia",
-    "Atletismo", "Minigolf", "Petanca", "Otro"
+    "Football", "Basketball", "Ping-Pong", "Volleyball",
+    "Chess", "Fencing", "Skating", "Calisthenics",
+    "Athletics", "Mini Golf", "Pétanque", "Other"
 )
 
 @Composable
@@ -184,7 +184,7 @@ fun AddInstalacionScreen(
                     )
                 }
                 Text(
-                    "Nueva Instalación",
+                    "New Location",
                     color = Color(0xFFF5F5F5),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -201,7 +201,7 @@ fun AddInstalacionScreen(
             ) {
                 // Category
                 Text(
-                    "Categoría",
+                    "Category",
                     color = Color(0xFFF5F5F5),
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -236,9 +236,9 @@ fun AddInstalacionScreen(
                 }
 
                 // Photos
-                Text("Fotos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Text("Photos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Text(
-                    "Añade hasta 4 fotos. La primera es la principal.",
+                    "Add up to 4 photos. The first one is the main photo.",
                     color = Color(0xFF8B949E),
                     fontSize = 12.sp
                 )
@@ -290,7 +290,7 @@ fun AddInstalacionScreen(
                             } else {
                                 Icon(
                                     Icons.Default.AddAPhoto,
-                                    contentDescription = "Añadir foto",
+                                    contentDescription = "Add photo",
                                     tint = Color(0xFF4CAF50),
                                     modifier = Modifier.size(32.dp)
                                 )
@@ -300,7 +300,7 @@ fun AddInstalacionScreen(
                 }
 
                 // Description
-                Text("Descripción", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Text("Description", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { viewModel.descripcion.value = it },
@@ -315,17 +315,17 @@ fun AddInstalacionScreen(
                         cursorColor = Color(0xFF4CAF50)
                     ),
                     placeholder = {
-                        Text("Describe la instalación...", color = Color(0xFF8B949E))
+                        Text("Describe the facility...", color = Color(0xFF8B949E))
                     }
                 )
 
-                // Estado
-                Text("Estado", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                // Condition
+                Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Triple(1, "Bueno", Color(0xFF4CAF50)),
-                        Triple(2, "Desgastado", Color(0xFFFFC107)),
-                        Triple(3, "Roto", Color(0xFFF44336))
+                        Triple(1, "Good", Color(0xFF4CAF50)),
+                        Triple(2, "Fair", Color(0xFFFFC107)),
+                        Triple(3, "Broken", Color(0xFFF44336))
                     ).forEach { (value, label, color) ->
                         Box(
                             modifier = Modifier
@@ -339,8 +339,8 @@ fun AddInstalacionScreen(
                     }
                 }
 
-                // Experiencia
-                Text("Experiencia de uso", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                // Experience
+                Text("Experience", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row {
                     repeat(5) { index ->
                         Text(
@@ -354,8 +354,8 @@ fun AddInstalacionScreen(
                     }
                 }
 
-                // Amenidades
-                Text("Amenidades", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                // Amenities
+                Text("Amenities", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -370,7 +370,7 @@ fun AddInstalacionScreen(
                             )
                         )
                         Text(
-                            "Agua",
+                            "Water",
                             color = if (agua) Color(0xFF1E88E5) else Color(0xFF8B949E),
                             fontSize = 12.sp
                         )
@@ -388,7 +388,7 @@ fun AddInstalacionScreen(
                             )
                         )
                         Text(
-                            "Asientos",
+                            "Seats",
                             color = if (asientos) Color(0xFF8D6E63) else Color(0xFF8B949E),
                             fontSize = 12.sp
                         )
@@ -396,7 +396,7 @@ fun AddInstalacionScreen(
                 }
 
                 // Location
-                Text("Ubicación", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Text("Location", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Button(
                     onClick = { showMapPicker = true },
                     colors = ButtonDefaults.buttonColors(
@@ -407,7 +407,7 @@ fun AddInstalacionScreen(
                     Icon(Icons.Default.Place, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.size(4.dp))
                     Text(
-                        if (pinLatLng != null) "Ubicación seleccionada ✓" else "Seleccionar ubicación",
+                        if (pinLatLng != null) "Location selected ✓" else "Select location",
                         color = Color.White
                     )
                 }
@@ -436,7 +436,7 @@ fun AddInstalacionScreen(
                         )
                     } else {
                         Text(
-                            "Guardar instalación",
+                            "Save location",
                             color = Color.White,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -457,7 +457,7 @@ fun AddInstalacionScreen(
             AlertDialog(
                 onDismissRequest = { showPhotoSourceDialog = false },
                 containerColor = Color(0xFF2C332D),
-                title = { Text("Añadir foto", color = Color(0xFFF5F5F5)) },
+                title = { Text("Add photo", color = Color(0xFFF5F5F5)) },
                 text = {
                     Column {
                         TextButton(onClick = {
@@ -468,7 +468,7 @@ fun AddInstalacionScreen(
                         }) {
                             Icon(Icons.Default.CameraAlt, null, tint = Color(0xFF4CAF50))
                             Spacer(Modifier.width(8.dp))
-                            Text("Cámara", color = Color(0xFFF5F5F5))
+                            Text("Camera", color = Color(0xFFF5F5F5))
                         }
                         TextButton(onClick = {
                             showPhotoSourceDialog = false
@@ -476,7 +476,7 @@ fun AddInstalacionScreen(
                         }) {
                             Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF4CAF50))
                             Spacer(Modifier.width(8.dp))
-                            Text("Galería", color = Color(0xFFF5F5F5))
+                            Text("Gallery", color = Color(0xFFF5F5F5))
                         }
                     }
                 },
@@ -566,7 +566,7 @@ private fun MapPickerScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    "Mueve el mapa para posicionar el pin",
+                    "Move the map to position the pin",
                     color = Color(0xFFF5F5F5)
                 )
             }
@@ -593,7 +593,7 @@ private fun MapPickerScreen(
                 containerColor = Color(0xFFF5F5F5),
                 contentColor = Color(0xFF2C332D)
             ) {
-                Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
+                Icon(Icons.Default.MyLocation, contentDescription = "My location")
             }
 
             Button(
@@ -606,7 +606,7 @@ private fun MapPickerScreen(
                     .padding(bottom = 32.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
             ) {
-                Text("Confirmar ubicación", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("Confirm location", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

@@ -66,33 +66,33 @@ import kotlinx.coroutines.launch
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.chess
-    "Pingpong" -> R.drawable.pingpong
-    "Fútbol", "Futbol" -> R.drawable.football
-    "Esgrima" -> R.drawable.fencing
-    "Patinaje" -> R.drawable.skate
+    "Ajedrez", "Chess" -> R.drawable.chess
+    "Pingpong", "Ping-Pong" -> R.drawable.pingpong
+    "Fútbol", "Futbol", "Football" -> R.drawable.football
+    "Esgrima", "Fencing" -> R.drawable.fencing
+    "Patinaje", "Skating" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto" -> R.drawable.basketball
-    "Calistenia" -> R.drawable.calisthenics
-    "Atletismo" -> R.drawable.atletism
-    "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanque
+    "Baloncesto", "Basketball" -> R.drawable.basketball
+    "Calistenia", "Calisthenics" -> R.drawable.calisthenics
+    "Atletismo", "Athletics" -> R.drawable.atletism
+    "Minigolf", "Mini Golf" -> R.drawable.minigolf
+    "Petanca", "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
 
 @DrawableRes
 private fun categoryDrawableWhite(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.chess_white
-    "Pingpong" -> R.drawable.pingpong_white
-    "Fútbol", "Futbol" -> R.drawable.football_white
-    "Esgrima" -> R.drawable.fencing_white
-    "Patinaje" -> R.drawable.skate_white
+    "Ajedrez", "Chess" -> R.drawable.chess_white
+    "Pingpong", "Ping-Pong" -> R.drawable.pingpong_white
+    "Fútbol", "Futbol", "Football" -> R.drawable.football_white
+    "Esgrima", "Fencing" -> R.drawable.fencing_white
+    "Patinaje", "Skating" -> R.drawable.skate_white
     "Volleyball" -> R.drawable.volleyball_white
-    "Baloncesto" -> R.drawable.basketball_white
-    "Calistenia" -> R.drawable.calisthenics_white
-    "Atletismo" -> R.drawable.atletism_white
-    "Minigolf" -> R.drawable.minigolf_white
-    "Petanca" -> R.drawable.petanque_white
+    "Baloncesto", "Basketball" -> R.drawable.basketball_white
+    "Calistenia", "Calisthenics" -> R.drawable.calisthenics_white
+    "Atletismo", "Athletics" -> R.drawable.atletism_white
+    "Minigolf", "Mini Golf" -> R.drawable.minigolf_white
+    "Petanca", "Pétanque" -> R.drawable.petanque_white
     else -> R.drawable.other_white
 }
 
@@ -124,24 +124,24 @@ private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes:
 
 // Display name → ViewModel category name (used for filtering)
 private val categoryDisplayToKey = mapOf(
-    "Fútbol" to "Futbol",
-    "Baloncesto" to "Baloncesto",
-    "Pingpong" to "Pingpong",
+    "Football" to "Football",
+    "Basketball" to "Basketball",
+    "Ping-Pong" to "Ping-Pong",
     "Volleyball" to "Volleyball",
-    "Ajedrez" to "Ajedrez",
-    "Esgrima" to "Esgrima",
-    "Patinaje" to "Patinaje",
-    "Calistenia" to "Calistenia",
-    "Atletismo" to "Atletismo",
-    "Minigolf" to "Minigolf",
-    "Petanca" to "Petanca",
-    "Otro" to "Otro"
+    "Chess" to "Chess",
+    "Fencing" to "Fencing",
+    "Skating" to "Skating",
+    "Calisthenics" to "Calisthenics",
+    "Athletics" to "Athletics",
+    "Mini Golf" to "Mini Golf",
+    "Pétanque" to "Pétanque",
+    "Other" to "Other"
 )
 
 private val categories = listOf(
-    "Fútbol", "Baloncesto", "Pingpong", "Volleyball",
-    "Ajedrez", "Esgrima", "Patinaje", "Calistenia",
-    "Atletismo", "Minigolf", "Petanca", "Otro"
+    "Football", "Basketball", "Ping-Pong", "Volleyball",
+    "Chess", "Fencing", "Skating", "Calisthenics",
+    "Athletics", "Mini Golf", "Pétanque", "Other"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -248,7 +248,7 @@ fun MapScreen(
             containerColor = Color(0xFFF5F5F5),
             contentColor = Color(0xFF2C332D)
         ) {
-            Icon(Icons.Default.MyLocation, contentDescription = "Mi ubicación")
+            Icon(Icons.Default.MyLocation, contentDescription = "My location")
         }
 
         // Filter FAB — bottom-end
@@ -263,7 +263,7 @@ fun MapScreen(
             containerColor = Color(0xFF4CAF50),
             contentColor = Color.White
         ) {
-            Icon(Icons.Default.FilterList, contentDescription = "Filtrar")
+            Icon(Icons.Default.FilterList, contentDescription = "Filter")
         }
     }
 
@@ -275,7 +275,7 @@ fun MapScreen(
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
-                    "Filtrar por deporte",
+                    "Filter by sport",
                     color = Color(0xFFF5F5F5),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -301,7 +301,7 @@ fun MapScreen(
                         tint = Color(0xFF4CAF50),
                         modifier = Modifier.size(28.dp)
                     )
-                    Text("Todos", color = Color(0xFFF5F5F5), fontSize = 16.sp)
+                    Text("All", color = Color(0xFFF5F5F5), fontSize = 16.sp)
                     if (selectedCategory == null) {
                         Spacer(Modifier.weight(1f))
                         Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF4CAF50))

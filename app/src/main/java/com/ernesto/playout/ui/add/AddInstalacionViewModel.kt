@@ -68,23 +68,23 @@ class AddInstalacionViewModel @Inject constructor(
     fun save() {
         when {
             categoria.value == null -> {
-                validationError.value = "Selecciona una categoría"
+                validationError.value = "Please select a category"
                 return
             }
             estado.value == null -> {
-                validationError.value = "Selecciona el estado"
+                validationError.value = "Please select a condition"
                 return
             }
             experiencia.value == 0 -> {
-                validationError.value = "Añade una valoración"
+                validationError.value = "Please add a rating"
                 return
             }
             photoPaths.value[0] == null -> {
-                validationError.value = "Añade al menos la foto principal"
+                validationError.value = "Please add at least the main photo"
                 return
             }
             pinLatLng.value == null -> {
-                validationError.value = "Selecciona una ubicación"
+                validationError.value = "Please select a location"
                 return
             }
         }

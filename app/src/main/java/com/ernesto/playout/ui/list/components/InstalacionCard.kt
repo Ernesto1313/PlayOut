@@ -42,18 +42,18 @@ private fun getPhotoModel(path: String?): Any {
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez" -> R.drawable.chess
-    "Pingpong" -> R.drawable.pingpong
-    "Futbol" -> R.drawable.football
-    "Esgrima" -> R.drawable.fencing
-    "Patinaje" -> R.drawable.skate
+    "Ajedrez", "Chess" -> R.drawable.chess
+    "Pingpong", "Ping-Pong" -> R.drawable.pingpong
+    "Futbol", "Fútbol", "Football" -> R.drawable.football
+    "Esgrima", "Fencing" -> R.drawable.fencing
+    "Patinaje", "Skating" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto" -> R.drawable.basketball
-    "Calistenia" -> R.drawable.calisthenics
-    "Atletismo" -> R.drawable.atletism
-    "Otro" -> R.drawable.other
-    "Minigolf" -> R.drawable.minigolf
-    "Petanca" -> R.drawable.petanque
+    "Baloncesto", "Basketball" -> R.drawable.basketball
+    "Calistenia", "Calisthenics" -> R.drawable.calisthenics
+    "Atletismo", "Athletics" -> R.drawable.atletism
+    "Otro", "Other" -> R.drawable.other
+    "Minigolf", "Mini Golf" -> R.drawable.minigolf
+    "Petanca", "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
 
@@ -133,10 +133,10 @@ fun InstalacionCard(
                     }
                 }
                 val (estadoText, estadoColor, estadoBg) = when (instalacion.estado) {
-                    1 -> Triple("Bueno", Color(0xFF4CAF50), Color(0xFF4CAF50).copy(alpha = 0.15f))
-                    2 -> Triple("Desgastado", Color(0xFFFFC107), Color(0xFFFFC107).copy(alpha = 0.15f))
-                    3 -> Triple("Roto", Color(0xFFF44336), Color(0xFFF44336).copy(alpha = 0.15f))
-                    else -> Triple("Desconocido", Color(0xFF8B949E), Color(0xFF8B949E).copy(alpha = 0.15f))
+                    1 -> Triple("Good", Color(0xFF4CAF50), Color(0xFF4CAF50).copy(alpha = 0.15f))
+                    2 -> Triple("Fair", Color(0xFFFFC107), Color(0xFFFFC107).copy(alpha = 0.15f))
+                    3 -> Triple("Broken", Color(0xFFF44336), Color(0xFFF44336).copy(alpha = 0.15f))
+                    else -> Triple("Unknown", Color(0xFF8B949E), Color(0xFF8B949E).copy(alpha = 0.15f))
                 }
                 Box(
                     modifier = Modifier

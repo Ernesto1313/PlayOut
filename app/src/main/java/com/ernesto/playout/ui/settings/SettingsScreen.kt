@@ -59,7 +59,7 @@ fun SettingsScreen(
             )
         }
         Text(
-            text = "Ajustes",
+            text = "Settings",
             color = Color(0xFFF5F5F5),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
@@ -79,7 +79,7 @@ fun SettingsScreen(
                 contentDescription = null,
                 tint = Color(0xFF4CAF50)
             )
-            Text(text = "Versión 1.0.0", color = Color(0xFFF5F5F5), fontSize = 16.sp)
+            Text(text = "Version 1.0.0", color = Color(0xFFF5F5F5), fontSize = 16.sp)
         }
         HorizontalDivider(color = Color(0xFF4CAF50), thickness = 1.dp)
         Row(
@@ -115,7 +115,7 @@ fun SettingsScreen(
         )
 
         Text(
-            "Mis instalaciones",
+            "My locations",
             color = Color(0xFFF5F5F5),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
@@ -125,7 +125,7 @@ fun SettingsScreen(
 
         if (customInstalaciones.isEmpty()) {
             Text(
-                "No has añadido ninguna instalación todavía.",
+                "You haven't added any locations yet.",
                 color = Color(0xFF8B949E),
                 fontSize = 14.sp
             )
@@ -144,17 +144,17 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         val iconRes = when (inst.categoria?.replaceFirstChar { it.uppercase() }) {
-                            "Fútbol", "Futbol" -> R.drawable.football
-                            "Baloncesto" -> R.drawable.basketball
-                            "Pingpong" -> R.drawable.pingpong
+                            "Fútbol", "Futbol", "Football" -> R.drawable.football
+                            "Baloncesto", "Basketball" -> R.drawable.basketball
+                            "Pingpong", "Ping-Pong" -> R.drawable.pingpong
                             "Volleyball" -> R.drawable.volleyball
-                            "Ajedrez" -> R.drawable.chess
-                            "Esgrima" -> R.drawable.fencing
-                            "Patinaje" -> R.drawable.skate
-                            "Calistenia" -> R.drawable.calisthenics
-                            "Atletismo" -> R.drawable.atletism
-                            "Minigolf" -> R.drawable.minigolf
-                            "Petanca" -> R.drawable.petanque
+                            "Ajedrez", "Chess" -> R.drawable.chess
+                            "Esgrima", "Fencing" -> R.drawable.fencing
+                            "Patinaje", "Skating" -> R.drawable.skate
+                            "Calistenia", "Calisthenics" -> R.drawable.calisthenics
+                            "Atletismo", "Athletics" -> R.drawable.atletism
+                            "Minigolf", "Mini Golf" -> R.drawable.minigolf
+                            "Petanca", "Pétanque" -> R.drawable.petanque
                             else -> R.drawable.other
                         }
                         Image(
@@ -165,12 +165,12 @@ fun SettingsScreen(
                         )
                         Column {
                             Text(
-                                inst.categoria?.replaceFirstChar { it.uppercase() } ?: "Sin categoría",
+                                inst.categoria?.replaceFirstChar { it.uppercase() } ?: "No category",
                                 color = Color(0xFFF5F5F5),
                                 fontSize = 15.sp
                             )
                             val estadoText = when (inst.estado) {
-                                1 -> "Bueno"; 2 -> "Desgastado"; 3 -> "Roto"; else -> ""
+                                1 -> "Good"; 2 -> "Fair"; 3 -> "Broken"; else -> ""
                             }
                             if (estadoText.isNotEmpty()) {
                                 Text(estadoText, color = Color(0xFF8B949E), fontSize = 12.sp)
@@ -180,7 +180,7 @@ fun SettingsScreen(
                     IconButton(onClick = { viewModel.delete(inst) }) {
                         Icon(
                             Icons.Default.Delete,
-                            contentDescription = "Eliminar",
+                            contentDescription = "Delete",
                             tint = Color(0xFFF44336)
                         )
                     }
