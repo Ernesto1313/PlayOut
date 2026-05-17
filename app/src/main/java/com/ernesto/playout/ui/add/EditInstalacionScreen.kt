@@ -1,12 +1,10 @@
 package com.ernesto.playout.ui.add
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,11 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -34,14 +31,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -55,7 +50,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,57 +62,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ernesto.playout.R
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
 
-internal fun createCameraUri(context: Context): Uri {
-    val file = java.io.File(
-        context.cacheDir,
-        "camera_temp_${System.currentTimeMillis()}.jpg"
-    )
-    return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-}
-
-@DrawableRes
-internal fun categoryDrawable(name: String): Int = when (name) {
-    "Futbol", "Fútbol", "Football" -> R.drawable.football_white
-    "Baloncesto", "Basketball" -> R.drawable.basketball_white
-    "Pingpong", "Ping-Pong" -> R.drawable.pingpong_white
-    "Volleyball" -> R.drawable.volleyball_white
-    "Ajedrez", "Chess" -> R.drawable.chess_white
-    "Esgrima", "Fencing" -> R.drawable.fencing_white
-    "Patinaje", "Skating" -> R.drawable.skate_white
-    "Calistenia", "Calisthenics" -> R.drawable.calisthenics_white
-    "Atletismo", "Athletics" -> R.drawable.atletism_white
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf_white
-    "Petanca", "Pétanque" -> R.drawable.petanque_white
-    else -> R.drawable.other_white
-}
-
-private val categories = listOf(
+private val editCategories = listOf(
     "Football", "Basketball", "Ping-Pong", "Volleyball",
     "Chess", "Fencing", "Skating", "Calisthenics",
     "Athletics", "Mini Golf", "Pétanque", "Other"
 )
 
 @Composable
-fun AddInstalacionScreen(
+fun EditInstalacionScreen(
+    fid: Int,
     onBack: () -> Unit,
-    viewModel: AddInstalacionViewModel = hiltViewModel()
+    viewModel: EditInstalacionViewModel = hiltViewModel()
 ) {
     val categoria by viewModel.categoria.collectAsStateWithLifecycle()
     val descripcion by viewModel.descripcion.collectAsStateWithLifecycle()
@@ -131,7 +92,6 @@ fun AddInstalacionScreen(
     val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
     val saveSuccess by viewModel.saveSuccess.collectAsStateWithLifecycle()
     val validationError by viewModel.validationError.collectAsStateWithLifecycle()
-    val currentLocation by viewModel.location.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -193,7 +153,7 @@ fun AddInstalacionScreen(
                     )
                 }
                 Text(
-                    "New Location",
+                    "Edit Location",
                     color = Color(0xFFF5F5F5),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -216,7 +176,7 @@ fun AddInstalacionScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(categories) { name ->
+                    items(editCategories) { name ->
                         val selected = categoria == name
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -291,7 +251,7 @@ fun AddInstalacionScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
-                                        contentDescription = "Eliminar foto",
+                                        contentDescription = "Remove photo",
                                         tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -503,165 +463,12 @@ fun AddInstalacionScreen(
         if (showMapPicker) {
             MapPickerScreen(
                 initialPosition = pinLatLng ?: LatLng(50.7753, 6.0839),
-                currentLocation = currentLocation,
+                currentLocation = null,
                 onConfirm = { latLng ->
                     viewModel.pinLatLng.value = latLng
                     showMapPicker = false
                 },
                 onDismiss = { showMapPicker = false }
-            )
-        }
-    }
-}
-
-@Composable
-internal fun MapPickerScreen(
-    initialPosition: LatLng,
-    currentLocation: android.location.Location?,
-    onConfirm: (LatLng) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    var hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-    val scope = rememberCoroutineScope()
-    var showLocationSettingsDialog by remember { mutableStateOf(false) }
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
-        }
-
-        val locationPermissionLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            if (granted) {
-                hasLocationPermission = true
-                currentLocation?.let { loc ->
-                    scope.launch {
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(loc.latitude, loc.longitude), 16f
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-        Box(Modifier.fillMaxSize()) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
-                uiSettings = MapUiSettings(myLocationButtonEnabled = false)
-            )
-
-            Icon(
-                Icons.Default.Place,
-                contentDescription = null,
-                tint = Color(0xFF4CAF50),
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.Center)
-                    .offset(y = (-24).dp)
-            )
-
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF2C332D))
-                    .statusBarsPadding()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    "Move the map to position the pin",
-                    color = Color(0xFFF5F5F5)
-                )
-            }
-
-            FloatingActionButton(
-                onClick = {
-                    val locationManager = context.getSystemService(Context.LOCATION_SERVICE)
-                        as android.location.LocationManager
-                    val isLocationEnabled = locationManager.isProviderEnabled(
-                        android.location.LocationManager.GPS_PROVIDER) ||
-                        locationManager.isProviderEnabled(
-                        android.location.LocationManager.NETWORK_PROVIDER)
-                    if (!isLocationEnabled) {
-                        showLocationSettingsDialog = true
-                    } else if (hasLocationPermission) {
-                        currentLocation?.let { loc ->
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(loc.latitude, loc.longitude), 16f
-                                    )
-                                )
-                            }
-                        }
-                    } else {
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 16.dp, bottom = 96.dp),
-                containerColor = Color(0xFFF5F5F5),
-                contentColor = Color(0xFF2C332D)
-            ) {
-                Icon(Icons.Default.MyLocation, contentDescription = "My location")
-            }
-
-            Button(
-                onClick = {
-                    val center = cameraPositionState.position.target
-                    onConfirm(center)
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text("Confirm location", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        if (showLocationSettingsDialog) {
-            AlertDialog(
-                onDismissRequest = { showLocationSettingsDialog = false },
-                containerColor = Color(0xFF2C332D),
-                title = {
-                    Text("Location disabled", color = Color(0xFFF5F5F5),
-                        fontWeight = FontWeight.Bold)
-                },
-                text = {
-                    Text("Location is disabled on your device. Would you like to enable it?",
-                        color = Color(0xFFF5F5F5))
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showLocationSettingsDialog = false
-                        context.startActivity(
-                            android.content.Intent(
-                                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                    }) {
-                        Text("Open Settings", color = Color(0xFF4CAF50))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showLocationSettingsDialog = false }) {
-                        Text("Cancel", color = Color(0xFF8B949E))
-                    }
-                }
             )
         }
     }

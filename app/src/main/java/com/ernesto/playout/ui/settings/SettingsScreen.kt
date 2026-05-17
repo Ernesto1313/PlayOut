@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
@@ -40,6 +41,7 @@ import com.ernesto.playout.R
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onEditInstalacion: (Int) -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
@@ -176,6 +178,13 @@ fun SettingsScreen(
                                 Text(estadoText, color = Color(0xFF8B949E), fontSize = 12.sp)
                             }
                         }
+                    }
+                    IconButton(onClick = { onEditInstalacion(inst.fid) }) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color(0xFF4CAF50)
+                        )
                     }
                     IconButton(onClick = { viewModel.delete(inst) }) {
                         Icon(

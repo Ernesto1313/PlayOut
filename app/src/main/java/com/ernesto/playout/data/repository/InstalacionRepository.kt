@@ -36,7 +36,7 @@ class InstalacionRepository @Inject constructor(
 
     fun getInstalacionById(fid: Int): Flow<Instalacion?> = flow {
         val inst = if (fid >= 10000) {
-            instalacionCustomDao.getById(fid)
+            instalacionCustomDao.getByIdOnce(fid)
                 ?.let { c ->
                     Instalacion(c.fid, c.nombre_sitio, c.foto, c.categoria, c.descripcion,
                         c.estado, c.agua, c.asientos, c.experiencia_uso, c.longitud, c.latitud)
@@ -56,4 +56,8 @@ class InstalacionRepository @Inject constructor(
     suspend fun insertCustom(inst: InstalacionCustom) = instalacionCustomDao.insert(inst)
 
     suspend fun deleteCustom(inst: InstalacionCustom) = instalacionCustomDao.delete(inst)
+
+    fun getCustomById(fid: Int): Flow<InstalacionCustom?> = instalacionCustomDao.getById(fid)
+
+    suspend fun updateCustom(inst: InstalacionCustom) = instalacionCustomDao.update(inst)
 }

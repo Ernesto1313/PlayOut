@@ -2,6 +2,7 @@ package com.ernesto.playout.ui.map
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Paint
@@ -24,12 +25,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -159,6 +162,7 @@ fun MapScreen(
     var showFilterSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var showLocationSettingsDialog by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(50.7753, 6.0839), 13f)
@@ -225,7 +229,15 @@ fun MapScreen(
         // Locate-me FAB — bottom-start
         FloatingActionButton(
             onClick = {
-                if (hasLocationPermission) {
+                val locationManager = context.getSystemService(Context.LOCATION_SERVICE)
+                    as android.location.LocationManager
+                val isLocationEnabled = locationManager.isProviderEnabled(
+                    android.location.LocationManager.GPS_PROVIDER) ||
+                    locationManager.isProviderEnabled(
+                    android.location.LocationManager.NETWORK_PROVIDER)
+                if (!isLocationEnabled) {
+                    showLocationSettingsDialog = true
+                } else if (hasLocationPermission) {
                     userLocation?.let { loc ->
                         scope.launch {
                             cameraPositionState.animate(
@@ -265,6 +277,35 @@ fun MapScreen(
         ) {
             Icon(Icons.Default.FilterList, contentDescription = "Filter")
         }
+    }
+
+    if (showLocationSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocationSettingsDialog = false },
+            containerColor = Color(0xFF2C332D),
+            title = {
+                Text("Location disabled", color = Color(0xFFF5F5F5),
+                    fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text("Location is disabled on your device. Would you like to enable it?",
+                    color = Color(0xFFF5F5F5))
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLocationSettingsDialog = false
+                    context.startActivity(
+                        Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }) {
+                    Text("Open Settings", color = Color(0xFF4CAF50))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLocationSettingsDialog = false }) {
+                    Text("Cancel", color = Color(0xFF8B949E))
+                }
+            }
+        )
     }
 
     if (showFilterSheet) {
