@@ -103,17 +103,35 @@ class AddInstalacionViewModel @Inject constructor(
                 experiencia_uso = experiencia.value,
                 longitud = lng,
                 latitud = lat,
-                foto = photoPaths.value[0]
+                foto = null
             )
-            val newFid = repository.insertCustom(tempInst)
+            val newFid = repository.insertCustom(tempInst).toInt()
 
             val dir = java.io.File(context.filesDir, "photos")
             val suffixes = listOf("main", "extra1", "extra2", "extra3")
-            photoPaths.value.forEachIndexed { index, path ->
+            val finalPaths = photoPaths.value.mapIndexed { index, path ->
                 if (path != null) {
                     val newFile = java.io.File(dir, "${newFid}_${suffixes[index]}.jpg")
                     java.io.File(path).renameTo(newFile)
-                }
+                    newFile.absolutePath
+                } else null
+            }
+
+            val finalMainPath = finalPaths[0]
+            if (finalMainPath != null) {
+                val updated = InstalacionCustom(
+                    fid = newFid,
+                    categoria = categoria.value,
+                    descripcion = descripcion.value.ifBlank { null },
+                    estado = estado.value,
+                    agua = if (agua.value) 1 else 0,
+                    asientos = if (asientos.value) 1 else 0,
+                    experiencia_uso = experiencia.value,
+                    longitud = lng,
+                    latitud = lat,
+                    foto = finalMainPath
+                )
+                repository.updateCustom(updated)
             }
 
             isSaving.value = false
