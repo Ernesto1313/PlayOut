@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -72,14 +72,12 @@ fun InstalacionCard(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-        Row {
+        Row(modifier = Modifier.fillMaxSize()) {
             val photoModel: Any = remember(instalacion.fid, instalacion.foto) {
                 val foto = instalacion.foto
-                if (foto != null && foto.startsWith("/")) {
-                    java.io.File(foto)
-                } else {
-                    "file:///android_asset/photos/${instalacion.fid}_main.jpg"
+                when {
+                    foto != null && foto.startsWith("/") -> java.io.File(foto)
+                    else -> "file:///android_asset/photos/${instalacion.fid}_main.jpg"
                 }
             }
             AsyncImage(
@@ -93,8 +91,8 @@ fun InstalacionCard(
             )
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .weight(1f),
+                    .weight(1f)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Row(
@@ -104,12 +102,12 @@ fun InstalacionCard(
                     Image(
                         painter = painterResource(categoryDrawable(instalacion.categoria)),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        colorFilter = ColorFilter.tint(Color(0xFFF5F5F5))
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(Color(0xFF2C332D))
                     )
                     Text(
                         text = instalacion.categoria ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
+                        fontSize = 13.sp,
                         color = Color(0xFF2C332D)
                     )
                 }
@@ -163,24 +161,21 @@ fun InstalacionCard(
                             modifier = Modifier.size(16.dp)
                         )
                     }
+                    if (distance != null) {
+                        val distanceText = if (distance < 1000f) {
+                            "${distance.toInt()} m"
+                        } else {
+                            "${"%.1f".format(distance / 1000f)} km"
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = distanceText,
+                            color = Color(0xFF8B949E),
+                            fontSize = 11.sp
+                        )
+                    }
                 }
             }
-        }
-        if (distance != null) {
-            val distanceText = if (distance < 1000f) {
-                "${distance.toInt()} m"
-            } else {
-                "${"%.1f".format(distance / 1000f)} km"
-            }
-            Text(
-                text = distanceText,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 6.dp, bottom = 4.dp),
-                color = Color(0xFF8B949E),
-                fontSize = 11.sp
-            )
-        }
         }
     }
 }

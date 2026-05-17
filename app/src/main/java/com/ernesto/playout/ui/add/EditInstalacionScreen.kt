@@ -468,7 +468,8 @@ fun EditInstalacionScreen(
                     viewModel.pinLatLng.value = latLng
                     showMapPicker = false
                 },
-                onDismiss = { showMapPicker = false }
+                onDismiss = { showMapPicker = false },
+                onPinMoved = { latLng -> viewModel.pinLatLng.value = latLng }
             )
         }
     }

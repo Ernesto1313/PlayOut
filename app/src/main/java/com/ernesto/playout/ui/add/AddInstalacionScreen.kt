@@ -508,7 +508,8 @@ fun AddInstalacionScreen(
                     viewModel.pinLatLng.value = latLng
                     showMapPicker = false
                 },
-                onDismiss = { showMapPicker = false }
+                onDismiss = { showMapPicker = false },
+                onPinMoved = { latLng -> viewModel.pinLatLng.value = latLng }
             )
         }
     }
@@ -519,7 +520,8 @@ internal fun MapPickerScreen(
     initialPosition: LatLng,
     currentLocation: android.location.Location?,
     onConfirm: (LatLng) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onPinMoved: (LatLng) -> Unit = {}
 ) {
     val context = LocalContext.current
     var hasLocationPermission by remember {
@@ -600,13 +602,13 @@ internal fun MapPickerScreen(
                         showLocationSettingsDialog = true
                     } else if (hasLocationPermission) {
                         currentLocation?.let { loc ->
+                            val latLng = LatLng(loc.latitude, loc.longitude)
                             scope.launch {
                                 cameraPositionState.animate(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(loc.latitude, loc.longitude), 16f
-                                    )
+                                    CameraUpdateFactory.newLatLngZoom(latLng, 16f)
                                 )
                             }
+                            onPinMoved(latLng)
                         }
                     } else {
                         locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)

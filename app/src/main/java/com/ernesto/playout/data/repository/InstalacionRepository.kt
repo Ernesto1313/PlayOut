@@ -7,6 +7,7 @@ import com.ernesto.playout.data.model.InstalacionCustom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class InstalacionRepository @Inject constructor(
@@ -34,17 +35,28 @@ class InstalacionRepository @Inject constructor(
             assets + customMapped
         }
 
-    fun getInstalacionById(fid: Int): Flow<Instalacion?> = flow {
-        val inst = if (fid >= 10000) {
-            instalacionCustomDao.getByIdOnce(fid)
-                ?.let { c ->
-                    Instalacion(c.fid, c.nombre_sitio, c.foto, c.categoria, c.descripcion,
-                        c.estado, c.agua, c.asientos, c.experiencia_uso, c.longitud, c.latitud)
+    fun getInstalacionById(fid: Int): Flow<Instalacion?> {
+        return if (fid >= 10000) {
+            instalacionCustomDao.getById(fid).map { custom ->
+                custom?.let {
+                    Instalacion(
+                        fid = it.fid,
+                        nombre_sitio = it.nombre_sitio,
+                        foto = it.foto,
+                        categoria = it.categoria,
+                        descripcion = it.descripcion,
+                        estado = it.estado,
+                        agua = it.agua,
+                        asientos = it.asientos,
+                        experiencia_uso = it.experiencia_uso,
+                        longitud = it.longitud,
+                        latitud = it.latitud
+                    )
                 }
+            }
         } else {
-            dao.getById(fid)
+            flow { emit(dao.getById(fid)) }
         }
-        emit(inst)
     }
 
     fun getInstalacionesByCategoria(categoria: String): Flow<List<Instalacion>> =
