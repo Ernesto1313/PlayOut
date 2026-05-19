@@ -38,7 +38,7 @@ fun ListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D1117))
+            .background(Color(0xFF806B40))
     ) {
         SortBar(sortOrder = sortOrder, onSortSelected = viewModel::setSortOrder)
 
@@ -86,7 +86,7 @@ private fun SortBar(sortOrder: SortOrder, onSortSelected: (SortOrder) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF0D1117))
+            .background(Color(0xFF806B40))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {

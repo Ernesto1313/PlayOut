@@ -313,18 +313,36 @@ private fun ImmersiveMode(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (inst.agua == 1) {
-                        Image(
-                            painter = painterResource(R.drawable.drop),
-                            contentDescription = null,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color(0xFFF5F5F5),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(6.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.drop),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                     if (inst.asientos == 1) {
-                        Image(
-                            painter = painterResource(R.drawable.bench),
-                            contentDescription = null,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = Color(0xFFF5F5F5),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(6.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.bench),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                     val stars = inst.experiencia_uso ?: 0
                     Text(
