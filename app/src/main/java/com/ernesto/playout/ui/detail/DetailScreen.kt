@@ -497,36 +497,40 @@ private fun ProfileMode(
                     fontSize = 14.sp
                 )
             }
-            if (inst.agua == 1) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color(0xFFF5F5F5),
-                            shape = RoundedCornerShape(8.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (inst.agua == 1) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFF5F5F5),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(6.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.drop),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
                         )
-                        .padding(6.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.drop),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    }
                 }
-            }
-            if (inst.asientos == 1) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color(0xFFF5F5F5),
-                            shape = RoundedCornerShape(8.dp)
+                if (inst.asientos == 1) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFF5F5F5),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(6.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.bench),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
                         )
-                        .padding(6.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.bench),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    }
                 }
             }
             HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
