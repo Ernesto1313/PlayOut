@@ -46,7 +46,7 @@ fun ListScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .background(Color(0xFF2C332D))
+                .background(Color(0xFF806B40))
         ) {
             when (val state = uiState) {
                 is ListUiState.Loading -> {
@@ -113,7 +113,7 @@ private fun SortChip(label: String, selected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .background(
-                color = if (selected) Color(0xFF4CAF50) else Color(0xFF1C2230),
+                color = if (selected) Color(0xFF00AEFF) else Color(0xFF1C2230),
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable { onClick() }

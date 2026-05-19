@@ -103,18 +103,18 @@ fun InstalacionCard(
                         painter = painterResource(categoryDrawable(instalacion.categoria)),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(Color(0xFF2C332D))
+                        colorFilter = ColorFilter.tint(Color(0xFF806B40))
                     )
                     Text(
                         text = instalacion.categoria ?: "",
                         fontSize = 13.sp,
-                        color = Color(0xFF2C332D)
+                        color = Color(0xFF806B40)
                     )
                 }
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0xFFFFC107).copy(alpha = 0.15f),
+                            color = Color(0xFF00AEFF).copy(alpha = 0.15f),
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 6.dp, vertical = 3.dp)
@@ -125,7 +125,7 @@ fun InstalacionCard(
                             Text(
                                 text = if (index < stars) "★" else "☆",
                                 fontSize = 14.sp,
-                                color = Color(0xFFFFC107)
+                                color = Color(0xFF00AEFF)
                             )
                         }
                     }
