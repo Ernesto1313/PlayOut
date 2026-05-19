@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FormatListBulleted
@@ -77,22 +79,12 @@ fun MapListScaffold(
                 if (onMap) {
                     TopAppBar(
                         title = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(R.drawable.football),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Text(
-                                    text = "PlayOut",
-                                    color = Color(0xFFF5F5F5),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp
-                                )
-                            }
+                            Image(
+                                painter = painterResource(R.drawable.playout_banner),
+                                contentDescription = "PlayOut",
+                                modifier = Modifier.height(36.dp),
+                                contentScale = ContentScale.Fit
+                            )
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = Color(0xFF806B40)
