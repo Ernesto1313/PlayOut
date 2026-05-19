@@ -107,11 +107,11 @@ private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes:
         val canvas = android.graphics.Canvas(bitmap)
         val paint = Paint().apply { isAntiAlias = true }
 
-        paint.color = android.graphics.Color.WHITE
+        paint.color = android.graphics.Color.parseColor("#00AEFF")
         canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
 
         paint.style = Paint.Style.STROKE
-        paint.color = android.graphics.Color.argb(255, 44, 51, 45)
+        paint.color = android.graphics.Color.parseColor("#F5F5F5")
         paint.strokeWidth = 4f
         canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
 
@@ -210,7 +210,7 @@ fun MapScreen(
                 val lat = instalacion.latitud
                 val lng = instalacion.longitud
                 if (lat != null && lng != null) {
-                    val iconRes = categoryDrawable(
+                    val iconRes = categoryDrawableWhite(
                         instalacion.categoria?.replaceFirstChar { it.uppercase() }
                     )
                     val markerIcon = rememberCategoryMarkerBitmap(context, iconRes)
@@ -275,8 +275,8 @@ fun MapScreen(
                     start = 16.dp,
                     bottom = contentPadding.calculateBottomPadding() + 16.dp
                 ),
-            containerColor = Color(0xFFF5F5F5),
-            contentColor = Color(0xFF2C332D)
+            containerColor = Color(0xFF00AEFF),
+            contentColor = Color(0xFFF5F5F5)
         ) {
             Icon(Icons.Default.MyLocation, contentDescription = "My location")
         }
