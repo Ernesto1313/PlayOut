@@ -248,7 +248,7 @@ fun AddInstalacionScreen(
                 Text("Photos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Text(
                     "Add up to 4 photos. The first one is the main photo.",
-                    color = Color(0xFF8B949E),
+                    color = Color(0xFFF5F5F5),
                     fontSize = 12.sp
                 )
                 Row(
@@ -318,13 +318,13 @@ fun AddInstalacionScreen(
                         .height(120.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF00AEFF),
-                        unfocusedBorderColor = Color(0xFF8B949E),
+                        unfocusedBorderColor = Color(0xFFF5F5F5),
                         focusedTextColor = Color(0xFFF5F5F5),
                         unfocusedTextColor = Color(0xFFF5F5F5),
                         cursorColor = Color(0xFF00AEFF)
                     ),
                     placeholder = {
-                        Text("Describe the facility...", color = Color(0xFF8B949E))
+                        Text("Describe the facility...", color = Color(0xFFF5F5F5))
                     }
                 )
 
@@ -332,7 +332,7 @@ fun AddInstalacionScreen(
                 Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Triple(1, "Good", Color(0xFF00AEFF)),
+                        Triple(1, "Good", Color(0xFF4CAF50)),
                         Triple(2, "Fair", Color(0xFFFFC107)),
                         Triple(3, "Broken", Color(0xFFF44336))
                     ).forEach { (value, label, color) ->
@@ -343,7 +343,7 @@ fun AddInstalacionScreen(
                                 .clickable { viewModel.estado.value = value }
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Text(label, color = Color.White)
+                            Text(label, color = Color(0xFFF5F5F5))
                         }
                     }
                 }
@@ -365,42 +365,49 @@ fun AddInstalacionScreen(
 
                 // Amenities
                 Text("Amenities", color = Color(0xFFF5F5F5), fontSize = 14.sp)
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { viewModel.agua.value = !agua }
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.drop),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            colorFilter = ColorFilter.tint(
-                                if (agua) Color(0xFF1E88E5) else Color(0xFF8B949E)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFF5F5F5))
+                        .padding(12.dp)
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable { viewModel.agua.value = !agua }
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.drop),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                colorFilter = ColorFilter.tint(
+                                    if (agua) Color(0xFF1E88E5) else Color(0xFFF5F5F5)
+                                )
                             )
-                        )
-                        Text(
-                            "Water",
-                            color = if (agua) Color(0xFF1E88E5) else Color(0xFF8B949E),
-                            fontSize = 12.sp
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { viewModel.asientos.value = !asientos }
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.bench),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            colorFilter = ColorFilter.tint(
-                                if (asientos) Color(0xFF8D6E63) else Color(0xFF8B949E)
+                            Text(
+                                "Water",
+                                color = if (agua) Color(0xFF1E88E5) else Color(0xFFF5F5F5),
+                                fontSize = 12.sp
                             )
-                        )
-                        Text(
-                            "Seats",
-                            color = if (asientos) Color(0xFF8D6E63) else Color(0xFF8B949E),
-                            fontSize = 12.sp
-                        )
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable { viewModel.asientos.value = !asientos }
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.bench),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                colorFilter = ColorFilter.tint(
+                                    if (asientos) Color(0xFF8D6E63) else Color(0xFFF5F5F5)
+                                )
+                            )
+                            Text(
+                                "Seats",
+                                color = if (asientos) Color(0xFF8D6E63) else Color(0xFFF5F5F5),
+                                fontSize = 12.sp
+                            )
+                        }
                     }
                 }
 
@@ -409,21 +416,21 @@ fun AddInstalacionScreen(
                 Button(
                     onClick = { showMapPicker = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (pinLatLng != null) Color(0xFF00AEFF) else Color(0xFF1C2230)
+                        containerColor = Color(0xFF00AEFF)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Place, contentDescription = null, tint = Color.White)
+                    Icon(Icons.Default.Place, contentDescription = null, tint = Color(0xFFF5F5F5))
                     Spacer(modifier = Modifier.size(4.dp))
                     Text(
                         if (pinLatLng != null) "Location selected ✓" else "Select location",
-                        color = Color.White
+                        color = Color(0xFFF5F5F5)
                     )
                 }
                 if (pinLatLng != null) {
                     Text(
                         "${pinLatLng!!.latitude}, ${pinLatLng!!.longitude}",
-                        color = Color(0xFF8B949E),
+                        color = Color(0xFFF5F5F5),
                         fontSize = 12.sp
                     )
                 }
@@ -661,7 +668,7 @@ internal fun MapPickerScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showLocationSettingsDialog = false }) {
-                        Text("Cancel", color = Color(0xFF8B949E))
+                        Text("Cancel", color = Color(0xFFF5F5F5))
                     }
                 }
             )
