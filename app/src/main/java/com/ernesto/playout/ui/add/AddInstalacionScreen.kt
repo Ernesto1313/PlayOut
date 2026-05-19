@@ -228,7 +228,7 @@ fun AddInstalacionScreen(
                                     .size(60.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(
-                                        if (selected) Color(0xFF4CAF50) else Color(0xFF1C2230)
+                                        if (selected) Color(0xFF00AEFF) else Color(0xFF1C2230)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -300,7 +300,7 @@ fun AddInstalacionScreen(
                                 Icon(
                                     Icons.Default.AddAPhoto,
                                     contentDescription = "Add photo",
-                                    tint = Color(0xFF4CAF50),
+                                    tint = Color(0xFF00AEFF),
                                     modifier = Modifier.size(32.dp)
                                 )
                             }
@@ -317,11 +317,11 @@ fun AddInstalacionScreen(
                         .fillMaxWidth()
                         .height(120.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF4CAF50),
+                        focusedBorderColor = Color(0xFF00AEFF),
                         unfocusedBorderColor = Color(0xFF8B949E),
                         focusedTextColor = Color(0xFFF5F5F5),
                         unfocusedTextColor = Color(0xFFF5F5F5),
-                        cursorColor = Color(0xFF4CAF50)
+                        cursorColor = Color(0xFF00AEFF)
                     ),
                     placeholder = {
                         Text("Describe the facility...", color = Color(0xFF8B949E))
@@ -332,7 +332,7 @@ fun AddInstalacionScreen(
                 Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Triple(1, "Good", Color(0xFF4CAF50)),
+                        Triple(1, "Good", Color(0xFF00AEFF)),
                         Triple(2, "Fair", Color(0xFFFFC107)),
                         Triple(3, "Broken", Color(0xFFF44336))
                     ).forEach { (value, label, color) ->
@@ -409,7 +409,7 @@ fun AddInstalacionScreen(
                 Button(
                     onClick = { showMapPicker = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (pinLatLng != null) Color(0xFF4CAF50) else Color(0xFF1C2230)
+                        containerColor = if (pinLatLng != null) Color(0xFF00AEFF) else Color(0xFF1C2230)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -434,7 +434,7 @@ fun AddInstalacionScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
                     shape = RoundedCornerShape(12.dp),
                     enabled = !isSaving
                 ) {
@@ -482,7 +482,7 @@ fun AddInstalacionScreen(
                                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                             }
                         }) {
-                            Icon(Icons.Default.CameraAlt, null, tint = Color(0xFF4CAF50))
+                            Icon(Icons.Default.CameraAlt, null, tint = Color(0xFF00AEFF))
                             Spacer(Modifier.width(8.dp))
                             Text("Camera", color = Color(0xFFF5F5F5))
                         }
@@ -490,7 +490,7 @@ fun AddInstalacionScreen(
                             showPhotoSourceDialog = false
                             galleryLauncher.launch("image/*")
                         }) {
-                            Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF4CAF50))
+                            Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF00AEFF))
                             Spacer(Modifier.width(8.dp))
                             Text("Gallery", color = Color(0xFFF5F5F5))
                         }
@@ -570,7 +570,7 @@ internal fun MapPickerScreen(
             Icon(
                 Icons.Default.Place,
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = Color(0xFF00AEFF),
                 modifier = Modifier
                     .size(48.dp)
                     .align(Alignment.Center)
@@ -631,7 +631,7 @@ internal fun MapPickerScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
             ) {
                 Text("Confirm location", color = Color.White, fontWeight = FontWeight.Bold)
             }
@@ -656,7 +656,7 @@ internal fun MapPickerScreen(
                             android.content.Intent(
                                 android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     }) {
-                        Text("Open Settings", color = Color(0xFF4CAF50))
+                        Text("Open Settings", color = Color(0xFF00AEFF))
                     }
                 },
                 dismissButton = {

@@ -290,7 +290,7 @@ fun MapScreen(
                     end = 16.dp,
                     bottom = contentPadding.calculateBottomPadding() + 16.dp
                 ),
-            containerColor = Color(0xFF4CAF50),
+            containerColor = Color(0xFF00AEFF),
             contentColor = Color.White
         ) {
             Icon(Icons.Default.FilterList, contentDescription = "Filter")
@@ -315,7 +315,7 @@ fun MapScreen(
                     context.startActivity(
                         Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }) {
-                    Text("Open Settings", color = Color(0xFF4CAF50))
+                    Text("Open Settings", color = Color(0xFF00AEFF))
                 }
             },
             dismissButton = {
@@ -330,7 +330,7 @@ fun MapScreen(
         ModalBottomSheet(
             onDismissRequest = { showFilterSheet = false },
             sheetState = sheetState,
-            containerColor = Color(0xFF2C332D)
+            containerColor = Color(0xFF806B40)
         ) {
             Column(Modifier.padding(16.dp)) {
                 Text(
@@ -357,17 +357,17 @@ fun MapScreen(
                     Icon(
                         Icons.Default.FilterList,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = Color(0xFF00AEFF),
                         modifier = Modifier.size(28.dp)
                     )
                     Text("All", color = Color(0xFFF5F5F5), fontSize = 16.sp)
                     if (selectedCategory == null) {
                         Spacer(Modifier.weight(1f))
-                        Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF4CAF50))
+                        Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF00AEFF))
                     }
                 }
 
-                HorizontalDivider(color = Color(0xFF4CAF50).copy(alpha = 0.3f))
+                HorizontalDivider(color = Color(0xFF00AEFF).copy(alpha = 0.3f))
 
                 categories.forEach { cat ->
                     val iconRes = categoryDrawableWhite(cat)
@@ -392,10 +392,10 @@ fun MapScreen(
                         Text(cat, color = Color(0xFFF5F5F5), fontSize = 16.sp)
                         if (selectedCategory == cat) {
                             Spacer(Modifier.weight(1f))
-                            Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF4CAF50))
+                            Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF00AEFF))
                         }
                     }
-                    HorizontalDivider(color = Color(0xFF4CAF50).copy(alpha = 0.2f))
+                    HorizontalDivider(color = Color(0xFF00AEFF).copy(alpha = 0.2f))
                 }
             }
         }

@@ -67,7 +67,7 @@ fun SettingsScreen(
             fontWeight = FontWeight.Bold
         )
         HorizontalDivider(
-            color = Color(0xFF4CAF50),
+            color = Color(0xFF00AEFF),
             thickness = 1.dp,
             modifier = Modifier.padding(top = 8.dp)
         )
@@ -79,11 +79,11 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.Info,
                 contentDescription = null,
-                tint = Color(0xFF4CAF50)
+                tint = Color(0xFF00AEFF)
             )
             Text(text = "Version 1.0.0", color = Color(0xFFF5F5F5), fontSize = 16.sp)
         }
-        HorizontalDivider(color = Color(0xFF4CAF50), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF00AEFF), thickness = 1.dp)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -92,11 +92,11 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.Place,
                 contentDescription = null,
-                tint = Color(0xFF4CAF50)
+                tint = Color(0xFF00AEFF)
             )
             Text(text = "Aachen, Deutschland", color = Color(0xFFF5F5F5), fontSize = 16.sp)
         }
-        HorizontalDivider(color = Color(0xFF4CAF50), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFF00AEFF), thickness = 1.dp)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -105,13 +105,13 @@ fun SettingsScreen(
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
-                tint = Color(0xFF4CAF50)
+                tint = Color(0xFF00AEFF)
             )
             Text(text = "Ernesto Gimeno García", color = Color(0xFFF5F5F5), fontSize = 16.sp)
         }
 
         HorizontalDivider(
-            color = Color(0xFF4CAF50),
+            color = Color(0xFF00AEFF),
             thickness = 1.dp,
             modifier = Modifier.padding(vertical = 16.dp)
         )
@@ -163,7 +163,7 @@ fun SettingsScreen(
                             painterResource(iconRes),
                             contentDescription = null,
                             modifier = Modifier.size(28.dp),
-                            colorFilter = ColorFilter.tint(Color(0xFF4CAF50))
+                            colorFilter = ColorFilter.tint(Color(0xFF00AEFF))
                         )
                         Column {
                             Text(
@@ -183,7 +183,7 @@ fun SettingsScreen(
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Edit",
-                            tint = Color(0xFF4CAF50)
+                            tint = Color(0xFF00AEFF)
                         )
                     }
                     IconButton(onClick = { viewModel.delete(inst) }) {
