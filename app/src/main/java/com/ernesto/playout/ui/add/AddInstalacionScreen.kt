@@ -365,47 +365,65 @@ fun AddInstalacionScreen(
 
                 // Amenities
                 Text("Amenities", color = Color(0xFFF5F5F5), fontSize = 14.sp)
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF5F5F5))
-                        .padding(12.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF5F5F5))
+                            .clickable { viewModel.agua.value = !viewModel.agua.value }
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.clickable { viewModel.agua.value = !agua }
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Image(
-                                painter = painterResource(R.drawable.drop),
+                                painterResource(R.drawable.drop),
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (agua) Color(0xFF00AEFF) else Color(0xFF2C332D)
+                                    if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230)
                                 )
                             )
                             Text(
                                 "Water",
-                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF2C332D),
-                                fontSize = 12.sp
+                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
                             )
                         }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF5F5F5))
+                            .clickable { viewModel.asientos.value = !viewModel.asientos.value }
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.clickable { viewModel.asientos.value = !asientos }
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Image(
-                                painter = painterResource(R.drawable.bench),
+                                painterResource(R.drawable.bench),
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (asientos) Color(0xFF806B40) else Color(0xFF2C332D)
+                                    if (asientos) Color(0xFF806B40) else Color(0xFF1C2230)
                                 )
                             )
                             Text(
                                 "Seats",
-                                color = if (asientos) Color(0xFF806B40) else Color(0xFF2C332D),
-                                fontSize = 12.sp
+                                color = if (asientos) Color(0xFF806B40) else Color(0xFF1C2230),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
