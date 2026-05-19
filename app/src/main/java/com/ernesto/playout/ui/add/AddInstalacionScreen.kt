@@ -387,12 +387,12 @@ fun AddInstalacionScreen(
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230)
+                                    if (agua) Color(0xFF00AEFF) else Color(0xFF806B40)
                                 )
                             )
                             Text(
                                 "Water",
-                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230),
+                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF806B40),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -416,12 +416,12 @@ fun AddInstalacionScreen(
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (asientos) Color(0xFF806B40) else Color(0xFF1C2230)
+                                    if (asientos) Color(0xFF806B40) else Color(0xFF806B40)
                                 )
                             )
                             Text(
                                 "Seats",
-                                color = if (asientos) Color(0xFF806B40) else Color(0xFF1C2230),
+                                color = if (asientos) Color(0xFF806B40) else Color(0xFF806B40),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
