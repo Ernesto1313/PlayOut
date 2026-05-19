@@ -642,8 +642,8 @@ internal fun MapPickerScreen(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(start = 16.dp, bottom = 96.dp),
-                containerColor = Color(0xFFF5F5F5),
-                contentColor = Color(0xFF806B40)
+                containerColor = Color(0xFF00AEFF),
+                contentColor = Color(0xFFF5F5F5)
             ) {
                 Icon(Icons.Default.MyLocation, contentDescription = "My location")
             }
