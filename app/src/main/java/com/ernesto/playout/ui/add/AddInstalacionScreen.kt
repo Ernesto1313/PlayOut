@@ -175,7 +175,7 @@ fun AddInstalacionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2C332D))
+            .background(Color(0xFF806B40))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -465,7 +465,7 @@ fun AddInstalacionScreen(
         if (showPhotoSourceDialog) {
             AlertDialog(
                 onDismissRequest = { showPhotoSourceDialog = false },
-                containerColor = Color(0xFF2C332D),
+                containerColor = Color(0xFF806B40),
                 title = { Text("Add photo", color = Color(0xFFF5F5F5)) },
                 text = {
                     Column {
@@ -580,7 +580,7 @@ internal fun MapPickerScreen(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF2C332D))
+                    .background(Color(0xFF806B40))
                     .statusBarsPadding()
                     .padding(16.dp)
             ) {
@@ -618,7 +618,7 @@ internal fun MapPickerScreen(
                     .align(Alignment.BottomStart)
                     .padding(start = 16.dp, bottom = 96.dp),
                 containerColor = Color(0xFFF5F5F5),
-                contentColor = Color(0xFF2C332D)
+                contentColor = Color(0xFF806B40)
             ) {
                 Icon(Icons.Default.MyLocation, contentDescription = "My location")
             }
@@ -640,7 +640,7 @@ internal fun MapPickerScreen(
         if (showLocationSettingsDialog) {
             AlertDialog(
                 onDismissRequest = { showLocationSettingsDialog = false },
-                containerColor = Color(0xFF2C332D),
+                containerColor = Color(0xFF806B40),
                 title = {
                     Text("Location disabled", color = Color(0xFFF5F5F5),
                         fontWeight = FontWeight.Bold)

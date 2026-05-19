@@ -111,7 +111,7 @@ private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes:
         canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
 
         paint.style = Paint.Style.STROKE
-        paint.color = android.graphics.Color.parseColor("#F5F5F5")
+        paint.color = android.graphics.Color.parseColor("#806B40")
         paint.strokeWidth = 4f
         canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, paint)
 
