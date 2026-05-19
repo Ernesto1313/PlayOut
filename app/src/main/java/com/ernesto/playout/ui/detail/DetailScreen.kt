@@ -247,8 +247,8 @@ private fun ImmersiveMode(
                         .height(3.dp)
                         .clip(RoundedCornerShape(2.dp))
                         .background(
-                            if (index == currentSlide) Color.White
-                            else Color.White.copy(alpha = 0.3f)
+                            if (index == currentSlide) Color(0xFF00AEFF)
+                            else Color(0xFFF5F5F5).copy(alpha = 0.4f)
                         )
                 )
             }
@@ -275,7 +275,7 @@ private fun ImmersiveMode(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(Color(0xFF2C332D).copy(alpha = 0.75f))
+                .background(Color(0xFF806B40).copy(alpha = 0.85f))
                 .padding(16.dp)
         ) {
             when (currentSlide) {
@@ -329,7 +329,7 @@ private fun ImmersiveMode(
                     val stars = inst.experiencia_uso ?: 0
                     Text(
                         text = "★".repeat(stars) + "☆".repeat(5 - stars),
-                        color = Color(0xFFFFC107),
+                        color = Color(0xFF00AEFF),
                         fontSize = 20.sp
                     )
                 }
@@ -388,7 +388,7 @@ private fun ProfileMode(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White
+                    tint = Color(0xFFF5F5F5)
                 )
             }
         }
@@ -398,6 +398,7 @@ private fun ProfileMode(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .background(Color(0xFF806B40))
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -416,6 +417,7 @@ private fun ProfileMode(
                 Text(
                     text = inst.categoria ?: "-",
                     style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFFF5F5F5),
                     modifier = Modifier.weight(1f)
                 )
                 val context = LocalContext.current
@@ -438,21 +440,21 @@ private fun ProfileMode(
                         }
                 )
             }
-            HorizontalDivider()
-            Text(text = descripcion, style = MaterialTheme.typography.bodyMedium)
-            HorizontalDivider()
+            HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
+            Text(text = descripcion, color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
+            HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Condition: ", style = MaterialTheme.typography.bodyMedium)
+                Text("Condition: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 EstadoText(inst.estado)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Experience: ", style = MaterialTheme.typography.bodyMedium)
+                Text("Experience: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 StarRating(value = inst.experiencia_uso, starSize = 20)
             }
             val distance = userLocation?.let { loc ->
@@ -473,7 +475,7 @@ private fun ProfileMode(
                 }
                 Text(
                     "Distance: $distanceText",
-                    color = Color(0xFF2C332D),
+                    color = Color(0xFFF5F5F5),
                     fontSize = 14.sp
                 )
             }
@@ -487,7 +489,7 @@ private fun ProfileMode(
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Water available", style = MaterialTheme.typography.bodyMedium)
+                    Text("Water available", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 }
             }
             if (inst.asientos == 1) {
@@ -500,10 +502,10 @@ private fun ProfileMode(
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Seats available", style = MaterialTheme.typography.bodyMedium)
+                    Text("Seats available", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 }
             }
-            HorizontalDivider()
+            HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
             // 2x2 photo gallery
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(
@@ -553,7 +555,7 @@ private fun StarRating(value: Int?, starSize: Int) {
             Text(
                 text = if (index < filled) "★" else "☆",
                 fontSize = starSize.sp,
-                color = if (index < filled) Color(0xFFFFC107) else Color.Gray
+                color = if (index < filled) Color(0xFF00AEFF) else Color.Gray
             )
         }
     }
