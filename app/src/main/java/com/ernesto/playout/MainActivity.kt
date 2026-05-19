@@ -95,7 +95,7 @@ fun MapListScaffold(
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(0xFF2C332D)
+                            containerColor = Color(0xFF806B40)
                         )
                     )
                 }
@@ -103,7 +103,7 @@ fun MapListScaffold(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = Color(0xFF2C332D),
+                containerColor = Color(0xFF806B40),
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Column(
@@ -138,7 +138,7 @@ fun MapListScaffold(
                     FloatingActionButton(
                         onClick = { navController.navigate("add") },
                         modifier = Modifier.size(48.dp),
-                        containerColor = Color(0xFF4CAF50),
+                        containerColor = Color(0xFF00AEFF),
                         contentColor = Color.White
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Añadir")
