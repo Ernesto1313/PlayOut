@@ -498,29 +498,35 @@ private fun ProfileMode(
                 )
             }
             if (inst.agua == 1) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFF5F5F5),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(6.dp)
                 ) {
                     Image(
                         painter = painterResource(R.drawable.drop),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Water available", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 }
             }
             if (inst.asientos == 1) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFF5F5F5),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(6.dp)
                 ) {
                     Image(
                         painter = painterResource(R.drawable.bench),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-                    Text("Seats available", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
                 }
             }
             HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))

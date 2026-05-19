@@ -354,7 +354,7 @@ fun AddInstalacionScreen(
                     repeat(5) { index ->
                         Text(
                             text = if (index < experiencia) "★" else "☆",
-                            color = Color(0xFFFFC107),
+                            color = Color(0xFF00AEFF),
                             fontSize = 32.sp,
                             modifier = Modifier.clickable {
                                 viewModel.experiencia.value = index + 1
@@ -387,12 +387,12 @@ fun AddInstalacionScreen(
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (agua) Color(0xFF00AEFF) else Color(0xFF806B40)
+                                    if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230)
                                 )
                             )
                             Text(
                                 "Water",
-                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF806B40),
+                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -416,12 +416,12 @@ fun AddInstalacionScreen(
                                 contentDescription = null,
                                 modifier = Modifier.size(32.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (asientos) Color(0xFF806B40) else Color(0xFF806B40)
+                                    if (asientos) Color(0xFF806B40) else Color(0xFF1C2230)
                                 )
                             )
                             Text(
                                 "Seats",
-                                color = if (asientos) Color(0xFF806B40) else Color(0xFF806B40),
+                                color = if (asientos) Color(0xFF806B40) else Color(0xFF1C2230),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
                             )
