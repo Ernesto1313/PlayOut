@@ -6,37 +6,34 @@ import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,13 +75,20 @@ fun MapListScaffold(
 
             topBar = {
                 if (onMap) {
-                    TopAppBar(
+                    CenterAlignedTopAppBar(
                         title = {
-                            Image(
-                                painter = painterResource(R.drawable.playout_banner),
-                                contentDescription = "PlayOut",
-                                modifier = Modifier.height(36.dp),
-                                contentScale = ContentScale.Fit
+                            Text(
+                                text = "PlayOut",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 26.sp,
+                                color = Color(0xFF00AEFF),
+                                style = TextStyle(
+                                    shadow = Shadow(
+                                        color = Color(0xFFF5F5F5),
+                                        offset = Offset(2f, 2f),
+                                        blurRadius = 0f
+                                    )
+                                )
                             )
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
