@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.PlayOut" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.PlayOut.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#806B40</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.PlayOut</item>
+    </style>
 </resources>

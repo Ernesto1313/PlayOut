@@ -128,7 +128,7 @@ fun SettingsScreen(
         if (customInstalaciones.isEmpty()) {
             Text(
                 "You haven't added any locations yet.",
-                color = Color(0xFF8B949E),
+                color = Color(0xFFF5F5F5),
                 fontSize = 14.sp
             )
         } else {
