@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
@@ -46,7 +45,7 @@ import androidx.navigation.navArgument
 import com.ernesto.playout.ui.add.AddInstalacionScreen
 import com.ernesto.playout.ui.add.EditInstalacionScreen
 import com.ernesto.playout.ui.detail.DetailScreen
-import com.ernesto.playout.ui.list.ListScreen
+import com.ernesto.playout.ui.feed.FeedScreen
 import com.ernesto.playout.ui.map.MapScreen
 import com.ernesto.playout.ui.onboarding.PermissionScreen
 import com.ernesto.playout.ui.settings.SettingsScreen
@@ -56,7 +55,7 @@ import dagger.hilt.android.AndroidEntryPoint
 sealed class Screen(val route: String) {
     object Permission : Screen("permission")
     object Map : Screen("map")
-    object List : Screen("list")
+    object Feed : Screen("feed")
     object Detail : Screen("detail/{fid}") {
         fun createRoute(fid: Int) = "detail/$fid"
     }
@@ -70,11 +69,13 @@ fun MapListScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val onMap = currentRoute == Screen.Map.route
+    val onFeed = currentRoute == Screen.Feed.route
+    val showTopBar = currentRoute == Screen.Map.route || currentRoute == Screen.Feed.route
 
     Scaffold(
 
             topBar = {
-                if (onMap) {
+                if (showTopBar) {
                     CenterAlignedTopAppBar(
                         title = {
                             Text(
@@ -109,21 +110,21 @@ fun MapListScaffold(
                 ) {
                     IconButton(onClick = {
                         if (onMap) {
-                            navController.navigate(Screen.List.route) {
+                            navController.navigate(Screen.Feed.route) {
                                 popUpTo(Screen.Map.route)
                                 launchSingleTop = true
                             }
                         } else {
                             navController.navigate(Screen.Map.route) {
-                                popUpTo(Screen.Map.route) { inclusive = true }
+                                popUpTo(Screen.Feed.route) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }
                     }) {
                         Icon(
-                            imageVector = if (onMap) Icons.Default.FormatListBulleted else Icons.Default.Place,
-                            contentDescription = if (onMap) "Lista" else "Mapa",
-                            tint = Color(0xFFF5F5F5)
+                            imageVector = if (onMap) Icons.Default.GridView else Icons.Default.Place,
+                            contentDescription = if (onMap) "Grid" else "Map",
+                            tint = if (onFeed) Color(0xFF00AEFF) else Color(0xFFF5F5F5)
                         )
                     }
                 }
@@ -189,10 +190,13 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Detail.createRoute(fid))
                             })
                         }
-                        composable(Screen.List.route) {
-                            ListScreen(onInstalacionClick = { fid ->
-                                navController.navigate(Screen.Detail.createRoute(fid))
-                            })
+                        composable(Screen.Feed.route) {
+                            FeedScreen(
+                                onInstalacionClick = { fid ->
+                                    navController.navigate(Screen.Detail.createRoute(fid))
+                                },
+                                contentPadding = PaddingValues()
+                            )
                         }
                         composable(
                             route = Screen.Detail.route,
@@ -206,9 +210,22 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = mainNavController,
-                        startDestination = Screen.Map.route,
+                        startDestination = Screen.Feed.route,
                         modifier = Modifier.fillMaxSize()
                     ) {
+                        composable(Screen.Feed.route) {
+                            MapListScaffold(
+                                currentRoute = Screen.Feed.route,
+                                navController = mainNavController
+                            ) { padding ->
+                                FeedScreen(
+                                    onInstalacionClick = { fid ->
+                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
+                                    },
+                                    contentPadding = padding
+                                )
+                            }
+                        }
                         composable(Screen.Map.route) {
                             MapListScaffold(
                                 currentRoute = Screen.Map.route,
@@ -220,18 +237,6 @@ class MainActivity : ComponentActivity() {
                                     },
                                     contentPadding = padding
                                 )
-                            }
-                        }
-                        composable(Screen.List.route) {
-                            MapListScaffold(
-                                currentRoute = Screen.List.route,
-                                navController = mainNavController
-                            ) { padding ->
-                                Box(modifier = Modifier.padding(padding)) {
-                                    ListScreen(onInstalacionClick = { fid ->
-                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
-                                    })
-                                }
                             }
                         }
                         composable(
