@@ -79,7 +79,7 @@ private fun slidePath(facility: Facility, suffix: String): String? {
 @DrawableRes
 private fun categoryDrawable(sport: String?): Int = when (sport) {
     "Chess" -> R.drawable.chess
-    "Ping-Pong" -> R.drawable.pingpong
+    "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> R.drawable.pingpong
     "Football" -> R.drawable.football
     "Fencing" -> R.drawable.fencing
     "Skating" -> R.drawable.skate
@@ -87,7 +87,7 @@ private fun categoryDrawable(sport: String?): Int = when (sport) {
     "Basketball" -> R.drawable.basketball
     "Calisthenics" -> R.drawable.calisthenics
     "Athletics" -> R.drawable.atletism
-    "Other" -> R.drawable.other
+    "Other", "Otro", "other" -> R.drawable.other
     "Mini Golf" -> R.drawable.minigolf
     "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
@@ -98,7 +98,7 @@ private fun categoryColor(sport: String?): Color = when (sport) {
     "Basketball" -> Color(0xFFE65100)
     "Volleyball" -> Color(0xFF1565C0)
     "Chess" -> Color(0xFF37474F)
-    "Ping-Pong" -> Color(0xFF558B2F)
+    "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> Color(0xFF558B2F)
     "Mini Golf" -> Color(0xFF00695C)
     "Fencing" -> Color(0xFF6A1B9A)
     "Skating" -> Color(0xFF00838F)

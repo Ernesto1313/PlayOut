@@ -44,6 +44,10 @@ class MapViewModel @Inject constructor(
 
     val filteredFacilities: StateFlow<List<Facility>> =
         combine(facilities, _selectedCategory) { list, cat ->
-            if (cat == null) list else list.filter { it.sport == cat }
+            if (cat == null) list
+            else list.filter { facility ->
+                facility.sport?.equals(cat, ignoreCase = true) == true ||
+                (cat == "Pingpong" && facility.sport?.contains("ping", ignoreCase = true) == true)
+            }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 }

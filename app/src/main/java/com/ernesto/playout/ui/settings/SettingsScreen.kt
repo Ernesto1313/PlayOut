@@ -148,7 +148,7 @@ fun SettingsScreen(
                         val iconRes = when (inst.sport) {
                             "Football" -> R.drawable.football
                             "Basketball" -> R.drawable.basketball
-                            "Ping-Pong" -> R.drawable.pingpong
+                            "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> R.drawable.pingpong
                             "Volleyball" -> R.drawable.volleyball
                             "Chess" -> R.drawable.chess
                             "Fencing" -> R.drawable.fencing

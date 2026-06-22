@@ -79,8 +79,8 @@ class AddFacilityViewModel @Inject constructor(
                 validationError.value = "Please add a rating"
                 return
             }
-            photoPaths.value[0] == null -> {
-                validationError.value = "Please add at least the main photo"
+            photoPaths.value.any { it == null } -> {
+                validationError.value = "Please add all 4 photos"
                 return
             }
             pinLatLng.value == null -> {

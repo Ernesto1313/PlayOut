@@ -69,33 +69,33 @@ import kotlinx.coroutines.launch
 
 @DrawableRes
 private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez", "Chess" -> R.drawable.chess
-    "Pingpong", "Ping-Pong" -> R.drawable.pingpong
-    "Fútbol", "Futbol", "Football" -> R.drawable.football
-    "Esgrima", "Fencing" -> R.drawable.fencing
-    "Patinaje", "Skating" -> R.drawable.skate
+    "Chess" -> R.drawable.chess
+    "Pingpong", "Ping-Pong", "PingPong", "ping-pong" -> R.drawable.pingpong
+    "Football" -> R.drawable.football
+    "Fencing" -> R.drawable.fencing
+    "Skating" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto", "Basketball" -> R.drawable.basketball
-    "Calistenia", "Calisthenics" -> R.drawable.calisthenics
-    "Atletismo", "Athletics" -> R.drawable.atletism
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf
-    "Petanca", "Pétanque" -> R.drawable.petanque
+    "Basketball" -> R.drawable.basketball
+    "Calisthenics" -> R.drawable.calisthenics
+    "Athletics" -> R.drawable.atletism
+    "Mini Golf" -> R.drawable.minigolf
+    "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
 
 @DrawableRes
 private fun categoryDrawableWhite(categoria: String?): Int = when (categoria) {
-    "Ajedrez", "Chess" -> R.drawable.chess_white
-    "Pingpong", "Ping-Pong" -> R.drawable.pingpong_white
-    "Fútbol", "Futbol", "Football" -> R.drawable.football_white
-    "Esgrima", "Fencing" -> R.drawable.fencing_white
-    "Patinaje", "Skating" -> R.drawable.skate_white
+    "Chess" -> R.drawable.chess_white
+    "Pingpong", "Ping-Pong", "PingPong", "ping-pong" -> R.drawable.pingpong_white
+    "Football" -> R.drawable.football_white
+    "Fencing" -> R.drawable.fencing_white
+    "Skating" -> R.drawable.skate_white
     "Volleyball" -> R.drawable.volleyball_white
-    "Baloncesto", "Basketball" -> R.drawable.basketball_white
-    "Calistenia", "Calisthenics" -> R.drawable.calisthenics_white
-    "Atletismo", "Athletics" -> R.drawable.atletism_white
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf_white
-    "Petanca", "Pétanque" -> R.drawable.petanque_white
+    "Basketball" -> R.drawable.basketball_white
+    "Calisthenics" -> R.drawable.calisthenics_white
+    "Athletics" -> R.drawable.atletism_white
+    "Mini Golf" -> R.drawable.minigolf_white
+    "Pétanque" -> R.drawable.petanque_white
     else -> R.drawable.other_white
 }
 
@@ -125,11 +125,11 @@ private fun rememberCategoryMarkerBitmap(context: Context, @DrawableRes iconRes:
     }
 }
 
-// Display name → ViewModel category name (used for filtering)
+// Display name → DB category value (used for filtering)
 private val categoryDisplayToKey = mapOf(
     "Football" to "Football",
     "Basketball" to "Basketball",
-    "Ping-Pong" to "Ping-Pong",
+    "Ping-Pong" to "Pingpong",
     "Volleyball" to "Volleyball",
     "Chess" to "Chess",
     "Fencing" to "Fencing",
@@ -193,11 +193,7 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (!hasLocationPermission) {
-            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
+    var showPermissionDialog by remember { mutableStateOf(!hasLocationPermission) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -319,6 +315,42 @@ fun MapScreen(
             dismissButton = {
                 TextButton(onClick = { showLocationSettingsDialog = false }) {
                     Text("Cancel", color = Color(0xFF8B949E))
+                }
+            }
+        )
+    }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            containerColor = Color(0xFF806B40),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            title = {
+                Text(
+                    "Location access",
+                    color = Color(0xFFF5F5F5),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            },
+            text = {
+                Text(
+                    "PlayOut uses your location to show nearby facilities and calculate distances.",
+                    color = Color(0xFFF5F5F5),
+                    fontSize = 14.sp
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPermissionDialog = false
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }) {
+                    Text("Allow", color = Color(0xFF00AEFF), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text("Not now", color = Color(0xFFF5F5F5))
                 }
             }
         )

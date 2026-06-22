@@ -97,7 +97,7 @@ internal fun createCameraUri(context: Context): Uri {
 internal fun categoryDrawable(name: String): Int = when (name) {
     "Football" -> R.drawable.football_white
     "Basketball" -> R.drawable.basketball_white
-    "Ping-Pong" -> R.drawable.pingpong_white
+    "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> R.drawable.pingpong_white
     "Volleyball" -> R.drawable.volleyball_white
     "Chess" -> R.drawable.chess_white
     "Fencing" -> R.drawable.fencing_white
@@ -247,7 +247,7 @@ fun AddFacilityScreen(
                 // Photos
                 Text("Photos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Text(
-                    "Add up to 4 photos. The first one is the main photo.",
+                    "All 4 photos are required.",
                     color = Color(0xFFF5F5F5),
                     fontSize = 12.sp
                 )

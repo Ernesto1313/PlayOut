@@ -4,7 +4,7 @@ import com.ernesto.playout.R
 
 fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Chess" -> R.drawable.chess
-    "Ping-Pong", "Pingpong", "ping-pong", "PingPong" -> R.drawable.pingpong
+    "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> R.drawable.pingpong
     "Football" -> R.drawable.football
     "Fencing" -> R.drawable.fencing
     "Skating" -> R.drawable.skate
@@ -14,6 +14,7 @@ fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Athletics" -> R.drawable.atletism
     "Minigolf", "Mini Golf" -> R.drawable.minigolf
     "Pétanque" -> R.drawable.petanque
+    "Other", "Otro", "other" -> R.drawable.other
     else -> R.drawable.other
 }
 
