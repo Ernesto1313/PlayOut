@@ -88,7 +88,7 @@ private fun categoryDrawable(sport: String?): Int = when (sport) {
     "Calisthenics" -> R.drawable.calisthenics
     "Athletics" -> R.drawable.atletism
     "Other", "Otro", "other" -> R.drawable.other
-    "Mini Golf" -> R.drawable.minigolf
+    "Minigolf" -> R.drawable.minigolf
     "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
@@ -99,7 +99,7 @@ private fun categoryColor(sport: String?): Color = when (sport) {
     "Volleyball" -> Color(0xFF1565C0)
     "Chess" -> Color(0xFF37474F)
     "Ping-Pong", "Pingpong", "PingPong", "ping-pong" -> Color(0xFF558B2F)
-    "Mini Golf" -> Color(0xFF00695C)
+    "Minigolf" -> Color(0xFF00695C)
     "Fencing" -> Color(0xFF6A1B9A)
     "Skating" -> Color(0xFF00838F)
     "Calisthenics" -> Color(0xFF4527A0)

@@ -72,7 +72,7 @@ import com.google.android.gms.maps.model.LatLng
 private val editCategories = listOf(
     "Football", "Basketball", "Ping-Pong", "Volleyball",
     "Chess", "Fencing", "Skating", "Calisthenics",
-    "Athletics", "Mini Golf", "Pétanque", "Other"
+    "Athletics", "Minigolf", "Pétanque", "Other"
 )
 
 @Composable

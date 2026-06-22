@@ -20,7 +20,7 @@ object AppModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         AppDatabase.appContext = context
-        return Room.databaseBuilder(context, AppDatabase::class.java, "playout10.db")
+        return Room.databaseBuilder(context, AppDatabase::class.java, "playout21.db")
             .addCallback(AppDatabase.callback)
             .addMigrations(
                 AppDatabase.MIGRATION_1_2,

@@ -12,7 +12,7 @@ fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Basketball" -> R.drawable.basketball
     "Calisthenics" -> R.drawable.calisthenics
     "Athletics" -> R.drawable.atletism
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf
+    "Minigolf", "Minigolf" -> R.drawable.minigolf
     "Pétanque" -> R.drawable.petanque
     "Other", "Otro", "other" -> R.drawable.other
     else -> R.drawable.other

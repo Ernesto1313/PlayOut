@@ -78,7 +78,7 @@ private fun categoryDrawable(categoria: String?): Int = when (categoria) {
     "Basketball" -> R.drawable.basketball
     "Calisthenics" -> R.drawable.calisthenics
     "Athletics" -> R.drawable.atletism
-    "Mini Golf" -> R.drawable.minigolf
+    "Minigolf" -> R.drawable.minigolf
     "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
@@ -94,7 +94,7 @@ private fun categoryDrawableWhite(categoria: String?): Int = when (categoria) {
     "Basketball" -> R.drawable.basketball_white
     "Calisthenics" -> R.drawable.calisthenics_white
     "Athletics" -> R.drawable.atletism_white
-    "Mini Golf" -> R.drawable.minigolf_white
+    "Minigolf" -> R.drawable.minigolf_white
     "Pétanque" -> R.drawable.petanque_white
     else -> R.drawable.other_white
 }
@@ -136,15 +136,14 @@ private val categoryDisplayToKey = mapOf(
     "Skating" to "Skating",
     "Calisthenics" to "Calisthenics",
     "Athletics" to "Athletics",
-    "Mini Golf" to "Mini Golf",
-    "Pétanque" to "Pétanque",
+    "Minigolf" to "Minigolf",
     "Other" to "Other"
 )
 
 private val categories = listOf(
     "Football", "Basketball", "Ping-Pong", "Volleyball",
     "Chess", "Fencing", "Skating", "Calisthenics",
-    "Athletics", "Mini Golf", "Pétanque", "Other"
+    "Athletics", "Minigolf", "Other"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -155,7 +155,7 @@ fun SettingsScreen(
                             "Skating" -> R.drawable.skate
                             "Calisthenics" -> R.drawable.calisthenics
                             "Athletics" -> R.drawable.atletism
-                            "Mini Golf" -> R.drawable.minigolf
+                            "Minigolf" -> R.drawable.minigolf
                             "Pétanque" -> R.drawable.petanque
                             else -> R.drawable.other
                         }

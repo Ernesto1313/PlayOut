@@ -104,7 +104,7 @@ internal fun categoryDrawable(name: String): Int = when (name) {
     "Skating" -> R.drawable.skate_white
     "Calisthenics" -> R.drawable.calisthenics_white
     "Athletics" -> R.drawable.atletism_white
-    "Mini Golf" -> R.drawable.minigolf_white
+    "Minigolf" -> R.drawable.minigolf_white
     "Pétanque" -> R.drawable.petanque_white
     else -> R.drawable.other_white
 }
@@ -112,7 +112,7 @@ internal fun categoryDrawable(name: String): Int = when (name) {
 private val categories = listOf(
     "Football", "Basketball", "Ping-Pong", "Volleyball",
     "Chess", "Fencing", "Skating", "Calisthenics",
-    "Athletics", "Mini Golf", "Pétanque", "Other"
+    "Athletics", "Minigolf", "Pétanque", "Other"
 )
 
 @Composable
