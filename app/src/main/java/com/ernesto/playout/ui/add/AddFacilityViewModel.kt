@@ -14,18 +14,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AddInstalacionViewModel @Inject constructor(
+class AddFacilityViewModel @Inject constructor(
     private val repository: FacilityRepository,
     private val locationDataSource: LocationDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    val categoria = MutableStateFlow<String?>(null)
-    val descripcion = MutableStateFlow("")
-    val estado = MutableStateFlow<Int?>(null)
-    val agua = MutableStateFlow(false)
-    val asientos = MutableStateFlow(false)
-    val experiencia = MutableStateFlow(0)
+    val sport = MutableStateFlow<String?>(null)
+    val description = MutableStateFlow("")
+    val condition = MutableStateFlow<Int?>(null)
+    val water = MutableStateFlow(false)
+    val seats = MutableStateFlow(false)
+    val experience = MutableStateFlow(0)
     val photoPaths = MutableStateFlow<List<String?>>(listOf(null, null, null, null))
     val location = MutableStateFlow<android.location.Location?>(null)
     val pinLatLng = MutableStateFlow<com.google.android.gms.maps.model.LatLng?>(null)
@@ -67,15 +67,15 @@ class AddInstalacionViewModel @Inject constructor(
 
     fun save() {
         when {
-            categoria.value == null -> {
+            sport.value == null -> {
                 validationError.value = "Please select a category"
                 return
             }
-            estado.value == null -> {
+            condition.value == null -> {
                 validationError.value = "Please select a condition"
                 return
             }
-            experiencia.value == 0 -> {
+            experience.value == 0 -> {
                 validationError.value = "Please add a rating"
                 return
             }
@@ -95,12 +95,12 @@ class AddInstalacionViewModel @Inject constructor(
         viewModelScope.launch {
             isSaving.value = true
             val tempFacility = CustomFacility(
-                sport = categoria.value,
-                description = descripcion.value.ifBlank { null },
-                condition = estado.value,
-                water = if (agua.value) 1 else 0,
-                seats = if (asientos.value) 1 else 0,
-                experience = experiencia.value,
+                sport = sport.value,
+                description = description.value.ifBlank { null },
+                condition = condition.value,
+                water = if (water.value) 1 else 0,
+                seats = if (seats.value) 1 else 0,
+                experience = experience.value,
                 longitude = lng,
                 latitude = lat,
                 photo = null
@@ -121,12 +121,12 @@ class AddInstalacionViewModel @Inject constructor(
             if (finalMainPath != null) {
                 val updated = CustomFacility(
                     fid = newFid,
-                    sport = categoria.value,
-                    description = descripcion.value.ifBlank { null },
-                    condition = estado.value,
-                    water = if (agua.value) 1 else 0,
-                    seats = if (asientos.value) 1 else 0,
-                    experience = experiencia.value,
+                    sport = sport.value,
+                    description = description.value.ifBlank { null },
+                    condition = condition.value,
+                    water = if (water.value) 1 else 0,
+                    seats = if (seats.value) 1 else 0,
+                    experience = experience.value,
                     longitude = lng,
                     latitude = lat,
                     photo = finalMainPath

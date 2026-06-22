@@ -154,7 +154,7 @@ fun MapScreen(
     contentPadding: PaddingValues = PaddingValues(),
     viewModel: MapViewModel = hiltViewModel()
 ) {
-    val filteredInstalaciones by viewModel.filteredInstalaciones.collectAsState()
+    val filteredFacilities by viewModel.filteredFacilities.collectAsState()
     val userLocation by viewModel.userLocation.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -206,19 +206,17 @@ fun MapScreen(
             properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
             uiSettings = MapUiSettings(myLocationButtonEnabled = false)
         ) {
-            filteredInstalaciones.forEach { instalacion ->
-                val lat = instalacion.latitud
-                val lng = instalacion.longitud
+            filteredFacilities.forEach { facility ->
+                val lat = facility.latitude
+                val lng = facility.longitude
                 if (lat != null && lng != null) {
-                    val iconRes = categoryDrawableWhite(
-                        instalacion.categoria?.replaceFirstChar { it.uppercase() }
-                    )
+                    val iconRes = categoryDrawableWhite(facility.sport)
                     val markerIcon = rememberCategoryMarkerBitmap(context, iconRes)
                     Marker(
                         state = MarkerState(position = LatLng(lat, lng)),
                         icon = markerIcon,
                         onClick = { _ ->
-                            onInstalacionClick(instalacion.fid)
+                            onInstalacionClick(facility.fid)
                             true
                         }
                     )

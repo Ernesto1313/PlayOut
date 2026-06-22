@@ -1,12 +1,10 @@
 package com.ernesto.playout.ui.add
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,11 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -34,14 +31,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -55,7 +50,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,70 +62,36 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ernesto.playout.R
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.launch
 
-internal fun createCameraUri(context: Context): Uri {
-    val file = java.io.File(
-        context.cacheDir,
-        "camera_temp_${System.currentTimeMillis()}.jpg"
-    )
-    return FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-}
-
-@DrawableRes
-internal fun categoryDrawable(name: String): Int = when (name) {
-    "Futbol", "Fútbol", "Football" -> R.drawable.football_white
-    "Baloncesto", "Basketball" -> R.drawable.basketball_white
-    "Pingpong", "Ping-Pong" -> R.drawable.pingpong_white
-    "Volleyball" -> R.drawable.volleyball_white
-    "Ajedrez", "Chess" -> R.drawable.chess_white
-    "Esgrima", "Fencing" -> R.drawable.fencing_white
-    "Patinaje", "Skating" -> R.drawable.skate_white
-    "Calistenia", "Calisthenics" -> R.drawable.calisthenics_white
-    "Atletismo", "Athletics" -> R.drawable.atletism_white
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf_white
-    "Petanca", "Pétanque" -> R.drawable.petanque_white
-    else -> R.drawable.other_white
-}
-
-private val categories = listOf(
+private val editCategories = listOf(
     "Football", "Basketball", "Ping-Pong", "Volleyball",
     "Chess", "Fencing", "Skating", "Calisthenics",
     "Athletics", "Mini Golf", "Pétanque", "Other"
 )
 
 @Composable
-fun AddInstalacionScreen(
+fun EditFacilityScreen(
+    fid: Int,
     onBack: () -> Unit,
-    viewModel: AddInstalacionViewModel = hiltViewModel()
+    viewModel: EditFacilityViewModel = hiltViewModel()
 ) {
-    val categoria by viewModel.categoria.collectAsStateWithLifecycle()
-    val descripcion by viewModel.descripcion.collectAsStateWithLifecycle()
-    val estado by viewModel.estado.collectAsStateWithLifecycle()
-    val agua by viewModel.agua.collectAsStateWithLifecycle()
-    val asientos by viewModel.asientos.collectAsStateWithLifecycle()
-    val experiencia by viewModel.experiencia.collectAsStateWithLifecycle()
+    val sport by viewModel.sport.collectAsStateWithLifecycle()
+    val description by viewModel.description.collectAsStateWithLifecycle()
+    val condition by viewModel.condition.collectAsStateWithLifecycle()
+    val water by viewModel.water.collectAsStateWithLifecycle()
+    val seats by viewModel.seats.collectAsStateWithLifecycle()
+    val experience by viewModel.experience.collectAsStateWithLifecycle()
     val photoPaths by viewModel.photoPaths.collectAsStateWithLifecycle()
     val pinLatLng by viewModel.pinLatLng.collectAsStateWithLifecycle()
     val isSaving by viewModel.isSaving.collectAsStateWithLifecycle()
     val saveSuccess by viewModel.saveSuccess.collectAsStateWithLifecycle()
     val validationError by viewModel.validationError.collectAsStateWithLifecycle()
-    val currentLocation by viewModel.location.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -175,7 +135,7 @@ fun AddInstalacionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF806B40))
+            .background(Color(0xFF2C332D))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -193,7 +153,7 @@ fun AddInstalacionScreen(
                     )
                 }
                 Text(
-                    "New Location",
+                    "Edit Location",
                     color = Color(0xFFF5F5F5),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -216,12 +176,12 @@ fun AddInstalacionScreen(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(categories) { name ->
-                        val selected = categoria == name
+                    items(editCategories) { name ->
+                        val selected = sport == name
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.clickable { viewModel.categoria.value = name }
+                            modifier = Modifier.clickable { viewModel.sport.value = name }
                         ) {
                             Box(
                                 modifier = Modifier
@@ -248,7 +208,7 @@ fun AddInstalacionScreen(
                 Text("Photos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Text(
                     "Add up to 4 photos. The first one is the main photo.",
-                    color = Color(0xFFF5F5F5),
+                    color = Color(0xFF8B949E),
                     fontSize = 12.sp
                 )
                 Row(
@@ -291,7 +251,7 @@ fun AddInstalacionScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
-                                        contentDescription = "Delete photo",
+                                        contentDescription = "Remove photo",
                                         tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -311,20 +271,20 @@ fun AddInstalacionScreen(
                 // Description
                 Text("Description", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 OutlinedTextField(
-                    value = descripcion,
-                    onValueChange = { viewModel.descripcion.value = it },
+                    value = description,
+                    onValueChange = { viewModel.description.value = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(120.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF00AEFF),
-                        unfocusedBorderColor = Color(0xFFF5F5F5),
+                        unfocusedBorderColor = Color(0xFF8B949E),
                         focusedTextColor = Color(0xFFF5F5F5),
                         unfocusedTextColor = Color(0xFFF5F5F5),
                         cursorColor = Color(0xFF00AEFF)
                     ),
                     placeholder = {
-                        Text("Describe the facility...", color = Color(0xFFF5F5F5))
+                        Text("Describe the facility...", color = Color(0xFF8B949E))
                     }
                 )
 
@@ -332,18 +292,18 @@ fun AddInstalacionScreen(
                 Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Triple(1, "Good", Color(0xFF4CAF50)),
+                        Triple(1, "Good", Color(0xFF00AEFF)),
                         Triple(2, "Fair", Color(0xFFFFC107)),
                         Triple(3, "Broken", Color(0xFFF44336))
                     ).forEach { (value, label, color) ->
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(20.dp))
-                                .background(if (estado == value) color else Color(0xFF1C2230))
-                                .clickable { viewModel.estado.value = value }
+                                .background(if (condition == value) color else Color(0xFF1C2230))
+                                .clickable { viewModel.condition.value = value }
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Text(label, color = Color(0xFFF5F5F5))
+                            Text(label, color = Color.White)
                         }
                     }
                 }
@@ -353,11 +313,11 @@ fun AddInstalacionScreen(
                 Row {
                     repeat(5) { index ->
                         Text(
-                            text = if (index < experiencia) "★" else "☆",
-                            color = Color(0xFF00AEFF),
+                            text = if (index < experience) "★" else "☆",
+                            color = Color(0xFFFFC107),
                             fontSize = 32.sp,
                             modifier = Modifier.clickable {
-                                viewModel.experiencia.value = index + 1
+                                viewModel.experience.value = index + 1
                             }
                         )
                     }
@@ -365,67 +325,42 @@ fun AddInstalacionScreen(
 
                 // Amenities
                 Text("Amenities", color = Color(0xFFF5F5F5), fontSize = 14.sp)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFFF5F5F5))
-                            .clickable { viewModel.agua.value = !viewModel.agua.value }
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable { viewModel.water.value = !water }
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Image(
-                                painterResource(R.drawable.drop),
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp),
-                                colorFilter = ColorFilter.tint(
-                                    if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230)
-                                )
+                        Image(
+                            painter = painterResource(R.drawable.drop),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            colorFilter = ColorFilter.tint(
+                                if (water) Color(0xFF1E88E5) else Color(0xFF8B949E)
                             )
-                            Text(
-                                "Water",
-                                color = if (agua) Color(0xFF00AEFF) else Color(0xFF1C2230),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        )
+                        Text(
+                            "Water",
+                            color = if (water) Color(0xFF1E88E5) else Color(0xFF8B949E),
+                            fontSize = 12.sp
+                        )
                     }
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFFF5F5F5))
-                            .clickable { viewModel.asientos.value = !viewModel.asientos.value }
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable { viewModel.seats.value = !seats }
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Image(
-                                painterResource(R.drawable.bench),
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp),
-                                colorFilter = ColorFilter.tint(
-                                    if (asientos) Color(0xFF806B40) else Color(0xFF1C2230)
-                                )
+                        Image(
+                            painter = painterResource(R.drawable.bench),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            colorFilter = ColorFilter.tint(
+                                if (seats) Color(0xFF8D6E63) else Color(0xFF8B949E)
                             )
-                            Text(
-                                "Seats",
-                                color = if (asientos) Color(0xFF806B40) else Color(0xFF1C2230),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        )
+                        Text(
+                            "Seats",
+                            color = if (seats) Color(0xFF8D6E63) else Color(0xFF8B949E),
+                            fontSize = 12.sp
+                        )
                     }
                 }
 
@@ -434,21 +369,21 @@ fun AddInstalacionScreen(
                 Button(
                     onClick = { showMapPicker = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00AEFF)
+                        containerColor = if (pinLatLng != null) Color(0xFF00AEFF) else Color(0xFF1C2230)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Place, contentDescription = null, tint = Color(0xFFF5F5F5))
+                    Icon(Icons.Default.Place, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.size(4.dp))
                     Text(
                         if (pinLatLng != null) "Location selected ✓" else "Select location",
-                        color = Color(0xFFF5F5F5)
+                        color = Color.White
                     )
                 }
                 if (pinLatLng != null) {
                     Text(
                         "${pinLatLng!!.latitude}, ${pinLatLng!!.longitude}",
-                        color = Color(0xFFF5F5F5),
+                        color = Color(0xFF8B949E),
                         fontSize = 12.sp
                     )
                 }
@@ -490,7 +425,7 @@ fun AddInstalacionScreen(
         if (showPhotoSourceDialog) {
             AlertDialog(
                 onDismissRequest = { showPhotoSourceDialog = false },
-                containerColor = Color(0xFF806B40),
+                containerColor = Color(0xFF2C332D),
                 title = { Text("Add photo", color = Color(0xFFF5F5F5)) },
                 text = {
                     Column {
@@ -528,167 +463,13 @@ fun AddInstalacionScreen(
         if (showMapPicker) {
             MapPickerScreen(
                 initialPosition = pinLatLng ?: LatLng(50.7753, 6.0839),
-                currentLocation = currentLocation,
+                currentLocation = null,
                 onConfirm = { latLng ->
                     viewModel.pinLatLng.value = latLng
                     showMapPicker = false
                 },
                 onDismiss = { showMapPicker = false },
                 onPinMoved = { latLng -> viewModel.pinLatLng.value = latLng }
-            )
-        }
-    }
-}
-
-@Composable
-internal fun MapPickerScreen(
-    initialPosition: LatLng,
-    currentLocation: android.location.Location?,
-    onConfirm: (LatLng) -> Unit,
-    onDismiss: () -> Unit,
-    onPinMoved: (LatLng) -> Unit = {}
-) {
-    val context = LocalContext.current
-    var hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-    val scope = rememberCoroutineScope()
-    var showLocationSettingsDialog by remember { mutableStateOf(false) }
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(initialPosition, 15f)
-        }
-
-        val locationPermissionLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            if (granted) {
-                hasLocationPermission = true
-                currentLocation?.let { loc ->
-                    scope.launch {
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(loc.latitude, loc.longitude), 16f
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-        Box(Modifier.fillMaxSize()) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
-                uiSettings = MapUiSettings(myLocationButtonEnabled = false)
-            )
-
-            Icon(
-                Icons.Default.Place,
-                contentDescription = null,
-                tint = Color(0xFF00AEFF),
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.Center)
-                    .offset(y = (-24).dp)
-            )
-
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF806B40))
-                    .statusBarsPadding()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    "Move the map to position the pin",
-                    color = Color(0xFFF5F5F5)
-                )
-            }
-
-            FloatingActionButton(
-                onClick = {
-                    val locationManager = context.getSystemService(Context.LOCATION_SERVICE)
-                        as android.location.LocationManager
-                    val isLocationEnabled = locationManager.isProviderEnabled(
-                        android.location.LocationManager.GPS_PROVIDER) ||
-                        locationManager.isProviderEnabled(
-                        android.location.LocationManager.NETWORK_PROVIDER)
-                    if (!isLocationEnabled) {
-                        showLocationSettingsDialog = true
-                    } else if (hasLocationPermission) {
-                        currentLocation?.let { loc ->
-                            val latLng = LatLng(loc.latitude, loc.longitude)
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    CameraUpdateFactory.newLatLngZoom(latLng, 16f)
-                                )
-                            }
-                            onPinMoved(latLng)
-                        }
-                    } else {
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 16.dp, bottom = 96.dp),
-                containerColor = Color(0xFF00AEFF),
-                contentColor = Color(0xFFF5F5F5)
-            ) {
-                Icon(Icons.Default.MyLocation, contentDescription = "My location")
-            }
-
-            Button(
-                onClick = {
-                    val center = cameraPositionState.position.target
-                    onConfirm(center)
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
-            ) {
-                Text("Confirm location", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        if (showLocationSettingsDialog) {
-            AlertDialog(
-                onDismissRequest = { showLocationSettingsDialog = false },
-                containerColor = Color(0xFF806B40),
-                title = {
-                    Text("Location disabled", color = Color(0xFFF5F5F5),
-                        fontWeight = FontWeight.Bold)
-                },
-                text = {
-                    Text("Location is disabled on your device. Would you like to enable it?",
-                        color = Color(0xFFF5F5F5))
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showLocationSettingsDialog = false
-                        context.startActivity(
-                            android.content.Intent(
-                                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                    }) {
-                        Text("Open Settings", color = Color(0xFF00AEFF))
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showLocationSettingsDialog = false }) {
-                        Text("Cancel", color = Color(0xFFF5F5F5))
-                    }
-                }
             )
         }
     }

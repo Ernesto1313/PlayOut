@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 sealed class ListUiState {
     object Loading : ListUiState()
-    data class Success(val instalaciones: List<Facility>) : ListUiState()
+    data class Success(val facilities: List<Facility>) : ListUiState()
     data class Error(val message: String) : ListUiState()
 }
 

@@ -40,8 +40,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.ernesto.playout.ui.add.AddInstalacionScreen
-import com.ernesto.playout.ui.add.EditInstalacionScreen
+import com.ernesto.playout.ui.add.AddFacilityScreen
+import com.ernesto.playout.ui.add.EditFacilityScreen
 import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.feed.FeedScreen
 import com.ernesto.playout.ui.map.MapScreen
@@ -206,13 +206,13 @@ class MainActivity : ComponentActivity() {
                     composable("settings") {
                         SettingsScreen(
                             onBack = { navController.navigateUp() },
-                            onEditInstalacion = { fid ->
+                            onEditFacility = { fid ->
                                 navController.navigate("edit/$fid")
                             }
                         )
                     }
                     composable("add") {
-                        AddInstalacionScreen(onBack = { navController.navigateUp() })
+                        AddFacilityScreen(onBack = { navController.navigateUp() })
                     }
                     composable(
                         route = "edit/{fid}",
@@ -220,7 +220,7 @@ class MainActivity : ComponentActivity() {
                     ) { backStackEntry ->
                         val fid = backStackEntry.arguments?.getInt("fid")
                             ?: return@composable
-                        EditInstalacionScreen(
+                        EditFacilityScreen(
                             fid = fid,
                             onBack = { navController.navigateUp() }
                         )

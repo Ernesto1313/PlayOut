@@ -41,7 +41,7 @@ import com.ernesto.playout.R
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    onEditInstalacion: (Int) -> Unit = {},
+    onEditFacility: (Int) -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
@@ -145,18 +145,18 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        val iconRes = when (inst.categoria?.replaceFirstChar { it.uppercase() }) {
-                            "Fútbol", "Futbol", "Football" -> R.drawable.football
-                            "Baloncesto", "Basketball" -> R.drawable.basketball
-                            "Pingpong", "Ping-Pong" -> R.drawable.pingpong
+                        val iconRes = when (inst.sport) {
+                            "Football" -> R.drawable.football
+                            "Basketball" -> R.drawable.basketball
+                            "Ping-Pong" -> R.drawable.pingpong
                             "Volleyball" -> R.drawable.volleyball
-                            "Ajedrez", "Chess" -> R.drawable.chess
-                            "Esgrima", "Fencing" -> R.drawable.fencing
-                            "Patinaje", "Skating" -> R.drawable.skate
-                            "Calistenia", "Calisthenics" -> R.drawable.calisthenics
-                            "Atletismo", "Athletics" -> R.drawable.atletism
-                            "Minigolf", "Mini Golf" -> R.drawable.minigolf
-                            "Petanca", "Pétanque" -> R.drawable.petanque
+                            "Chess" -> R.drawable.chess
+                            "Fencing" -> R.drawable.fencing
+                            "Skating" -> R.drawable.skate
+                            "Calisthenics" -> R.drawable.calisthenics
+                            "Athletics" -> R.drawable.atletism
+                            "Mini Golf" -> R.drawable.minigolf
+                            "Pétanque" -> R.drawable.petanque
                             else -> R.drawable.other
                         }
                         Image(
@@ -167,19 +167,19 @@ fun SettingsScreen(
                         )
                         Column {
                             Text(
-                                inst.categoria?.replaceFirstChar { it.uppercase() } ?: "No category",
+                                inst.sport ?: "No category",
                                 color = Color(0xFFF5F5F5),
                                 fontSize = 15.sp
                             )
-                            val estadoText = when (inst.estado) {
+                            val conditionText = when (inst.condition) {
                                 1 -> "Good"; 2 -> "Fair"; 3 -> "Broken"; else -> ""
                             }
-                            if (estadoText.isNotEmpty()) {
-                                Text(estadoText, color = Color(0xFF8B949E), fontSize = 12.sp)
+                            if (conditionText.isNotEmpty()) {
+                                Text(conditionText, color = Color(0xFF8B949E), fontSize = 12.sp)
                             }
                         }
                     }
-                    IconButton(onClick = { onEditInstalacion(inst.fid) }) {
+                    IconButton(onClick = { onEditFacility(inst.fid) }) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Edit",

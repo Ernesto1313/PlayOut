@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditInstalacionViewModel @Inject constructor(
+class EditFacilityViewModel @Inject constructor(
     private val repository: FacilityRepository,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
@@ -22,12 +22,12 @@ class EditInstalacionViewModel @Inject constructor(
 
     private val fid: Int = checkNotNull(savedStateHandle["fid"])
 
-    val categoria = MutableStateFlow<String?>(null)
-    val descripcion = MutableStateFlow("")
-    val estado = MutableStateFlow<Int?>(null)
-    val agua = MutableStateFlow(false)
-    val asientos = MutableStateFlow(false)
-    val experiencia = MutableStateFlow(0)
+    val sport = MutableStateFlow<String?>(null)
+    val description = MutableStateFlow("")
+    val condition = MutableStateFlow<Int?>(null)
+    val water = MutableStateFlow(false)
+    val seats = MutableStateFlow(false)
+    val experience = MutableStateFlow(0)
     val photoPaths = MutableStateFlow<List<String?>>(listOf(null, null, null, null))
     val pinLatLng = MutableStateFlow<com.google.android.gms.maps.model.LatLng?>(null)
     val isSaving = MutableStateFlow(false)
@@ -41,12 +41,12 @@ class EditInstalacionViewModel @Inject constructor(
             repository.getCustomFacilityById(fid).collect { inst ->
                 if (inst != null && !loaded) {
                     loaded = true
-                    categoria.value = inst.sport
-                    descripcion.value = inst.description ?: ""
-                    estado.value = inst.condition
-                    agua.value = inst.water == 1
-                    asientos.value = inst.seats == 1
-                    experiencia.value = inst.experience ?: 0
+                    sport.value = inst.sport
+                    description.value = inst.description ?: ""
+                    condition.value = inst.condition
+                    water.value = inst.water == 1
+                    seats.value = inst.seats == 1
+                    experience.value = inst.experience ?: 0
                     pinLatLng.value = if (inst.latitude != null && inst.longitude != null)
                         com.google.android.gms.maps.model.LatLng(inst.latitude, inst.longitude)
                     else null
@@ -81,21 +81,21 @@ class EditInstalacionViewModel @Inject constructor(
     fun save() {
         val lat = pinLatLng.value?.latitude
         val lng = pinLatLng.value?.longitude
-        if (categoria.value == null) { validationError.value = "Please select a category"; return }
-        if (estado.value == null) { validationError.value = "Please select a condition"; return }
-        if (experiencia.value == 0) { validationError.value = "Please add a rating"; return }
+        if (sport.value == null) { validationError.value = "Please select a category"; return }
+        if (condition.value == null) { validationError.value = "Please select a condition"; return }
+        if (experience.value == 0) { validationError.value = "Please add a rating"; return }
         if (lat == null || lng == null) { validationError.value = "Please select a location"; return }
 
         viewModelScope.launch {
             isSaving.value = true
             val updated = CustomFacility(
                 fid = fid,
-                sport = categoria.value,
-                description = descripcion.value.ifBlank { null },
-                condition = estado.value,
-                water = if (agua.value) 1 else 0,
-                seats = if (asientos.value) 1 else 0,
-                experience = experiencia.value,
+                sport = sport.value,
+                description = description.value.ifBlank { null },
+                condition = condition.value,
+                water = if (water.value) 1 else 0,
+                seats = if (seats.value) 1 else 0,
+                experience = experience.value,
                 longitude = lng,
                 latitude = lat,
                 photo = photoPaths.value[0]

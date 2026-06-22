@@ -30,12 +30,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ernesto.playout.data.model.Instalacion
+import com.ernesto.playout.data.model.Facility
 import com.ernesto.playout.ui.utils.categoryDrawable
 
 @Composable
 fun FeedCard(
-    instalacion: Instalacion,
+    facility: Facility,
     distanceMeters: Float?,
     onClick: () -> Unit
 ) {
@@ -49,19 +49,19 @@ fun FeedCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Layer 1 - Main photo
-            val photoModel: Any = remember(instalacion.fid, instalacion.foto) {
-                val foto = instalacion.foto
+            val photoModel: Any = remember(facility.fid, facility.photo) {
+                val photo = facility.photo
                 when {
-                    foto != null && foto.startsWith("/") -> java.io.File(foto)
-                    else -> "file:///android_asset/photos/${instalacion.fid}_main.jpg"
+                    photo != null && photo.startsWith("/") -> java.io.File(photo)
+                    else -> "file:///android_asset/photos/${facility.fid}_main.jpg"
                 }
             }
             AsyncImage(
                 model = photoModel,
-                contentDescription = instalacion.nombre_sitio,
+                contentDescription = facility.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                error = painterResource(categoryDrawable(instalacion.categoria))
+                error = painterResource(categoryDrawable(facility.sport))
             )
 
             // Layer 2 - Subtle top gradient
@@ -90,7 +90,7 @@ fun FeedCard(
                         .padding(6.dp)
                 ) {
                     Image(
-                        painter = painterResource(categoryDrawable(instalacion.categoria)),
+                        painter = painterResource(categoryDrawable(facility.sport)),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         colorFilter = ColorFilter.tint(Color.White)
@@ -104,7 +104,7 @@ fun FeedCard(
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
             ) {
-                val color = when (instalacion.estado) {
+                val color = when (facility.condition) {
                     1 -> Color(0xFF4CAF50)
                     2 -> Color(0xFFFFC107)
                     3 -> Color(0xFFF44336)
@@ -119,7 +119,7 @@ fun FeedCard(
             }
 
             // Layer 5 - Stars (bottom-end)
-            val stars = instalacion.experiencia_uso?.coerceIn(0, 5) ?: 0
+            val stars = facility.experience?.coerceIn(0, 5) ?: 0
             if (stars > 0) {
                 Box(
                     modifier = Modifier

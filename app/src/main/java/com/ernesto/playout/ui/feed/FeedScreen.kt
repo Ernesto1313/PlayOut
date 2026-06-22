@@ -76,23 +76,23 @@ fun FeedScreen(
     ) { /* location will update via VM once granted */ }
 
     val baseList = remember(uiState) {
-        if (uiState is ListUiState.Success) (uiState as ListUiState.Success).instalaciones
+        if (uiState is ListUiState.Success) (uiState as ListUiState.Success).facilities
         else emptyList()
     }
 
     val uniqueCategories = remember(baseList) {
-        baseList.mapNotNull { it.categoria }.distinct().sorted()
+        baseList.mapNotNull { it.sport }.distinct().sorted()
     }
 
     val filteredList = remember(baseList, selectedCategory, sortField, sortAscending, userLocation) {
         var result = if (selectedCategory.isNotEmpty()) {
-            baseList.filter { it.categoria == selectedCategory }
+            baseList.filter { it.sport == selectedCategory }
         } else {
             baseList
         }
         result = when (sortField) {
-            "condition" -> result.sortedWith(compareBy(nullsLast()) { it.estado })
-            "experience" -> result.sortedWith(compareBy(nullsLast()) { it.experiencia_uso })
+            "condition" -> result.sortedWith(compareBy(nullsLast()) { it.condition })
+            "experience" -> result.sortedWith(compareBy(nullsLast()) { it.experience })
             "distance" -> result.sortedWith(compareBy(nullsLast()) { viewModel.distanceTo(it) })
             else -> result
         }
@@ -244,11 +244,11 @@ fun FeedScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(filteredList) { instalacion ->
+            items(filteredList) { facility ->
                 FeedCard(
-                    instalacion = instalacion,
-                    distanceMeters = viewModel.distanceTo(instalacion),
-                    onClick = { onInstalacionClick(instalacion.fid) }
+                    facility = facility,
+                    distanceMeters = viewModel.distanceTo(facility),
+                    onClick = { onInstalacionClick(facility.fid) }
                 )
             }
         }

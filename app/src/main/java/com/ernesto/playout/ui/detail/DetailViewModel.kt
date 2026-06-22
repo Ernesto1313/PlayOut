@@ -24,7 +24,7 @@ class DetailViewModel @Inject constructor(
     private val fid: Int = checkNotNull(savedStateHandle["fid"])
 
     private val _facility = MutableStateFlow<Facility?>(null)
-    val instalacion: StateFlow<Facility?> = _facility.asStateFlow()
+    val facility: StateFlow<Facility?> = _facility.asStateFlow()
 
     private val _userLocation = MutableStateFlow<Location?>(null)
     val userLocation: StateFlow<Location?> = _userLocation.asStateFlow()

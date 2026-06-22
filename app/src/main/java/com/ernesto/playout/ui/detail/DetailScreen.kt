@@ -59,7 +59,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.ernesto.playout.R
-import com.ernesto.playout.data.model.Instalacion
+import com.ernesto.playout.data.model.Facility
 
 private fun getPhotoModel(path: String?): Any {
     if (path == null) return R.drawable.other
@@ -67,50 +67,50 @@ private fun getPhotoModel(path: String?): Any {
     else "file:///android_asset/photos/$path"
 }
 
-private fun slidePath(inst: Instalacion, suffix: String): String? {
-    return if (inst.foto?.startsWith("/") == true) {
-        val dir = java.io.File(inst.foto!!).parent
-        "$dir/${inst.fid}_$suffix.jpg"
+private fun slidePath(facility: Facility, suffix: String): String? {
+    return if (facility.photo?.startsWith("/") == true) {
+        val dir = java.io.File(facility.photo!!).parent
+        "$dir/${facility.fid}_$suffix.jpg"
     } else {
-        "${inst.fid}_$suffix.jpg"
+        "${facility.fid}_$suffix.jpg"
     }
 }
 
 @DrawableRes
-private fun categoryDrawable(categoria: String?): Int = when (categoria) {
-    "Ajedrez", "Chess" -> R.drawable.chess
-    "Pingpong", "Ping-Pong" -> R.drawable.pingpong
-    "Futbol", "Fútbol", "Football" -> R.drawable.football
-    "Esgrima", "Fencing" -> R.drawable.fencing
-    "Patinaje", "Skating" -> R.drawable.skate
+private fun categoryDrawable(sport: String?): Int = when (sport) {
+    "Chess" -> R.drawable.chess
+    "Ping-Pong" -> R.drawable.pingpong
+    "Football" -> R.drawable.football
+    "Fencing" -> R.drawable.fencing
+    "Skating" -> R.drawable.skate
     "Volleyball" -> R.drawable.volleyball
-    "Baloncesto", "Basketball" -> R.drawable.basketball
-    "Calistenia", "Calisthenics" -> R.drawable.calisthenics
-    "Atletismo", "Athletics" -> R.drawable.atletism
-    "Otro", "Other" -> R.drawable.other
-    "Minigolf", "Mini Golf" -> R.drawable.minigolf
-    "Petanca", "Pétanque" -> R.drawable.petanque
+    "Basketball" -> R.drawable.basketball
+    "Calisthenics" -> R.drawable.calisthenics
+    "Athletics" -> R.drawable.atletism
+    "Other" -> R.drawable.other
+    "Mini Golf" -> R.drawable.minigolf
+    "Pétanque" -> R.drawable.petanque
     else -> R.drawable.other
 }
 
-private fun categoryColor(categoria: String?): Color = when (categoria) {
-    "Fútbol", "Futbol", "Football" -> Color(0xFF2E7D32)
-    "Baloncesto", "Basketball" -> Color(0xFFE65100)
+private fun categoryColor(sport: String?): Color = when (sport) {
+    "Football" -> Color(0xFF2E7D32)
+    "Basketball" -> Color(0xFFE65100)
     "Volleyball" -> Color(0xFF1565C0)
-    "Ajedrez", "Chess" -> Color(0xFF37474F)
-    "PingPong", "Pingpong", "Ping-Pong" -> Color(0xFF558B2F)
-    "Minigolf", "Mini Golf" -> Color(0xFF00695C)
-    "Esgrima", "Fencing" -> Color(0xFF6A1B9A)
-    "Patinaje", "Skating" -> Color(0xFF00838F)
-    "Calistenia", "Calisthenics" -> Color(0xFF4527A0)
-    "Petanca", "Pétanque" -> Color(0xFF4E342E)
-    "Atletismo", "Athletics" -> Color(0xFFC62828)
+    "Chess" -> Color(0xFF37474F)
+    "Ping-Pong" -> Color(0xFF558B2F)
+    "Mini Golf" -> Color(0xFF00695C)
+    "Fencing" -> Color(0xFF6A1B9A)
+    "Skating" -> Color(0xFF00838F)
+    "Calisthenics" -> Color(0xFF4527A0)
+    "Pétanque" -> Color(0xFF4E342E)
+    "Athletics" -> Color(0xFFC62828)
     else -> Color(0xFF37474F)
 }
 
 @Composable
-private fun EstadoText(estado: Int?, modifier: Modifier = Modifier) {
-    when (estado) {
+private fun ConditionText(condition: Int?, modifier: Modifier = Modifier) {
+    when (condition) {
         1 -> Text("Good", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold, modifier = modifier)
         2 -> Text("Fair", color = Color(0xFFFFC107), fontWeight = FontWeight.Bold, modifier = modifier)
         3 -> Text("Broken", color = Color(0xFFF44336), fontWeight = FontWeight.Bold, modifier = modifier)
@@ -122,12 +122,12 @@ fun DetailScreen(
     onBack: () -> Unit,
     viewModel: DetailViewModel = hiltViewModel()
 ) {
-    val instalacion by viewModel.instalacion.collectAsStateWithLifecycle()
+    val facility by viewModel.facility.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     var isImmersive by remember { mutableStateOf(true) }
     var currentSlide by remember { mutableStateOf(0) }
 
-    val inst = instalacion
+    val inst = facility
     if (inst == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -135,13 +135,13 @@ fun DetailScreen(
         return
     }
 
-    val bgColor = categoryColor(inst.categoria)
-    val descripcion = inst.descripcion ?: ""
+    val bgColor = categoryColor(inst.sport)
+    val desc = inst.description ?: ""
 
-    val sentences = descripcion.split(".").map { it.trim() }.filter { it.isNotEmpty() }
+    val sentences = desc.split(".").map { it.trim() }.filter { it.isNotEmpty() }
     val halfCount = sentences.size / 2
-    val descripcionSlide1 = sentences.take(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
-    val descripcionSlide2 = sentences.drop(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
+    val descSlide1 = sentences.take(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
+    val descSlide2 = sentences.drop(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
 
     AnimatedContent(
         targetState = isImmersive,
@@ -161,8 +161,8 @@ fun DetailScreen(
                 inst = inst,
                 bgColor = bgColor,
                 currentSlide = currentSlide,
-                descripcionSlide1 = descripcionSlide1,
-                descripcionSlide2 = descripcionSlide2,
+                descSlide1 = descSlide1,
+                descSlide2 = descSlide2,
                 onSlideLeft = { if (currentSlide > 0) currentSlide-- },
                 onSlideRight = { if (currentSlide < 3) currentSlide++ },
                 onSwipeUp = { isImmersive = false },
@@ -172,7 +172,7 @@ fun DetailScreen(
             ProfileMode(
                 inst = inst,
                 bgColor = bgColor,
-                descripcion = descripcion,
+                description = desc,
                 currentSlide = currentSlide,
                 userLocation = userLocation,
                 onSwipeDown = { isImmersive = true },
@@ -184,11 +184,11 @@ fun DetailScreen(
 
 @Composable
 private fun ImmersiveMode(
-    inst: Instalacion,
+    inst: Facility,
     bgColor: Color,
     currentSlide: Int,
-    descripcionSlide1: String,
-    descripcionSlide2: String,
+    descSlide1: String,
+    descSlide2: String,
     onSlideLeft: () -> Unit,
     onSlideRight: () -> Unit,
     onSwipeUp: () -> Unit,
@@ -217,7 +217,6 @@ private fun ImmersiveMode(
                 )
             }
     ) {
-        // Background photo — switches with currentSlide
         AsyncImage(
             model = photoModel,
             contentDescription = null,
@@ -225,7 +224,6 @@ private fun ImmersiveMode(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Tap zones — rendered before UI chrome so chrome captures clicks first
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSlideLeft() })
             Box(modifier = Modifier.weight(1f).fillMaxHeight().clickable { onSlideRight() })
@@ -254,7 +252,6 @@ private fun ImmersiveMode(
             }
         }
 
-        // Back button
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -269,7 +266,7 @@ private fun ImmersiveMode(
             )
         }
 
-        // Translucent bocadillo at bottom
+        // Bocadillo
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -281,7 +278,7 @@ private fun ImmersiveMode(
             when (currentSlide) {
                 0 -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = inst.categoria ?: "",
+                        text = inst.sport ?: "",
                         color = Color(0xFFF5F5F5),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
@@ -295,16 +292,16 @@ private fun ImmersiveMode(
                             color = Color(0xFFF5F5F5),
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        EstadoText(inst.estado)
+                        ConditionText(inst.condition)
                     }
                 }
                 1 -> Text(
-                    text = descripcionSlide1,
+                    text = descSlide1,
                     color = Color(0xFFF5F5F5),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 2 -> Text(
-                    text = descripcionSlide2,
+                    text = descSlide2,
                     color = Color(0xFFF5F5F5),
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -312,13 +309,10 @@ private fun ImmersiveMode(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (inst.agua == 1) {
+                    if (inst.water == 1) {
                         Box(
                             modifier = Modifier
-                                .background(
-                                    color = Color(0xFFF5F5F5),
-                                    shape = RoundedCornerShape(8.dp)
-                                )
+                                .background(color = Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
                                 .padding(6.dp)
                         ) {
                             Image(
@@ -328,13 +322,10 @@ private fun ImmersiveMode(
                             )
                         }
                     }
-                    if (inst.asientos == 1) {
+                    if (inst.seats == 1) {
                         Box(
                             modifier = Modifier
-                                .background(
-                                    color = Color(0xFFF5F5F5),
-                                    shape = RoundedCornerShape(8.dp)
-                                )
+                                .background(color = Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
                                 .padding(6.dp)
                         ) {
                             Image(
@@ -344,7 +335,7 @@ private fun ImmersiveMode(
                             )
                         }
                     }
-                    val stars = inst.experiencia_uso ?: 0
+                    val stars = inst.experience ?: 0
                     Text(
                         text = "★".repeat(stars) + "☆".repeat(5 - stars),
                         color = Color(0xFF00AEFF),
@@ -358,16 +349,15 @@ private fun ImmersiveMode(
 
 @Composable
 private fun ProfileMode(
-    inst: Instalacion,
+    inst: Facility,
     bgColor: Color,
-    descripcion: String,
+    description: String,
     currentSlide: Int,
     userLocation: android.location.Location?,
     onSwipeDown: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Fixed photo area — swipe down to return to immersive
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -411,7 +401,6 @@ private fun ProfileMode(
             }
         }
 
-        // Scrollable detail content
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -426,14 +415,14 @@ private fun ProfileMode(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = painterResource(categoryDrawable(inst.categoria)),
+                    painter = painterResource(categoryDrawable(inst.sport)),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
                     colorFilter = ColorFilter.tint(Color(0xFFF5F5F5))
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = inst.categoria ?: "-",
+                    text = inst.sport ?: "-",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color(0xFFF5F5F5),
                     modifier = Modifier.weight(1f)
@@ -441,12 +430,12 @@ private fun ProfileMode(
                 val context = LocalContext.current
                 Image(
                     painter = painterResource(R.drawable.google_maps_icon),
-                    contentDescription = "Abrir en Google Maps",
+                    contentDescription = "Open in Google Maps",
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {
-                            val lat = inst.latitud ?: 0.0
-                            val lng = inst.longitud ?: 0.0
+                            val lat = inst.latitude ?: 0.0
+                            val lng = inst.longitude ?: 0.0
                             val uri = Uri.parse("geo:$lat,$lng?q=$lat,$lng")
                             val intent = Intent(Intent.ACTION_VIEW, uri)
                             intent.setPackage("com.google.android.apps.maps")
@@ -459,28 +448,28 @@ private fun ProfileMode(
                 )
             }
             HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
-            Text(text = descripcion, color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
+            Text(text = description, color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
             HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Condition: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
-                EstadoText(inst.estado)
+                ConditionText(inst.condition)
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Experience: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
-                StarRating(value = inst.experiencia_uso, starSize = 20)
+                StarRating(value = inst.experience, starSize = 20)
             }
             val distance = userLocation?.let { loc ->
                 val results = FloatArray(1)
                 android.location.Location.distanceBetween(
                     loc.latitude, loc.longitude,
-                    inst.latitud ?: 0.0,
-                    inst.longitud ?: 0.0,
+                    inst.latitude ?: 0.0,
+                    inst.longitude ?: 0.0,
                     results
                 )
                 results[0]
@@ -497,16 +486,11 @@ private fun ProfileMode(
                     fontSize = 14.sp
                 )
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                if (inst.agua == 1) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (inst.water == 1) {
                     Box(
                         modifier = Modifier
-                            .background(
-                                color = Color(0xFFF5F5F5),
-                                shape = RoundedCornerShape(8.dp)
-                            )
+                            .background(color = Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
                             .padding(6.dp)
                     ) {
                         Image(
@@ -516,13 +500,10 @@ private fun ProfileMode(
                         )
                     }
                 }
-                if (inst.asientos == 1) {
+                if (inst.seats == 1) {
                     Box(
                         modifier = Modifier
-                            .background(
-                                color = Color(0xFFF5F5F5),
-                                shape = RoundedCornerShape(8.dp)
-                            )
+                            .background(color = Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
                             .padding(6.dp)
                     ) {
                         Image(
