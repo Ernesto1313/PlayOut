@@ -15,7 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
-        const val DATABASE_NAME = "playout10.db"
+        const val DATABASE_NAME = "playout17.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -95,14 +95,20 @@ abstract class AppDatabase : RoomDatabase() {
 
         val callback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
+                Log.d("PlayOut_DB", "onCreate called - creating fresh database")
                 super.onCreate(db)
                 try {
                     appContext.assets.open("facilities.csv").bufferedReader().use { reader ->
                         val lines = reader.readLines()
                         if (lines.isEmpty()) return
-                        val headers = lines.first().split(",").map { it.trim() }
+                        val headers = lines.first()
+                            .trimEnd(';')
+                            .split(",")
+                            .map { it.trim() }
                         var count = 0
-                        lines.drop(1).forEach { line ->
+                        lines.drop(1).forEach { rawLine ->
+                            val line = rawLine.trim().trimStart('"').trimEnd('"', ';')
+                            if (line.isBlank()) return@forEach
                             val values = parseCsvLine(line)
                             val map = headers.zip(values).toMap()
                             try {
@@ -116,7 +122,7 @@ abstract class AppDatabase : RoomDatabase() {
                                     '$sport',
                                     '$description',${map["condition"]},
                                     ${map["water"]},${map["seats"]},
-                                    ${map["expirience"]},${map["longitude"]},
+                                    ${map["experience"]},${map["longitude"]},
                                     ${map["latitude"]})""")
                                 count++
                                 Log.d("PlayOut_DB", "Inserted row $count")
