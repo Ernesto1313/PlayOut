@@ -15,7 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
-        const val DATABASE_NAME = "playout19.db"
+        const val DATABASE_NAME = "playout20.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -98,19 +98,15 @@ abstract class AppDatabase : RoomDatabase() {
                 Log.d("PlayOut_DB", "onCreate called")
                 super.onCreate(db)
                 try {
-                    val inputStream = appContext.assets.open("facilities.csv")
-                    Log.d("PlayOut_DB", "CSV opened successfully")
-                    inputStream.bufferedReader().use { reader ->
-                        val lines = reader.readLines()
-                        Log.d("PlayOut_DB", "Total lines in CSV: ${lines.size}")
-                        if (lines.isEmpty()) {
-                            Log.e("PlayOut_DB", "CSV is empty")
-                            return
-                        }
-                        val rawHeader = lines.first()
-                        Log.d("PlayOut_DB", "Raw header: $rawHeader")
-                        val headers = rawHeader.trimEnd(';').split(",").map { it.trim() }
-                        Log.d("PlayOut_DB", "Parsed headers: $headers")
+                    appContext.assets.open("facilities.csv").bufferedReader().use { reader ->
+                        val allLines = reader.readLines()
+                        if (allLines.isEmpty()) return
+
+                        val headers = allLines.first()
+                            .trimEnd(';', ' ')
+                            .split(",")
+                            .map { it.trim() }
+                        Log.d("PlayOut_DB", "Headers: $headers")
 
                         var count = 0
                         val stmt = db.compileStatement("""
@@ -119,30 +115,40 @@ abstract class AppDatabase : RoomDatabase() {
                              experience, longitude, latitude)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """)
-                        lines.drop(1).forEachIndexed { index, rawLine ->
-                            val line = rawLine.trim().trimStart('"').trimEnd('"', ';')
-                            if (line.isBlank()) return@forEachIndexed
-                            val values = parseCsvLine(line)
+
+                        allLines.drop(1).forEachIndexed { index, rawLine ->
+                            var line = rawLine.trim()
+                            if (line.startsWith("\"") && (line.endsWith("\"") || line.endsWith("\";") || line.endsWith("\";"))) {
+                                line = line.removePrefix("\"").trimEnd(';', '"', ' ')
+                            }
+                            line = line.replace("\"\"", "")
+                            val values = parseCsvLine(line).map { it.replace("", "\"") }
+                            if (values.size < 10) {
+                                Log.e("PlayOut_DB", "Row $index has only ${values.size} values, skipping")
+                                return@forEachIndexed
+                            }
                             val map = headers.zip(values).toMap()
+                            Log.d("PlayOut_DB", "Row $index: fid=${map["fid"]} name=${map["name"]} sport=${map["sport"]}")
                             try {
                                 stmt.clearBindings()
-                                stmt.bindLong(1, map["fid"]?.toLongOrNull() ?: return@forEachIndexed)
-                                stmt.bindString(2, map["name"].orEmpty())
-                                stmt.bindString(3, map["sport"].orEmpty())
-                                stmt.bindString(4, map["description"].orEmpty())
-                                stmt.bindLong(5, map["condition"]?.toLongOrNull() ?: 0)
-                                stmt.bindLong(6, map["water"]?.toLongOrNull() ?: 0)
-                                stmt.bindLong(7, map["seats"]?.toLongOrNull() ?: 0)
-                                stmt.bindLong(8, map["experience"]?.toLongOrNull() ?: 0)
-                                stmt.bindDouble(9, map["longitude"]?.toDoubleOrNull() ?: return@forEachIndexed)
-                                stmt.bindDouble(10, map["latitude"]?.toDoubleOrNull() ?: return@forEachIndexed)
+                                stmt.bindLong(1, map["fid"]?.trim()?.toLongOrNull() ?: return@forEachIndexed)
+                                stmt.bindString(2, map["name"]?.trim().orEmpty())
+                                stmt.bindString(3, map["sport"]?.trim().orEmpty())
+                                stmt.bindString(4, map["description"]?.trim().orEmpty())
+                                stmt.bindLong(5, map["condition"]?.trim()?.toLongOrNull() ?: 0)
+                                stmt.bindLong(6, map["water"]?.trim()?.toLongOrNull() ?: 0)
+                                stmt.bindLong(7, map["seats"]?.trim()?.toLongOrNull() ?: 0)
+                                stmt.bindLong(8, map["experience"]?.trim()?.toLongOrNull() ?: 0)
+                                stmt.bindDouble(9, map["longitude"]?.trim()?.toDoubleOrNull() ?: return@forEachIndexed)
+                                stmt.bindDouble(10, map["latitude"]?.trim()?.toDoubleOrNull() ?: return@forEachIndexed)
                                 stmt.executeInsert()
                                 count++
                                 Log.d("PlayOut_DB", "Inserted row $count: ${map["name"]}")
                             } catch (e: Exception) {
-                                Log.e("PlayOut_DB", "Row $index failed: ${e.message}")
+                                Log.e("PlayOut_DB", "Row $index insert failed: ${e.message}")
                             }
                         }
+                        Log.d("PlayOut_DB", "Import complete. Total: $count")
                     }
                 } catch (e: Exception) {
                     Log.e("PlayOut_DB", "Fatal CSV error: ${e.message}")
