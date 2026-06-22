@@ -15,7 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
-        const val DATABASE_NAME = "playout18.db"
+        const val DATABASE_NAME = "playout19.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -112,26 +112,33 @@ abstract class AppDatabase : RoomDatabase() {
                         val headers = rawHeader.trimEnd(';').split(",").map { it.trim() }
                         Log.d("PlayOut_DB", "Parsed headers: $headers")
 
+                        var count = 0
+                        val stmt = db.compileStatement("""
+                            INSERT INTO facilities
+                            (fid, name, sport, description, condition, water, seats,
+                             experience, longitude, latitude)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """)
                         lines.drop(1).forEachIndexed { index, rawLine ->
                             val line = rawLine.trim().trimStart('"').trimEnd('"', ';')
                             if (line.isBlank()) return@forEachIndexed
                             val values = parseCsvLine(line)
                             val map = headers.zip(values).toMap()
-                            Log.d("PlayOut_DB", "Row $index map: $map")
                             try {
-                                val name = map["name"].orEmpty().replace("'", "''")
-                                val sport = map["sport"].orEmpty().replace("'", "''")
-                                val description = map["description"].orEmpty().replace("'", "''")
-                                db.execSQL("""INSERT INTO facilities (
-                                    fid,name,sport,description,
-                                    condition,water,seats,experience,longitude,latitude)
-                                    VALUES (${map["fid"]},'$name',
-                                    '$sport',
-                                    '$description',${map["condition"]},
-                                    ${map["water"]},${map["seats"]},
-                                    ${map["experience"]},${map["longitude"]},
-                                    ${map["latitude"]})""")
-                                Log.d("PlayOut_DB", "Row $index inserted ok")
+                                stmt.clearBindings()
+                                stmt.bindLong(1, map["fid"]?.toLongOrNull() ?: return@forEachIndexed)
+                                stmt.bindString(2, map["name"].orEmpty())
+                                stmt.bindString(3, map["sport"].orEmpty())
+                                stmt.bindString(4, map["description"].orEmpty())
+                                stmt.bindLong(5, map["condition"]?.toLongOrNull() ?: 0)
+                                stmt.bindLong(6, map["water"]?.toLongOrNull() ?: 0)
+                                stmt.bindLong(7, map["seats"]?.toLongOrNull() ?: 0)
+                                stmt.bindLong(8, map["experience"]?.toLongOrNull() ?: 0)
+                                stmt.bindDouble(9, map["longitude"]?.toDoubleOrNull() ?: return@forEachIndexed)
+                                stmt.bindDouble(10, map["latitude"]?.toDoubleOrNull() ?: return@forEachIndexed)
+                                stmt.executeInsert()
+                                count++
+                                Log.d("PlayOut_DB", "Inserted row $count: ${map["name"]}")
                             } catch (e: Exception) {
                                 Log.e("PlayOut_DB", "Row $index failed: ${e.message}")
                             }
