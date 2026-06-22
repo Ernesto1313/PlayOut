@@ -1,6 +1,5 @@
 package com.ernesto.playout
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -31,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,13 +45,11 @@ import com.ernesto.playout.ui.add.EditInstalacionScreen
 import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.feed.FeedScreen
 import com.ernesto.playout.ui.map.MapScreen
-import com.ernesto.playout.ui.onboarding.PermissionScreen
 import com.ernesto.playout.ui.settings.SettingsScreen
 import com.ernesto.playout.ui.theme.PlayOutTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class Screen(val route: String) {
-    object Permission : Screen("permission")
     object Map : Screen("map")
     object Feed : Screen("feed")
     object Detail : Screen("detail/{fid}") {
@@ -73,31 +69,29 @@ fun MapListScaffold(
     val showTopBar = currentRoute == Screen.Map.route || currentRoute == Screen.Feed.route
 
     Scaffold(
-
-            topBar = {
-                if (showTopBar) {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            Text(
-                                text = "PlayOut",
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 26.sp,
-                                color = Color(0xFF00AEFF),
-                                style = TextStyle(
-                                    shadow = Shadow(
-                                        color = Color(0xFFF5F5F5),
-                                        offset = Offset(2f, 2f),
-                                        blurRadius = 0f
-                                    )
+        topBar = {
+            if (showTopBar) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "PlayOut",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 26.sp,
+                            color = Color(0xFF00AEFF),
+                            style = TextStyle(
+                                shadow = Shadow(
+                                    color = Color(0xFFF5F5F5),
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 0f
                                 )
                             )
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(0xFF806B40)
                         )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFF806B40)
                     )
-                }
-
+                )
+            }
         },
         bottomBar = {
             BottomAppBar(
@@ -139,7 +133,7 @@ fun MapListScaffold(
                         containerColor = Color(0xFF00AEFF),
                         contentColor = Color.White
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = "Añadir")
+                        Icon(Icons.Default.Add, contentDescription = "Add")
                     }
                 }
 
@@ -150,7 +144,7 @@ fun MapListScaffold(
                     IconButton(onClick = { navController.navigate("settings") }) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = "Ajustes",
+                            contentDescription = "Settings",
                             tint = Color(0xFFF5F5F5)
                         )
                     }
@@ -170,103 +164,66 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PlayOutTheme {
-                val context = LocalContext.current
-                val prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
-                val permissionDone = prefs.getBoolean("location_permission_requested", false)
-
                 val navController = rememberNavController()
 
-                if (!permissionDone) {
-                    NavHost(navController = navController, startDestination = Screen.Permission.route) {
-                        composable(Screen.Permission.route) {
-                            PermissionScreen(onDone = {
-                                navController.navigate(Screen.Map.route) {
-                                    popUpTo(Screen.Permission.route) { inclusive = true }
-                                }
-                            })
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Map.route,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    composable(Screen.Map.route) {
+                        MapListScaffold(
+                            currentRoute = Screen.Map.route,
+                            navController = navController
+                        ) { padding ->
+                            MapScreen(
+                                onInstalacionClick = { fid ->
+                                    navController.navigate(Screen.Detail.createRoute(fid))
+                                },
+                                contentPadding = padding
+                            )
                         }
-                        composable(Screen.Map.route) {
-                            MapScreen(onInstalacionClick = { fid ->
-                                navController.navigate(Screen.Detail.createRoute(fid))
-                            })
-                        }
-                        composable(Screen.Feed.route) {
+                    }
+                    composable(Screen.Feed.route) {
+                        MapListScaffold(
+                            currentRoute = Screen.Feed.route,
+                            navController = navController
+                        ) { padding ->
                             FeedScreen(
                                 onInstalacionClick = { fid ->
                                     navController.navigate(Screen.Detail.createRoute(fid))
                                 },
-                                contentPadding = PaddingValues()
+                                contentPadding = padding
                             )
-                        }
-                        composable(
-                            route = Screen.Detail.route,
-                            arguments = listOf(navArgument("fid") { type = NavType.IntType })
-                        ) {
-                            DetailScreen(onBack = { navController.navigateUp() })
                         }
                     }
-                } else {
-                    val mainNavController = rememberNavController()
-
-                    NavHost(
-                        navController = mainNavController,
-                        startDestination = Screen.Feed.route,
-                        modifier = Modifier.fillMaxSize()
+                    composable(
+                        route = Screen.Detail.route,
+                        arguments = listOf(navArgument("fid") { type = NavType.IntType })
                     ) {
-                        composable(Screen.Feed.route) {
-                            MapListScaffold(
-                                currentRoute = Screen.Feed.route,
-                                navController = mainNavController
-                            ) { padding ->
-                                FeedScreen(
-                                    onInstalacionClick = { fid ->
-                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
-                                    },
-                                    contentPadding = padding
-                                )
+                        DetailScreen(onBack = { navController.navigateUp() })
+                    }
+                    composable("settings") {
+                        SettingsScreen(
+                            onBack = { navController.navigateUp() },
+                            onEditInstalacion = { fid ->
+                                navController.navigate("edit/$fid")
                             }
-                        }
-                        composable(Screen.Map.route) {
-                            MapListScaffold(
-                                currentRoute = Screen.Map.route,
-                                navController = mainNavController
-                            ) { padding ->
-                                MapScreen(
-                                    onInstalacionClick = { fid ->
-                                        mainNavController.navigate(Screen.Detail.createRoute(fid))
-                                    },
-                                    contentPadding = padding
-                                )
-                            }
-                        }
-                        composable(
-                            route = Screen.Detail.route,
-                            arguments = listOf(navArgument("fid") { type = NavType.IntType })
-                        ) {
-                            DetailScreen(onBack = { mainNavController.navigateUp() })
-                        }
-                        composable("settings") {
-                            SettingsScreen(
-                                onBack = { mainNavController.navigateUp() },
-                                onEditInstalacion = { fid ->
-                                    mainNavController.navigate("edit/$fid")
-                                }
-                            )
-                        }
-                        composable("add") {
-                            AddInstalacionScreen(onBack = { mainNavController.navigateUp() })
-                        }
-                        composable(
-                            route = "edit/{fid}",
-                            arguments = listOf(navArgument("fid") { type = NavType.IntType })
-                        ) { backStackEntry ->
-                            val fid = backStackEntry.arguments?.getInt("fid")
-                                ?: return@composable
-                            EditInstalacionScreen(
-                                fid = fid,
-                                onBack = { mainNavController.navigateUp() }
-                            )
-                        }
+                        )
+                    }
+                    composable("add") {
+                        AddInstalacionScreen(onBack = { navController.navigateUp() })
+                    }
+                    composable(
+                        route = "edit/{fid}",
+                        arguments = listOf(navArgument("fid") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val fid = backStackEntry.arguments?.getInt("fid")
+                            ?: return@composable
+                        EditInstalacionScreen(
+                            fid = fid,
+                            onBack = { navController.navigateUp() }
+                        )
                     }
                 }
             }

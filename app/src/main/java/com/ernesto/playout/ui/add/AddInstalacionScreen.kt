@@ -291,7 +291,7 @@ fun AddInstalacionScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
-                                        contentDescription = "Eliminar foto",
+                                        contentDescription = "Delete photo",
                                         tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
