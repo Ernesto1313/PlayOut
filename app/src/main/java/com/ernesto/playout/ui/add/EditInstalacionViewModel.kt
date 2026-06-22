@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ernesto.playout.data.model.InstalacionCustom
-import com.ernesto.playout.data.repository.InstalacionRepository
+import com.ernesto.playout.data.model.CustomFacility
+import com.ernesto.playout.data.repository.FacilityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditInstalacionViewModel @Inject constructor(
-    private val repository: InstalacionRepository,
+    private val repository: FacilityRepository,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -38,17 +38,17 @@ class EditInstalacionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.getCustomById(fid).collect { inst ->
+            repository.getCustomFacilityById(fid).collect { inst ->
                 if (inst != null && !loaded) {
                     loaded = true
-                    categoria.value = inst.categoria
-                    descripcion.value = inst.descripcion ?: ""
-                    estado.value = inst.estado
-                    agua.value = inst.agua == 1
-                    asientos.value = inst.asientos == 1
-                    experiencia.value = inst.experiencia_uso ?: 0
-                    pinLatLng.value = if (inst.latitud != null && inst.longitud != null)
-                        com.google.android.gms.maps.model.LatLng(inst.latitud, inst.longitud)
+                    categoria.value = inst.sport
+                    descripcion.value = inst.description ?: ""
+                    estado.value = inst.condition
+                    agua.value = inst.water == 1
+                    asientos.value = inst.seats == 1
+                    experiencia.value = inst.experience ?: 0
+                    pinLatLng.value = if (inst.latitude != null && inst.longitude != null)
+                        com.google.android.gms.maps.model.LatLng(inst.latitude, inst.longitude)
                     else null
                     val dir = java.io.File(context.filesDir, "photos")
                     val suffixes = listOf("main", "extra1", "extra2", "extra3")
@@ -88,19 +88,19 @@ class EditInstalacionViewModel @Inject constructor(
 
         viewModelScope.launch {
             isSaving.value = true
-            val updated = InstalacionCustom(
+            val updated = CustomFacility(
                 fid = fid,
-                categoria = categoria.value,
-                descripcion = descripcion.value.ifBlank { null },
-                estado = estado.value,
-                agua = if (agua.value) 1 else 0,
-                asientos = if (asientos.value) 1 else 0,
-                experiencia_uso = experiencia.value,
-                longitud = lng,
-                latitud = lat,
-                foto = photoPaths.value[0]
+                sport = categoria.value,
+                description = descripcion.value.ifBlank { null },
+                condition = estado.value,
+                water = if (agua.value) 1 else 0,
+                seats = if (asientos.value) 1 else 0,
+                experience = experiencia.value,
+                longitude = lng,
+                latitude = lat,
+                photo = photoPaths.value[0]
             )
-            repository.updateCustom(updated)
+            repository.updateCustomFacility(updated)
             isSaving.value = false
             saveSuccess.value = true
         }

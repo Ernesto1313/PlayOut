@@ -6,13 +6,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ernesto.playout.data.model.Instalacion
-import com.ernesto.playout.data.model.InstalacionCustom
+import com.ernesto.playout.data.model.CustomFacility
+import com.ernesto.playout.data.model.Facility
 
-@Database(entities = [Instalacion::class, InstalacionCustom::class], version = 5, exportSchema = false)
+@Database(entities = [Facility::class, CustomFacility::class], version = 6, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun instalacionDao(): InstalacionDao
-    abstract fun instalacionCustomDao(): InstalacionCustomDao
+    abstract fun facilityDao(): FacilityDao
+    abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
         const val DATABASE_NAME = "playout3.db"
@@ -106,15 +106,15 @@ abstract class AppDatabase : RoomDatabase() {
                             val values = parseCsvLine(line)
                             val map = headers.zip(values).toMap()
                             try {
-                                val nombreSitio = map["name"].orEmpty().replace("'", "''")
-                                val categoria = map["sport"].orEmpty().replace("'", "''")
-                                val descripcion = map["description"].orEmpty().replace("'", "''")
-                                db.execSQL("""INSERT INTO instalaciones (
-                                    fid,nombre_sitio,categoria,descripcion,
-                                    estado,agua,asientos,experiencia_uso,longitud,latitud)
-                                    VALUES (${map["fid"]},'$nombreSitio',
-                                    '$categoria',
-                                    '$descripcion',${map["condition"]},
+                                val name = map["name"].orEmpty().replace("'", "''")
+                                val sport = map["sport"].orEmpty().replace("'", "''")
+                                val description = map["description"].orEmpty().replace("'", "''")
+                                db.execSQL("""INSERT INTO facilities (
+                                    fid,name,sport,description,
+                                    condition,water,seats,experience,longitude,latitude)
+                                    VALUES (${map["fid"]},'$name',
+                                    '$sport',
+                                    '$description',${map["condition"]},
                                     ${map["water"]},${map["seats"]},
                                     ${map["expirience"]},${map["longitude"]},
                                     ${map["latitude"]})""")

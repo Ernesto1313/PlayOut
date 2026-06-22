@@ -3,8 +3,8 @@ package com.ernesto.playout.di
 import android.content.Context
 import androidx.room.Room
 import com.ernesto.playout.data.db.AppDatabase
-import com.ernesto.playout.data.db.InstalacionCustomDao
-import com.ernesto.playout.data.db.InstalacionDao
+import com.ernesto.playout.data.db.CustomFacilityDao
+import com.ernesto.playout.data.db.FacilityDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,9 +34,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideInstalacionDao(db: AppDatabase): InstalacionDao = db.instalacionDao()
+    fun provideFacilityDao(db: AppDatabase): FacilityDao = db.facilityDao()
 
     @Provides
     @Singleton
-    fun provideInstalacionCustomDao(db: AppDatabase): InstalacionCustomDao = db.instalacionCustomDao()
+    fun provideCustomFacilityDao(db: AppDatabase): CustomFacilityDao = db.customFacilityDao()
 }

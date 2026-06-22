@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ernesto.playout.data.location.LocationDataSource
-import com.ernesto.playout.data.model.InstalacionCustom
-import com.ernesto.playout.data.repository.InstalacionRepository
+import com.ernesto.playout.data.model.CustomFacility
+import com.ernesto.playout.data.repository.FacilityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddInstalacionViewModel @Inject constructor(
-    private val repository: InstalacionRepository,
+    private val repository: FacilityRepository,
     private val locationDataSource: LocationDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -94,18 +94,18 @@ class AddInstalacionViewModel @Inject constructor(
 
         viewModelScope.launch {
             isSaving.value = true
-            val tempInst = InstalacionCustom(
-                categoria = categoria.value,
-                descripcion = descripcion.value.ifBlank { null },
-                estado = estado.value,
-                agua = if (agua.value) 1 else 0,
-                asientos = if (asientos.value) 1 else 0,
-                experiencia_uso = experiencia.value,
-                longitud = lng,
-                latitud = lat,
-                foto = null
+            val tempFacility = CustomFacility(
+                sport = categoria.value,
+                description = descripcion.value.ifBlank { null },
+                condition = estado.value,
+                water = if (agua.value) 1 else 0,
+                seats = if (asientos.value) 1 else 0,
+                experience = experiencia.value,
+                longitude = lng,
+                latitude = lat,
+                photo = null
             )
-            val newFid = repository.insertCustom(tempInst).toInt()
+            val newFid = repository.insertCustomFacility(tempFacility).toInt()
 
             val dir = java.io.File(context.filesDir, "photos")
             val suffixes = listOf("main", "extra1", "extra2", "extra3")
@@ -119,19 +119,19 @@ class AddInstalacionViewModel @Inject constructor(
 
             val finalMainPath = finalPaths[0]
             if (finalMainPath != null) {
-                val updated = InstalacionCustom(
+                val updated = CustomFacility(
                     fid = newFid,
-                    categoria = categoria.value,
-                    descripcion = descripcion.value.ifBlank { null },
-                    estado = estado.value,
-                    agua = if (agua.value) 1 else 0,
-                    asientos = if (asientos.value) 1 else 0,
-                    experiencia_uso = experiencia.value,
-                    longitud = lng,
-                    latitud = lat,
-                    foto = finalMainPath
+                    sport = categoria.value,
+                    description = descripcion.value.ifBlank { null },
+                    condition = estado.value,
+                    water = if (agua.value) 1 else 0,
+                    seats = if (asientos.value) 1 else 0,
+                    experience = experiencia.value,
+                    longitude = lng,
+                    latitude = lat,
+                    photo = finalMainPath
                 )
-                repository.updateCustom(updated)
+                repository.updateCustomFacility(updated)
             }
 
             isSaving.value = false
