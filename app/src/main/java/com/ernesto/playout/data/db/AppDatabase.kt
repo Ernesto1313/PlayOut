@@ -15,7 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
-        const val DATABASE_NAME = "playout17.db"
+        const val DATABASE_NAME = "playout18.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -95,22 +95,29 @@ abstract class AppDatabase : RoomDatabase() {
 
         val callback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
-                Log.d("PlayOut_DB", "onCreate called - creating fresh database")
+                Log.d("PlayOut_DB", "onCreate called")
                 super.onCreate(db)
                 try {
-                    appContext.assets.open("facilities.csv").bufferedReader().use { reader ->
+                    val inputStream = appContext.assets.open("facilities.csv")
+                    Log.d("PlayOut_DB", "CSV opened successfully")
+                    inputStream.bufferedReader().use { reader ->
                         val lines = reader.readLines()
-                        if (lines.isEmpty()) return
-                        val headers = lines.first()
-                            .trimEnd(';')
-                            .split(",")
-                            .map { it.trim() }
-                        var count = 0
-                        lines.drop(1).forEach { rawLine ->
+                        Log.d("PlayOut_DB", "Total lines in CSV: ${lines.size}")
+                        if (lines.isEmpty()) {
+                            Log.e("PlayOut_DB", "CSV is empty")
+                            return
+                        }
+                        val rawHeader = lines.first()
+                        Log.d("PlayOut_DB", "Raw header: $rawHeader")
+                        val headers = rawHeader.trimEnd(';').split(",").map { it.trim() }
+                        Log.d("PlayOut_DB", "Parsed headers: $headers")
+
+                        lines.drop(1).forEachIndexed { index, rawLine ->
                             val line = rawLine.trim().trimStart('"').trimEnd('"', ';')
-                            if (line.isBlank()) return@forEach
+                            if (line.isBlank()) return@forEachIndexed
                             val values = parseCsvLine(line)
                             val map = headers.zip(values).toMap()
+                            Log.d("PlayOut_DB", "Row $index map: $map")
                             try {
                                 val name = map["name"].orEmpty().replace("'", "''")
                                 val sport = map["sport"].orEmpty().replace("'", "''")
@@ -124,16 +131,14 @@ abstract class AppDatabase : RoomDatabase() {
                                     ${map["water"]},${map["seats"]},
                                     ${map["experience"]},${map["longitude"]},
                                     ${map["latitude"]})""")
-                                count++
-                                Log.d("PlayOut_DB", "Inserted row $count")
+                                Log.d("PlayOut_DB", "Row $index inserted ok")
                             } catch (e: Exception) {
-                                Log.e("PlayOut_DB", "Row failed: ${e.message}")
+                                Log.e("PlayOut_DB", "Row $index failed: ${e.message}")
                             }
                         }
-                        Log.d("PlayOut_DB", "Import complete. Total rows: $count")
                     }
                 } catch (e: Exception) {
-                    Log.e("PlayOut_DB", "CSV import failed: ${e.message}")
+                    Log.e("PlayOut_DB", "Fatal CSV error: ${e.message}")
                 }
             }
         }
