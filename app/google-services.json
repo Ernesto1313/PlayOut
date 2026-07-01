@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "958420111272",
+    "project_id": "playout-fd72f",
+    "storage_bucket": "playout-fd72f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958420111272:android:33547b5a590ed6c0d0579d",
+        "android_client_info": {
+          "package_name": "com.ernesto.playout"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBseDugEFfa1wa1ykyy-16RURJu0As4fHY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
