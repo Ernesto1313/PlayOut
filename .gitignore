@@ -23,3 +23,7 @@ prompt.txt
 *.gpkg
 
 .claude/
+
+# Firebase service account keys — never commit
+scripts/serviceAccountKey.json
+scripts/*firebase-adminsdk*.json
