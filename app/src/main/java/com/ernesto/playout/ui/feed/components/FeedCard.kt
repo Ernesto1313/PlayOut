@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,18 +19,15 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -137,46 +133,27 @@ fun FeedCard(
                 )
             }
 
-            // Layer 5 - Neighbourhood (bottom-start)
-            facility.neighbourhood?.let { n ->
+            // Bottom bar - neighbourhood + stars
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color(0x66000000))
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    text = n,
+                    text = facility.neighbourhood ?: "",
                     color = Color(0xFFF5F5F5),
                     fontSize = 10.sp,
-                    style = LocalTextStyle.current.copy(
-                        shadow = Shadow(
-                            color = Color.Black,
-                            offset = Offset(1f, 1f),
-                            blurRadius = 3f
-                        )
-                    ),
-                    softWrap = true,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(6.dp)
-                        .widthIn(max = 120.dp)
+                    modifier = Modifier.weight(1f).padding(end = 4.dp)
                 )
-            }
-
-            // Layer 6 - Stars (bottom-end)
-            val stars = facility.experience?.coerceIn(0, 5) ?: 0
-            if (stars > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .background(
-                                color = Color(0xCC000000),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 6.dp, vertical = 3.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
+                val stars = facility.experience?.coerceIn(0, 5) ?: 0
+                if (stars > 0) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                         repeat(stars) {
                             Icon(
                                 imageVector = Icons.Default.Star,
