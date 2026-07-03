@@ -16,5 +16,6 @@ data class Facility(
     val experience: Int?,
     val longitude: Double?,
     val latitude: Double?,
-    val photoUrlsJson: String? = null
+    val photoUrlsJson: String? = null,
+    val neighbourhood: String? = null
 )

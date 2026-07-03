@@ -29,7 +29,8 @@ class FirestoreDataSource @Inject constructor() {
                     experience = doc.getLong("experience")?.toInt(),
                     longitude = doc.getDouble("longitude"),
                     latitude = doc.getDouble("latitude"),
-                    photoUrlsJson = photoUrls?.joinToString(",") { it.toString() }
+                    photoUrlsJson = photoUrls?.joinToString(",") { it.toString() },
+                    neighbourhood = doc.getString("neighbourhood")
                 )
                 Log.d("PlayOut_Firebase", "Facility ${facility.fid} photo: ${facility.photo}")
                 facility

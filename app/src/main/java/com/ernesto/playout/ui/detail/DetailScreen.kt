@@ -512,6 +512,13 @@ private fun ProfileMode(
                     fontSize = 14.sp
                 )
             }
+            inst.neighbourhood?.let { n ->
+                Text(
+                    "Neighbourhood: $n",
+                    color = Color(0xFFF5F5F5),
+                    fontSize = 14.sp
+                )
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (inst.water == 1) {
                     Box(
