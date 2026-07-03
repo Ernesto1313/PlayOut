@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.maps.compose)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.lifecycle.viewmodel.compose)
