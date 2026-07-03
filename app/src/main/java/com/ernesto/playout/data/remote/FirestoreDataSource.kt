@@ -1,5 +1,6 @@
 package com.ernesto.playout.data.remote
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ernesto.playout.data.model.Facility
 import kotlinx.coroutines.tasks.await
@@ -16,7 +17,7 @@ class FirestoreDataSource @Inject constructor() {
         return snapshot.documents.mapNotNull { doc ->
             try {
                 val photoUrls = doc.get("photoUrls") as? List<*>
-                Facility(
+                val facility = Facility(
                     fid = (doc.getLong("fid") ?: return@mapNotNull null).toInt(),
                     name = doc.getString("name"),
                     photo = photoUrls?.firstOrNull()?.toString(),
@@ -30,6 +31,8 @@ class FirestoreDataSource @Inject constructor() {
                     latitude = doc.getDouble("latitude"),
                     photoUrlsJson = photoUrls?.joinToString(",") { it.toString() }
                 )
+                Log.d("PlayOut_Firebase", "Facility ${facility.fid} photo: ${facility.photo}")
+                facility
             } catch (e: Exception) {
                 null
             }

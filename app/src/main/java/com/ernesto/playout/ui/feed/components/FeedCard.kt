@@ -1,5 +1,6 @@
 package com.ernesto.playout.ui.feed.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,11 +53,13 @@ fun FeedCard(
             // Layer 1 - Main photo
             val photoModel: Any = remember(facility.fid, facility.photo) {
                 val photo = facility.photo
-                when {
+                val model: Any = when {
                     photo != null && photo.startsWith("https://") -> photo
                     photo != null && photo.startsWith("/") -> java.io.File(photo)
                     else -> R.drawable.other
                 }
+                Log.d("PlayOut_Firebase", "Loading photo model: $model")
+                model
             }
             AsyncImage(
                 model = photoModel,
