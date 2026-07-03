@@ -138,7 +138,6 @@ fun FeedCard(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .background(Color(0x66000000))
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -147,9 +146,9 @@ fun FeedCard(
                     text = facility.neighbourhood ?: "",
                     color = Color(0xFFF5F5F5),
                     fontSize = 10.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f).padding(end = 4.dp)
+                    maxLines = 2,
+                    overflow = TextOverflow.Clip,
+                    modifier = Modifier.padding(end = 4.dp)
                 )
                 val stars = facility.experience?.coerceIn(0, 5) ?: 0
                 if (stars > 0) {
