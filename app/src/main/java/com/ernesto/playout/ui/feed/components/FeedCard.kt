@@ -28,9 +28,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
 import com.ernesto.playout.ui.utils.categoryDrawable
@@ -61,10 +64,14 @@ fun FeedCard(
                 }
             }
             AsyncImage(
-                model = photoModel,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(photoModel)
+                    .crossfade(300)
+                    .build(),
                 contentDescription = facility.name,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
+                placeholder = painterResource(R.drawable.other),
                 error = painterResource(categoryDrawable(facility.sport))
             )
 

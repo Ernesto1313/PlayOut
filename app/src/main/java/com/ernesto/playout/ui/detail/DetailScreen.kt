@@ -59,6 +59,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
 
@@ -234,8 +236,13 @@ private fun ImmersiveMode(
             }
     ) {
         AsyncImage(
-            model = photoModel,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(photoModel)
+                .crossfade(300)
+                .build(),
             contentDescription = null,
+            placeholder = painterResource(R.drawable.other),
+            error = painterResource(R.drawable.other),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
@@ -394,8 +401,13 @@ private fun ProfileMode(
                 }
         ) {
             AsyncImage(
-                model = photoModelForSlide(inst, currentSlide),
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(photoModelForSlide(inst, currentSlide))
+                    .crossfade(300)
+                    .build(),
                 contentDescription = null,
+                placeholder = painterResource(R.drawable.other),
+                error = painterResource(R.drawable.other),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -535,14 +547,24 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = photoModelForSlide(inst, 0),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(photoModelForSlide(inst, 0))
+                            .crossfade(300)
+                            .build(),
                         contentDescription = null,
+                        placeholder = painterResource(R.drawable.other),
+                        error = painterResource(R.drawable.other),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = photoModelForSlide(inst, 1),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(photoModelForSlide(inst, 1))
+                            .crossfade(300)
+                            .build(),
                         contentDescription = null,
+                        placeholder = painterResource(R.drawable.other),
+                        error = painterResource(R.drawable.other),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
@@ -552,14 +574,24 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = photoModelForSlide(inst, 2),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(photoModelForSlide(inst, 2))
+                            .crossfade(300)
+                            .build(),
                         contentDescription = null,
+                        placeholder = painterResource(R.drawable.other),
+                        error = painterResource(R.drawable.other),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = photoModelForSlide(inst, 3),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(photoModelForSlide(inst, 3))
+                            .crossfade(300)
+                            .build(),
                         contentDescription = null,
+                        placeholder = painterResource(R.drawable.other),
+                        error = painterResource(R.drawable.other),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
