@@ -51,15 +51,14 @@ fun FeedCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Layer 1 - Main photo
-            val photoModel: Any = remember(facility.fid, facility.photo) {
+            val photoModel: Any = remember(facility.fid, facility.photo, facility.photoUrlsJson) {
                 val photo = facility.photo
-                val model: Any = when {
+                Log.d("PlayOut_Photo", "FID=${facility.fid} photo=$photo photoUrlsJson=${facility.photoUrlsJson}")
+                when {
                     photo != null && photo.startsWith("https://") -> photo
                     photo != null && photo.startsWith("/") -> java.io.File(photo)
                     else -> R.drawable.other
                 }
-                Log.d("PlayOut_Firebase", "Loading photo model: $model")
-                model
             }
             AsyncImage(
                 model = photoModel,

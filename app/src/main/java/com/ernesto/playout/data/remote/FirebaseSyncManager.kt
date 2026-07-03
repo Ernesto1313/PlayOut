@@ -21,6 +21,8 @@ class FirebaseSyncManager @Inject constructor(
                 val facilities = firestoreDataSource.fetchAllFacilities()
                 facilityDao.deleteAll()
                 facilityDao.insertAll(facilities)
+                Log.d("PlayOut_Photo", "First synced facility photo: ${facilities.firstOrNull()?.photo}")
+                Log.d("PlayOut_Photo", "First synced facility photoUrlsJson: ${facilities.firstOrNull()?.photoUrlsJson}")
                 Log.d("PlayOut_Firebase", "Sync complete: ${facilities.size} facilities")
             } catch (e: Exception) {
                 Log.e("PlayOut_Firebase", "Sync failed: ${e.message}")
