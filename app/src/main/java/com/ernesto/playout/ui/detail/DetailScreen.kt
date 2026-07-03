@@ -1,5 +1,6 @@
 package com.ernesto.playout.ui.detail
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -90,6 +91,7 @@ private fun facilityPhotoUrls(facility: Facility): List<String?> {
 
 private fun photoModelForSlide(facility: Facility, slide: Int): Any {
     val urls = facilityPhotoUrls(facility)
+    Log.d("PlayOut_Photo", "Slide $slide urls: ${facilityPhotoUrls(facility)}")
     return getPhotoModel(urls.getOrNull(slide) ?: urls.getOrNull(0))
 }
 
