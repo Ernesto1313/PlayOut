@@ -19,13 +19,11 @@ class PlayOutApplication : Application() {
         super.onCreate()
         syncManager.syncFacilities()
 
-        SingletonImageLoader.setSafe(this) {
-            ImageLoader.Builder(this)
+        SingletonImageLoader.setSafe {
+            ImageLoader.Builder(this@PlayOutApplication)
                 .components {
                     add(OkHttpNetworkFetcherFactory(
-                        callFactory = {
-                            OkHttpClient()
-                        }
+                        callFactory = { OkHttpClient() }
                     ))
                 }
                 .build()
