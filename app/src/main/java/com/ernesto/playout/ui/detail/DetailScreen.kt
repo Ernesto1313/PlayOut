@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -241,8 +242,8 @@ private fun ImmersiveMode(
                 .crossfade(300)
                 .build(),
             contentDescription = null,
-            placeholder = painterResource(R.drawable.other),
-            error = painterResource(R.drawable.other),
+            placeholder = ColorPainter(Color(0xFF2C332D)),
+            error = ColorPainter(Color(0xFF2C332D)),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
@@ -406,8 +407,8 @@ private fun ProfileMode(
                     .crossfade(300)
                     .build(),
                 contentDescription = null,
-                placeholder = painterResource(R.drawable.other),
-                error = painterResource(R.drawable.other),
+                placeholder = ColorPainter(Color(0xFF2C332D)),
+                error = ColorPainter(Color(0xFF2C332D)),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -552,8 +553,8 @@ private fun ProfileMode(
                             .crossfade(300)
                             .build(),
                         contentDescription = null,
-                        placeholder = painterResource(R.drawable.other),
-                        error = painterResource(R.drawable.other),
+                        placeholder = ColorPainter(Color(0xFF2C332D)),
+                        error = ColorPainter(Color(0xFF2C332D)),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
@@ -563,8 +564,8 @@ private fun ProfileMode(
                             .crossfade(300)
                             .build(),
                         contentDescription = null,
-                        placeholder = painterResource(R.drawable.other),
-                        error = painterResource(R.drawable.other),
+                        placeholder = ColorPainter(Color(0xFF2C332D)),
+                        error = ColorPainter(Color(0xFF2C332D)),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
@@ -579,8 +580,8 @@ private fun ProfileMode(
                             .crossfade(300)
                             .build(),
                         contentDescription = null,
-                        placeholder = painterResource(R.drawable.other),
-                        error = painterResource(R.drawable.other),
+                        placeholder = ColorPainter(Color(0xFF2C332D)),
+                        error = ColorPainter(Color(0xFF2C332D)),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
@@ -590,8 +591,8 @@ private fun ProfileMode(
                             .crossfade(300)
                             .build(),
                         contentDescription = null,
-                        placeholder = painterResource(R.drawable.other),
-                        error = painterResource(R.drawable.other),
+                        placeholder = ColorPainter(Color(0xFF2C332D)),
+                        error = ColorPainter(Color(0xFF2C332D)),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
