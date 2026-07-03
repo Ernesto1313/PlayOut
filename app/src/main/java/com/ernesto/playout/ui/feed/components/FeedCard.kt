@@ -148,6 +148,7 @@ fun FeedCard(
                     text = (facility.neighbourhood ?: "").replace(" ", "\n"),
                     color = Color(0xFFF5F5F5),
                     fontSize = 10.sp,
+                    lineHeight = 11.sp,
                     style = LocalTextStyle.current.copy(
                         shadow = Shadow(
                             color = Color.Black,
