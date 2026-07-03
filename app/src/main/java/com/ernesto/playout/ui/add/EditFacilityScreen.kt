@@ -16,10 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -111,8 +111,20 @@ fun EditFacilityScreen(
     var showPhotoSourceDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     val galleryLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { viewModel.savePhoto(activeSlotIndex, it) } }
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            // Find empty slots and fill them with selected photos
+            val currentPaths = viewModel.photoPaths.value.toMutableList()
+            var uriIndex = 0
+            for (i in currentPaths.indices) {
+                if (currentPaths[i] == null && uriIndex < uris.size) {
+                    viewModel.savePhoto(i, uris[uriIndex])
+                    uriIndex++
+                }
+            }
+        }
+    }
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
@@ -135,7 +147,7 @@ fun EditFacilityScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2C332D))
+            .background(Color(0xFF806B40))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
@@ -207,8 +219,8 @@ fun EditFacilityScreen(
                 // Photos
                 Text("Photos", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Text(
-                    "Add up to 4 photos. The first one is the main photo.",
-                    color = Color(0xFF8B949E),
+                    "All 4 photos are required.",
+                    color = Color(0xFFF5F5F5),
                     fontSize = 12.sp
                 )
                 Row(
@@ -251,7 +263,7 @@ fun EditFacilityScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
-                                        contentDescription = "Remove photo",
+                                        contentDescription = "Delete photo",
                                         tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -278,13 +290,13 @@ fun EditFacilityScreen(
                         .height(120.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF00AEFF),
-                        unfocusedBorderColor = Color(0xFF8B949E),
+                        unfocusedBorderColor = Color(0xFFF5F5F5),
                         focusedTextColor = Color(0xFFF5F5F5),
                         unfocusedTextColor = Color(0xFFF5F5F5),
                         cursorColor = Color(0xFF00AEFF)
                     ),
                     placeholder = {
-                        Text("Describe the facility...", color = Color(0xFF8B949E))
+                        Text("Describe the facility...", color = Color(0xFFF5F5F5))
                     }
                 )
 
@@ -292,7 +304,7 @@ fun EditFacilityScreen(
                 Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        Triple(1, "Good", Color(0xFF00AEFF)),
+                        Triple(1, "Good", Color(0xFF4CAF50)),
                         Triple(2, "Fair", Color(0xFFFFC107)),
                         Triple(3, "Broken", Color(0xFFF44336))
                     ).forEach { (value, label, color) ->
@@ -303,7 +315,7 @@ fun EditFacilityScreen(
                                 .clickable { viewModel.condition.value = value }
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         ) {
-                            Text(label, color = Color.White)
+                            Text(label, color = Color(0xFFF5F5F5))
                         }
                     }
                 }
@@ -314,7 +326,7 @@ fun EditFacilityScreen(
                     repeat(5) { index ->
                         Text(
                             text = if (index < experience) "★" else "☆",
-                            color = Color(0xFFFFC107),
+                            color = Color(0xFF00AEFF),
                             fontSize = 32.sp,
                             modifier = Modifier.clickable {
                                 viewModel.experience.value = index + 1
@@ -325,42 +337,67 @@ fun EditFacilityScreen(
 
                 // Amenities
                 Text("Amenities", color = Color(0xFFF5F5F5), fontSize = 14.sp)
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { viewModel.water.value = !water }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF5F5F5))
+                            .clickable { viewModel.water.value = !viewModel.water.value }
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.drop),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            colorFilter = ColorFilter.tint(
-                                if (water) Color(0xFF1E88E5) else Color(0xFF8B949E)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Image(
+                                painterResource(R.drawable.drop),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                colorFilter = ColorFilter.tint(
+                                    if (water) Color(0xFF00AEFF) else Color(0xFF1C2230)
+                                )
                             )
-                        )
-                        Text(
-                            "Water",
-                            color = if (water) Color(0xFF1E88E5) else Color(0xFF8B949E),
-                            fontSize = 12.sp
-                        )
+                            Text(
+                                "Water",
+                                color = if (water) Color(0xFF00AEFF) else Color(0xFF1C2230),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable { viewModel.seats.value = !seats }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF5F5F5))
+                            .clickable { viewModel.seats.value = !viewModel.seats.value }
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.bench),
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp),
-                            colorFilter = ColorFilter.tint(
-                                if (seats) Color(0xFF8D6E63) else Color(0xFF8B949E)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Image(
+                                painterResource(R.drawable.bench),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp),
+                                colorFilter = ColorFilter.tint(
+                                    if (seats) Color(0xFF806B40) else Color(0xFF1C2230)
+                                )
                             )
-                        )
-                        Text(
-                            "Seats",
-                            color = if (seats) Color(0xFF8D6E63) else Color(0xFF8B949E),
-                            fontSize = 12.sp
-                        )
+                            Text(
+                                "Seats",
+                                color = if (seats) Color(0xFF806B40) else Color(0xFF1C2230),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
 
@@ -369,21 +406,21 @@ fun EditFacilityScreen(
                 Button(
                     onClick = { showMapPicker = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (pinLatLng != null) Color(0xFF00AEFF) else Color(0xFF1C2230)
+                        containerColor = Color(0xFF00AEFF)
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Default.Place, contentDescription = null, tint = Color.White)
+                    Icon(Icons.Default.Place, contentDescription = null, tint = Color(0xFFF5F5F5))
                     Spacer(modifier = Modifier.size(4.dp))
                     Text(
                         if (pinLatLng != null) "Location selected ✓" else "Select location",
-                        color = Color.White
+                        color = Color(0xFFF5F5F5)
                     )
                 }
                 if (pinLatLng != null) {
                     Text(
                         "${pinLatLng!!.latitude}, ${pinLatLng!!.longitude}",
-                        color = Color(0xFF8B949E),
+                        color = Color(0xFFF5F5F5),
                         fontSize = 12.sp
                     )
                 }
@@ -405,7 +442,7 @@ fun EditFacilityScreen(
                         )
                     } else {
                         Text(
-                            "Save location",
+                            "Save changes",
                             color = Color.White,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -425,7 +462,7 @@ fun EditFacilityScreen(
         if (showPhotoSourceDialog) {
             AlertDialog(
                 onDismissRequest = { showPhotoSourceDialog = false },
-                containerColor = Color(0xFF2C332D),
+                containerColor = Color(0xFF806B40),
                 title = { Text("Add photo", color = Color(0xFFF5F5F5)) },
                 text = {
                     Column {
@@ -452,7 +489,8 @@ fun EditFacilityScreen(
                         }) {
                             Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF00AEFF))
                             Spacer(Modifier.width(8.dp))
-                            Text("Gallery", color = Color(0xFFF5F5F5))
+                            val emptySlots = photoPaths.count { it == null }
+                            Text("Gallery ($emptySlots remaining)", color = Color(0xFFF5F5F5))
                         }
                     }
                 },

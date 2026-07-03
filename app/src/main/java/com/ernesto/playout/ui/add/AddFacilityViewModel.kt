@@ -10,9 +10,13 @@ import com.ernesto.playout.data.model.CustomFacility
 import com.ernesto.playout.data.model.Proposal
 import com.ernesto.playout.data.remote.FirebaseStorageDataSource
 import com.ernesto.playout.data.remote.FirestoreDataSource
+import com.ernesto.playout.data.remote.UploadStatusTracker
 import com.ernesto.playout.data.repository.FacilityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +29,8 @@ class AddFacilityViewModel @Inject constructor(
     private val storageDataSource: FirebaseStorageDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     val sport = MutableStateFlow<String?>(null)
     val description = MutableStateFlow("")
@@ -140,42 +146,43 @@ class AddFacilityViewModel @Inject constructor(
                 repository.updateCustomFacility(updated)
             }
 
-            try {
-                // Upload photos to Storage
-                val uploadSuffixes = listOf("main", "extra1", "extra2", "extra3")
-                val uploadedUrls = mutableListOf<String>()
-                val tempId = "temp_$newFid"
-
-                uploadSuffixes.forEachIndexed { index, suffix ->
-                    val localPath = finalPaths.getOrNull(index)
-                    if (localPath != null) {
-                        val url = storageDataSource.uploadPhoto(localPath, tempId, suffix)
-                        if (url.isNotEmpty()) uploadedUrls.add(url)
-                    }
-                }
-
-                // Submit to Firestore
-                val proposal = Proposal(
-                    sport = sport.value ?: "",
-                    description = description.value,
-                    condition = condition.value ?: 0,
-                    water = if (water.value) 1 else 0,
-                    seats = if (seats.value) 1 else 0,
-                    experience = experience.value,
-                    longitude = pinLatLng.value?.longitude ?: 0.0,
-                    latitude = pinLatLng.value?.latitude ?: 0.0,
-                    photoUrls = uploadedUrls,
-                    status = "pending",
-                    localFid = newFid
-                )
-                firestoreDataSource.submitProposal(proposal)
-                Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")
-            } catch (e: Exception) {
-                Log.e("PlayOut_Firebase", "Failed to submit proposal: ${e.message}")
-            }
-
             isSaving.value = false
-            saveSuccess.value = true
+            saveSuccess.value = true // navigate immediately
+
+            // Upload in background - survives ViewModel destruction
+            appScope.launch {
+                UploadStatusTracker.setStatus(newFid, "uploading")
+                try {
+                    val uploadedUrls = mutableListOf<String>()
+                    val tempId = "temp_$newFid"
+                    suffixes.forEachIndexed { index, suffix ->
+                        val localPath = finalPaths.getOrNull(index)
+                        if (localPath != null) {
+                            val url = storageDataSource.uploadPhoto(localPath, tempId, suffix)
+                            if (url.isNotEmpty()) uploadedUrls.add(url)
+                        }
+                    }
+                    val proposal = Proposal(
+                        sport = sport.value ?: "",
+                        description = description.value,
+                        condition = condition.value ?: 0,
+                        water = if (water.value) 1 else 0,
+                        seats = if (seats.value) 1 else 0,
+                        experience = experience.value,
+                        longitude = pinLatLng.value?.longitude ?: 0.0,
+                        latitude = pinLatLng.value?.latitude ?: 0.0,
+                        photoUrls = uploadedUrls,
+                        status = "pending",
+                        localFid = newFid
+                    )
+                    firestoreDataSource.submitProposal(proposal)
+                    Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")
+                    UploadStatusTracker.setStatus(newFid, "pending")
+                } catch (e: Exception) {
+                    Log.e("PlayOut_Firebase", "Failed to submit proposal: ${e.message}")
+                    UploadStatusTracker.setStatus(newFid, "error")
+                }
+            }
         }
     }
 }

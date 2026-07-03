@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,10 +23,12 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ernesto.playout.R
+import com.ernesto.playout.data.remote.UploadStatusTracker
 
 @Composable
 fun SettingsScreen(
@@ -49,6 +53,7 @@ fun SettingsScreen(
 ) {
     val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
     val proposalStatuses by viewModel.proposalStatuses.collectAsStateWithLifecycle()
+    val uploadStatuses by UploadStatusTracker.statuses.collectAsStateWithLifecycle()
 
     LaunchedEffect(customInstalaciones) {
         if (customInstalaciones.isNotEmpty()) {
@@ -189,27 +194,58 @@ fun SettingsScreen(
                             }
                         }
                     }
-                    val status = proposalStatuses[inst.fid]
-                    if (status != null) {
-                        val (badgeText, badgeColor) = when (status) {
-                            "approved" -> "Approved" to Color(0xFF4CAF50)
-                            "rejected" -> "Rejected" to Color(0xFFF44336)
-                            else -> "Pending" to Color(0xFFFFC107)
-                        }
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = badgeColor.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(8.dp)
+                    val uploadStatus = uploadStatuses[inst.fid]
+                    val proposalStatus = proposalStatuses[inst.fid]
+
+                    when {
+                        uploadStatus == "uploading" -> {
+                            // Show loading indicator
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(14.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color(0xFF00AEFF)
                                 )
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = badgeText,
-                                color = badgeColor,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                                Text("Uploading...", color = Color(0xFF8B949E), fontSize = 10.sp)
+                            }
+                        }
+                        uploadStatus == "error" -> {
+                            // Show error + retry button
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(Color(0xFF8B949E).copy(alpha = 0.2f),
+                                            RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text("Failed", color = Color(0xFF8B949E), fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold)
+                                }
+                                TextButton(
+                                    onClick = { viewModel.retryUpload(inst.fid) },
+                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                                ) {
+                                    Text("Retry", color = Color(0xFF00AEFF), fontSize = 10.sp)
+                                }
+                            }
+                        }
+                        proposalStatus != null -> {
+                            // Show Firestore status
+                            val (badgeText, badgeColor) = when (proposalStatus) {
+                                "approved" -> "Approved" to Color(0xFF4CAF50)
+                                "rejected" -> "Rejected" to Color(0xFFF44336)
+                                else -> "Pending" to Color(0xFFFFC107)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .background(badgeColor.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(text = badgeText, color = badgeColor, fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                     IconButton(onClick = { onEditFacility(inst.fid) }) {
