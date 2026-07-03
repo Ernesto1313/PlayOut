@@ -15,10 +15,11 @@ class FirestoreDataSource @Inject constructor() {
         val snapshot = db.collection("facilities").get().await()
         return snapshot.documents.mapNotNull { doc ->
             try {
+                val photoUrls = doc.get("photoUrls") as? List<*>
                 Facility(
                     fid = (doc.getLong("fid") ?: return@mapNotNull null).toInt(),
                     name = doc.getString("name"),
-                    photo = (doc.get("photoUrls") as? List<*>)?.firstOrNull()?.toString(),
+                    photo = photoUrls?.firstOrNull()?.toString(),
                     sport = doc.getString("sport"),
                     description = doc.getString("description"),
                     condition = doc.getLong("condition")?.toInt(),
@@ -26,7 +27,8 @@ class FirestoreDataSource @Inject constructor() {
                     seats = doc.getLong("seats")?.toInt(),
                     experience = doc.getLong("experience")?.toInt(),
                     longitude = doc.getDouble("longitude"),
-                    latitude = doc.getDouble("latitude")
+                    latitude = doc.getDouble("latitude"),
+                    photoUrlsJson = photoUrls?.joinToString(",") { it.toString() }
                 )
             } catch (e: Exception) {
                 null

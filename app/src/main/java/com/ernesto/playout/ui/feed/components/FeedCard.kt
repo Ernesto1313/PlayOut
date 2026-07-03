@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
 import com.ernesto.playout.ui.utils.categoryDrawable
 
@@ -52,8 +53,9 @@ fun FeedCard(
             val photoModel: Any = remember(facility.fid, facility.photo) {
                 val photo = facility.photo
                 when {
+                    photo != null && photo.startsWith("https://") -> photo
                     photo != null && photo.startsWith("/") -> java.io.File(photo)
-                    else -> "file:///android_asset/photos/${facility.fid}_main.jpg"
+                    else -> R.drawable.other
                 }
             }
             AsyncImage(

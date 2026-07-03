@@ -62,9 +62,11 @@ import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
 
 private fun getPhotoModel(path: String?): Any {
-    if (path == null) return R.drawable.other
-    return if (path.startsWith("/")) java.io.File(path)
-    else "file:///android_asset/photos/$path"
+    return when {
+        path != null && path.startsWith("https://") -> path
+        path != null && path.startsWith("/") -> java.io.File(path)
+        else -> R.drawable.other
+    }
 }
 
 private fun slidePath(facility: Facility, suffix: String): String? {
@@ -74,6 +76,21 @@ private fun slidePath(facility: Facility, suffix: String): String? {
     } else {
         "${facility.fid}_$suffix.jpg"
     }
+}
+
+private fun facilityPhotoUrls(facility: Facility): List<String?> {
+    return facility.photoUrlsJson?.split(",")
+        ?: listOf(
+            facility.photo,
+            slidePath(facility, "extra1"),
+            slidePath(facility, "extra2"),
+            slidePath(facility, "extra3")
+        )
+}
+
+private fun photoModelForSlide(facility: Facility, slide: Int): Any {
+    val urls = facilityPhotoUrls(facility)
+    return getPhotoModel(urls.getOrNull(slide) ?: urls.getOrNull(0))
 }
 
 @DrawableRes
@@ -194,10 +211,7 @@ private fun ImmersiveMode(
     onSwipeUp: () -> Unit,
     onBack: () -> Unit
 ) {
-    val slideSuffix = when (currentSlide) {
-        0 -> "main"; 1 -> "extra1"; 2 -> "extra2"; else -> "extra3"
-    }
-    val photoModel = getPhotoModel(slidePath(inst, slideSuffix))
+    val photoModel = photoModelForSlide(inst, currentSlide)
 
     Box(
         modifier = Modifier
@@ -377,11 +391,8 @@ private fun ProfileMode(
                     )
                 }
         ) {
-            val profileSuffix = when (currentSlide) {
-                0 -> "main"; 1 -> "extra1"; 2 -> "extra2"; 3 -> "extra3"; else -> "main"
-            }
             AsyncImage(
-                model = getPhotoModel(slidePath(inst, profileSuffix)),
+                model = photoModelForSlide(inst, currentSlide),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -522,13 +533,13 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = getPhotoModel(slidePath(inst, "main")),
+                        model = photoModelForSlide(inst, 0),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = getPhotoModel(slidePath(inst, "extra1")),
+                        model = photoModelForSlide(inst, 1),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
@@ -539,13 +550,13 @@ private fun ProfileMode(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     AsyncImage(
-                        model = getPhotoModel(slidePath(inst, "extra2")),
+                        model = photoModelForSlide(inst, 2),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     AsyncImage(
-                        model = getPhotoModel(slidePath(inst, "extra3")),
+                        model = photoModelForSlide(inst, 3),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
