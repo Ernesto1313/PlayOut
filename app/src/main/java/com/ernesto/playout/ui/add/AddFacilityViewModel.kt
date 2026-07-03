@@ -140,40 +140,38 @@ class AddFacilityViewModel @Inject constructor(
                 repository.updateCustomFacility(updated)
             }
 
-            viewModelScope.launch {
-                try {
-                    // Upload photos to Storage
-                    val uploadSuffixes = listOf("main", "extra1", "extra2", "extra3")
-                    val uploadedUrls = mutableListOf<String>()
-                    val tempId = "temp_$newFid"
+            try {
+                // Upload photos to Storage
+                val uploadSuffixes = listOf("main", "extra1", "extra2", "extra3")
+                val uploadedUrls = mutableListOf<String>()
+                val tempId = "temp_$newFid"
 
-                    uploadSuffixes.forEachIndexed { index, suffix ->
-                        val localPath = finalPaths.getOrNull(index)
-                        if (localPath != null) {
-                            val url = storageDataSource.uploadPhoto(localPath, tempId, suffix)
-                            if (url.isNotEmpty()) uploadedUrls.add(url)
-                        }
+                uploadSuffixes.forEachIndexed { index, suffix ->
+                    val localPath = finalPaths.getOrNull(index)
+                    if (localPath != null) {
+                        val url = storageDataSource.uploadPhoto(localPath, tempId, suffix)
+                        if (url.isNotEmpty()) uploadedUrls.add(url)
                     }
-
-                    // Submit to Firestore
-                    val proposal = Proposal(
-                        sport = sport.value ?: "",
-                        description = description.value,
-                        condition = condition.value ?: 0,
-                        water = if (water.value) 1 else 0,
-                        seats = if (seats.value) 1 else 0,
-                        experience = experience.value,
-                        longitude = pinLatLng.value?.longitude ?: 0.0,
-                        latitude = pinLatLng.value?.latitude ?: 0.0,
-                        photoUrls = uploadedUrls,
-                        status = "pending",
-                        localFid = newFid
-                    )
-                    firestoreDataSource.submitProposal(proposal)
-                    Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")
-                } catch (e: Exception) {
-                    Log.e("PlayOut_Firebase", "Failed to submit proposal: ${e.message}")
                 }
+
+                // Submit to Firestore
+                val proposal = Proposal(
+                    sport = sport.value ?: "",
+                    description = description.value,
+                    condition = condition.value ?: 0,
+                    water = if (water.value) 1 else 0,
+                    seats = if (seats.value) 1 else 0,
+                    experience = experience.value,
+                    longitude = pinLatLng.value?.longitude ?: 0.0,
+                    latitude = pinLatLng.value?.latitude ?: 0.0,
+                    photoUrls = uploadedUrls,
+                    status = "pending",
+                    localFid = newFid
+                )
+                firestoreDataSource.submitProposal(proposal)
+                Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")
+            } catch (e: Exception) {
+                Log.e("PlayOut_Firebase", "Failed to submit proposal: ${e.message}")
             }
 
             isSaving.value = false
