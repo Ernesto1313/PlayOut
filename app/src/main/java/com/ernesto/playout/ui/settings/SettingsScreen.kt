@@ -3,6 +3,7 @@ package com.ernesto.playout.ui.settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +48,13 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
+    val proposalStatuses by viewModel.proposalStatuses.collectAsStateWithLifecycle()
+
+    LaunchedEffect(customInstalaciones) {
+        if (customInstalaciones.isNotEmpty()) {
+            viewModel.fetchProposalStatuses(customInstalaciones.map { it.fid })
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -177,6 +187,29 @@ fun SettingsScreen(
                             if (conditionText.isNotEmpty()) {
                                 Text(conditionText, color = Color(0xFF8B949E), fontSize = 12.sp)
                             }
+                        }
+                    }
+                    val status = proposalStatuses[inst.fid]
+                    if (status != null) {
+                        val (badgeText, badgeColor) = when (status) {
+                            "approved" -> "Approved" to Color(0xFF4CAF50)
+                            "rejected" -> "Rejected" to Color(0xFFF44336)
+                            else -> "Pending" to Color(0xFFFFC107)
+                        }
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = badgeColor.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = badgeText,
+                                color = badgeColor,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                     IconButton(onClick = { onEditFacility(inst.fid) }) {

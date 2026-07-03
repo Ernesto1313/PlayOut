@@ -2,10 +2,14 @@ package com.ernesto.playout.ui.add
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ernesto.playout.data.location.LocationDataSource
 import com.ernesto.playout.data.model.CustomFacility
+import com.ernesto.playout.data.model.Proposal
+import com.ernesto.playout.data.remote.FirebaseStorageDataSource
+import com.ernesto.playout.data.remote.FirestoreDataSource
 import com.ernesto.playout.data.repository.FacilityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -17,6 +21,8 @@ import javax.inject.Inject
 class AddFacilityViewModel @Inject constructor(
     private val repository: FacilityRepository,
     private val locationDataSource: LocationDataSource,
+    private val firestoreDataSource: FirestoreDataSource,
+    private val storageDataSource: FirebaseStorageDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -132,6 +138,42 @@ class AddFacilityViewModel @Inject constructor(
                     photo = finalMainPath
                 )
                 repository.updateCustomFacility(updated)
+            }
+
+            viewModelScope.launch {
+                try {
+                    // Upload photos to Storage
+                    val uploadSuffixes = listOf("main", "extra1", "extra2", "extra3")
+                    val uploadedUrls = mutableListOf<String>()
+                    val tempId = "temp_$newFid"
+
+                    uploadSuffixes.forEachIndexed { index, suffix ->
+                        val localPath = finalPaths.getOrNull(index)
+                        if (localPath != null) {
+                            val url = storageDataSource.uploadPhoto(localPath, tempId, suffix)
+                            if (url.isNotEmpty()) uploadedUrls.add(url)
+                        }
+                    }
+
+                    // Submit to Firestore
+                    val proposal = Proposal(
+                        sport = sport.value ?: "",
+                        description = description.value,
+                        condition = condition.value ?: 0,
+                        water = if (water.value) 1 else 0,
+                        seats = if (seats.value) 1 else 0,
+                        experience = experience.value,
+                        longitude = pinLatLng.value?.longitude ?: 0.0,
+                        latitude = pinLatLng.value?.latitude ?: 0.0,
+                        photoUrls = uploadedUrls,
+                        status = "pending",
+                        localFid = newFid
+                    )
+                    firestoreDataSource.submitProposal(proposal)
+                    Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")
+                } catch (e: Exception) {
+                    Log.e("PlayOut_Firebase", "Failed to submit proposal: ${e.message}")
+                }
             }
 
             isSaving.value = false
