@@ -151,8 +151,20 @@ fun AddFacilityScreen(
     var showPhotoSourceDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
     val galleryLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { viewModel.savePhoto(activeSlotIndex, it) } }
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            // Find empty slots and fill them with selected photos
+            val currentPaths = viewModel.photoPaths.value.toMutableList()
+            var uriIndex = 0
+            for (i in currentPaths.indices) {
+                if (currentPaths[i] == null && uriIndex < uris.size) {
+                    viewModel.savePhoto(i, uris[uriIndex])
+                    uriIndex++
+                }
+            }
+        }
+    }
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
@@ -517,7 +529,8 @@ fun AddFacilityScreen(
                         }) {
                             Icon(Icons.Default.PhotoLibrary, null, tint = Color(0xFF00AEFF))
                             Spacer(Modifier.width(8.dp))
-                            Text("Gallery", color = Color(0xFFF5F5F5))
+                            val emptySlots = photoPaths.count { it == null }
+                            Text("Gallery ($emptySlots remaining)", color = Color(0xFFF5F5F5))
                         }
                     }
                 },
