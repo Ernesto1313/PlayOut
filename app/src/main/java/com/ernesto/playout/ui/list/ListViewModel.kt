@@ -41,6 +41,14 @@ class ListViewModel @Inject constructor(
         }
     }
 
+    fun refreshLocation() {
+        viewModelScope.launch {
+            locationDataSource.getCurrentLocation().collect { loc ->
+                if (loc != null) userLocation.value = loc
+            }
+        }
+    }
+
     fun distanceTo(facility: Facility): Float? {
         val loc = userLocation.value ?: return null
         val lat = facility.latitude ?: return null

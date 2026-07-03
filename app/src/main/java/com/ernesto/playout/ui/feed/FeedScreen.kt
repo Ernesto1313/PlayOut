@@ -3,6 +3,7 @@ package com.ernesto.playout.ui.feed
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,13 +27,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,8 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ernesto.playout.ui.feed.components.FeedCard
@@ -69,11 +68,15 @@ fun FeedScreen(
     var selectedCategory by remember { mutableStateOf("") }
     var sortField by remember { mutableStateOf("") }
     var sortAscending by remember { mutableStateOf(true) }
-    var showLocationSettingsDialog by remember { mutableStateOf(false) }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* location will update via VM once granted */ }
+    ) { granted ->
+        if (granted) {
+            sortField = "distance"
+            sortAscending = false
+        }
+    }
 
     val baseList = remember(uiState) {
         if (uiState is ListUiState.Success) (uiState as ListUiState.Success).facilities
@@ -199,21 +202,29 @@ fun FeedScreen(
                 FilterChip(
                     selected = sortField == "distance",
                     onClick = {
-                        if (userLocation == null) {
-                            val locationManager = context.getSystemService(
-                                Context.LOCATION_SERVICE) as LocationManager
-                            val isGpsEnabled = locationManager.isProviderEnabled(
-                                LocationManager.GPS_PROVIDER) ||
-                                locationManager.isProviderEnabled(
-                                LocationManager.NETWORK_PROVIDER)
-                            if (!isGpsEnabled) {
-                                showLocationSettingsDialog = true
-                            } else {
+                        val locationManager = context.getSystemService(
+                            Context.LOCATION_SERVICE) as LocationManager
+                        val isGpsEnabled = locationManager.isProviderEnabled(
+                            LocationManager.GPS_PROVIDER) ||
+                            locationManager.isProviderEnabled(
+                            LocationManager.NETWORK_PROVIDER)
+                        val hasPermission = ContextCompat.checkSelfPermission(
+                            context, Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+
+                        when {
+                            !hasPermission -> {
                                 locationPermissionLauncher.launch(
                                     Manifest.permission.ACCESS_FINE_LOCATION)
                             }
-                        } else {
-                            toggleSort("distance")
+                            !isGpsEnabled -> {
+                                context.startActivity(Intent(
+                                    Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            }
+                            else -> {
+                                viewModel.refreshLocation()
+                                toggleSort("distance")
+                            }
                         }
                     },
                     label = { Text("Distance") },
@@ -252,36 +263,5 @@ fun FeedScreen(
                 )
             }
         }
-    }
-
-    if (showLocationSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showLocationSettingsDialog = false },
-            containerColor = Color(0xFF2C332D),
-            title = {
-                Text("Location disabled",
-                    color = Color(0xFFF5F5F5),
-                    fontWeight = FontWeight.Bold)
-            },
-            text = {
-                Text(
-                    "Location is disabled on your device. Would you like to enable it?",
-                    color = Color(0xFFF5F5F5))
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showLocationSettingsDialog = false
-                    context.startActivity(Intent(
-                        Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                }) {
-                    Text("Open Settings", color = Color(0xFF00AEFF))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showLocationSettingsDialog = false }) {
-                    Text("Cancel", color = Color(0xFF8B949E))
-                }
-            }
-        )
     }
 }

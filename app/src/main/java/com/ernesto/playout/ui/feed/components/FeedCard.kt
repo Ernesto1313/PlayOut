@@ -144,19 +144,40 @@ fun FeedCard(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = (facility.neighbourhood ?: "").replace(" ", "\n"),
-                    color = Color(0xFFF5F5F5),
-                    fontSize = 10.sp,
-                    lineHeight = 11.sp,
-                    style = LocalTextStyle.current.copy(
-                        shadow = Shadow(
-                            color = Color.Black,
-                            offset = Offset(1f, 1f),
-                            blurRadius = 3f
+                if (distanceMeters != null) {
+                    val distanceText = if (distanceMeters < 1000f) {
+                        "${distanceMeters.toInt()} m"
+                    } else {
+                        "${"%.1f".format(distanceMeters / 1000f)} km"
+                    }
+                    Text(
+                        text = distanceText,
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 10.sp,
+                        lineHeight = 11.sp,
+                        style = LocalTextStyle.current.copy(
+                            shadow = Shadow(
+                                color = Color.Black,
+                                offset = Offset(1f, 1f),
+                                blurRadius = 3f
+                            )
                         )
                     )
-                )
+                } else {
+                    Text(
+                        text = (facility.neighbourhood ?: "").replace(" ", "\n"),
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 10.sp,
+                        lineHeight = 11.sp,
+                        style = LocalTextStyle.current.copy(
+                            shadow = Shadow(
+                                color = Color.Black,
+                                offset = Offset(1f, 1f),
+                                blurRadius = 3f
+                            )
+                        )
+                    )
+                }
                 val stars = facility.experience?.coerceIn(0, 5) ?: 0
                 if (stars > 0) {
                     Row(
