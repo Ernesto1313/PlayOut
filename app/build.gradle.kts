@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.play.services.location)
     implementation(libs.material.icons.extended)

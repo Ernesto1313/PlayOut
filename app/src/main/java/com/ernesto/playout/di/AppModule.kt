@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.ernesto.playout.data.db.AppDatabase
 import com.ernesto.playout.data.db.CustomFacilityDao
 import com.ernesto.playout.data.db.FacilityDao
+import com.ernesto.playout.data.remote.FirebaseSyncManager
+import com.ernesto.playout.data.remote.FirestoreDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,8 +22,7 @@ object AppModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         AppDatabase.appContext = context
-        return Room.databaseBuilder(context, AppDatabase::class.java, "playout21.db")
-            .addCallback(AppDatabase.callback)
+        return Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.DATABASE_NAME)
             .addMigrations(
                 AppDatabase.MIGRATION_1_2,
                 AppDatabase.MIGRATION_2_3,
@@ -39,4 +40,15 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCustomFacilityDao(db: AppDatabase): CustomFacilityDao = db.customFacilityDao()
+
+    @Provides
+    @Singleton
+    fun provideFirestoreDataSource(): FirestoreDataSource = FirestoreDataSource()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseSyncManager(
+        firestoreDataSource: FirestoreDataSource,
+        facilityDao: FacilityDao
+    ): FirebaseSyncManager = FirebaseSyncManager(firestoreDataSource, facilityDao)
 }
