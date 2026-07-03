@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,7 +35,6 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
@@ -147,20 +145,16 @@ fun FeedCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = facility.neighbourhood ?: "",
+                    text = (facility.neighbourhood ?: "").replace(" ", "\n"),
                     color = Color(0xFFF5F5F5),
                     fontSize = 10.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Clip,
-                    softWrap = true,
                     style = LocalTextStyle.current.copy(
                         shadow = Shadow(
                             color = Color.Black,
                             offset = Offset(1f, 1f),
                             blurRadius = 3f
                         )
-                    ),
-                    modifier = Modifier.widthIn(max = 100.dp)
+                    )
                 )
                 val stars = facility.experience?.coerceIn(0, 5) ?: 0
                 if (stars > 0) {
