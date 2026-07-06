@@ -13,130 +13,81 @@
             min-height: 100vh;
             padding: 24px;
         }
-        h1 {
-            font-size: 28px;
-            font-weight: 900;
-            color: #F5F5F5;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            color: #F5F5F5;
-            opacity: 0.7;
-            margin-bottom: 32px;
-            font-size: 14px;
-        }
-        .empty {
-            text-align: center;
-            padding: 60px;
-            opacity: 0.6;
-            font-size: 16px;
-        }
+        h1 { font-size: 28px; font-weight: 900; margin-bottom: 4px; }
+        .subtitle { opacity: 0.7; margin-bottom: 24px; font-size: 14px; }
+        .stats { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .stat { background: #2C332D; border-radius: 8px; padding: 12px 20px; text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #00AEFF; }
+        .stat-label { font-size: 11px; color: #8B949E; }
         .proposals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 20px;
         }
-        .card {
-            background: #2C332D;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #1C2230;
-        }
-        .card-body {
-            padding: 16px;
-        }
+        .card { background: #2C332D; border-radius: 12px; overflow: hidden; }
+        .card img { width: 100%; height: 200px; object-fit: cover; background: #1C2230; display: block; }
+        .photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+        .photos img { width: 100%; height: 80px; object-fit: cover; background: #1C2230; }
+        .card-body { padding: 16px; }
         .sport-badge {
-            display: inline-block;
-            background: #00AEFF;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 8px;
+            display: inline-block; background: #00AEFF; color: white;
+            padding: 3px 10px; border-radius: 20px; font-size: 12px;
+            font-weight: bold; margin-bottom: 12px;
         }
-        .card-body h3 {
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: #F5F5F5;
+        .field-group { margin-bottom: 12px; }
+        .field-group label { font-size: 11px; color: #8B949E; display: block; margin-bottom: 4px; }
+        .field-group input, .field-group textarea, .field-group select {
+            width: 100%; background: #1C2230; border: 1px solid #8B949E40;
+            border-radius: 6px; color: #F5F5F5; padding: 8px; font-size: 13px;
+            font-family: Arial, sans-serif;
         }
-        .card-body p {
-            font-size: 12px;
-            color: #8B949E;
-            margin-bottom: 8px;
-            line-height: 1.4;
-            max-height: 60px;
-            overflow: hidden;
+        .field-group textarea { resize: vertical; min-height: 80px; }
+        .toggle-row { display: flex; gap: 8px; }
+        .toggle-btn {
+            flex: 1; padding: 8px; border: 2px solid #8B949E40;
+            border-radius: 8px; background: transparent; color: #8B949E;
+            font-size: 12px; cursor: pointer; transition: all 0.2s;
         }
-        .meta {
-            font-size: 11px;
-            color: #8B949E;
-            margin-bottom: 12px;
+        .toggle-btn.active { border-color: #00AEFF; color: #00AEFF; background: #00AEFF20; }
+        .stars-row { display: flex; gap: 4px; }
+        .star-btn {
+            font-size: 20px; background: none; border: none;
+            cursor: pointer; color: #8B949E; transition: color 0.1s;
+            padding: 2px;
         }
-        .actions {
-            display: flex;
-            gap: 8px;
+        .star-btn.active { color: #00AEFF; }
+        .neighbourhood-row { display: flex; gap: 8px; align-items: flex-end; }
+        .neighbourhood-row input { flex: 1; }
+        .maps-btn {
+            padding: 8px 10px; background: #00AEFF; border: none;
+            border-radius: 6px; color: white; cursor: pointer;
+            font-size: 12px; white-space: nowrap;
         }
+        .actions { display: flex; gap: 8px; margin-top: 16px; }
         .btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
+            flex: 1; padding: 10px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: bold; cursor: pointer; transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.85; }
-        .btn-approve {
-            background: #4CAF50;
-            color: white;
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-approve { background: #4CAF50; color: white; }
+        .btn-reject { background: #F44336; color: white; flex: 0.5; }
+        .empty { text-align: center; padding: 60px; opacity: 0.6; font-size: 16px; }
+        .loading { text-align: center; padding: 60px; opacity: 0.7; }
+        .condition-row { display: flex; gap: 8px; }
+        .cond-btn {
+            flex: 1; padding: 8px; border: 2px solid #8B949E40;
+            border-radius: 8px; background: transparent;
+            font-size: 12px; cursor: pointer; transition: all 0.2s; color: #8B949E;
         }
-        .btn-reject {
-            background: #F44336;
-            color: white;
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .loading {
-            text-align: center;
-            padding: 60px;
-            font-size: 16px;
-            opacity: 0.7;
-        }
-        .stats {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat {
-            background: #2C332D;
-            border-radius: 8px;
-            padding: 12px 20px;
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00AEFF;
-        }
-        .stat-label {
-            font-size: 11px;
-            color: #8B949E;
-        }
+        .cond-btn.good { border-color: #4CAF50; color: #4CAF50; background: #4CAF5020; }
+        .cond-btn.fair { border-color: #FFC107; color: #FFC107; background: #FFC10720; }
+        .cond-btn.broken { border-color: #F44336; color: #F44336; background: #F4433620; }
     </style>
 </head>
 <body>
     <h1>PlayOut Admin</h1>
     <p class="subtitle">Review and approve facility proposals</p>
-
     <div class="stats">
         <div class="stat">
             <div class="stat-number" id="pendingCount">-</div>
@@ -151,12 +102,12 @@
             <div class="stat-label">Rejected</div>
         </div>
     </div>
-
     <div id="content" class="loading">Loading proposals...</div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+        import { getFirestore, collection, getDocs, doc, updateDoc }
+            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCybtOSVwlmfF0xSQYJXBn00736r7YRzDQ",
@@ -164,11 +115,14 @@
             projectId: "playout-fd72f",
             storageBucket: "playout-fd72f.firebasestorage.app",
             messagingSenderId: "958420111272",
-            appId: "1:958420111272:web:e90e6aeb22ea8eb9d0579d"
+            appId: "1:958420111272:web:060fbf254fff30d0d0579d"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // State per card
+        const cardState = {};
 
         async function loadProposals() {
             const content = document.getElementById('content');
@@ -194,27 +148,110 @@
                 grid.className = 'proposals-grid';
 
                 pending.forEach(proposal => {
-                    const photoUrl = proposal.photoUrls?.[0] || '';
+                    // Init state
+                    cardState[proposal.id] = {
+                        sport: proposal.sport || '',
+                        description: proposal.description || '',
+                        neighbourhood: proposal.neighbourhood || '',
+                        condition: proposal.condition || 1,
+                        water: proposal.water || 0,
+                        seats: proposal.seats || 0,
+                        experience: proposal.experience || 0
+                    };
+
+                    const photoUrls = proposal.photoUrls || [];
+                    const photosHtml = photoUrls.map(url =>
+                        `<img src="${url}" onerror="this.style.background='#1C2230'">`
+                    ).join('');
+
                     const card = document.createElement('div');
                     card.className = 'card';
+                    card.id = 'card-' + proposal.id;
                     card.innerHTML = `
-                        <img src="${photoUrl}" alt="Facility photo"
-                             onerror="this.style.background='#1C2230'">
+                        <div class="photos">${photosHtml}</div>
                         <div class="card-body">
                             <span class="sport-badge">${proposal.sport || 'Unknown'}</span>
-                            <h3>${proposal.neighbourhood || 'No neighbourhood'}</h3>
-                            <p>${proposal.description || 'No description'}</p>
-                            <div class="meta">
-                                ⭐ ${proposal.experience || 0}/5 &nbsp;|&nbsp;
-                                💧 ${proposal.water ? 'Yes' : 'No'} &nbsp;|&nbsp;
-                                🪑 ${proposal.seats ? 'Yes' : 'No'} &nbsp;|&nbsp;
-                                📍 ${proposal.latitude?.toFixed(4)}, ${proposal.longitude?.toFixed(4)}
+
+                            <div class="field-group">
+                                <label>Sport / Category</label>
+                                <select onchange="updateState('${proposal.id}', 'sport', this.value)">
+                                    ${['Football','Basketball','Pingpong','Volleyball','Chess',
+                                       'Fencing','Skating','Calisthenics','Athletics',
+                                       'Minigolf','Other'].map(s =>
+                                        `<option value="${s}" ${s === proposal.sport ? 'selected' : ''}>${s}</option>`
+                                    ).join('')}
+                                </select>
                             </div>
+
+                            <div class="field-group">
+                                <label>Description</label>
+                                <textarea onchange="updateState('${proposal.id}', 'description', this.value)"
+                                    >${proposal.description || ''}</textarea>
+                            </div>
+
+                            <div class="field-group">
+                                <label>Neighbourhood &nbsp;
+                                    <a href="https://www.google.com/maps?q=${proposal.latitude},${proposal.longitude}"
+                                       target="_blank" style="color:#00AEFF;font-size:11px;">
+                                        📍 Open in Maps
+                                    </a>
+                                </label>
+                                <input type="text" value="${proposal.neighbourhood || ''}"
+                                    onchange="updateState('${proposal.id}', 'neighbourhood', this.value)"
+                                    placeholder="e.g. Westpark">
+                            </div>
+
+                            <div class="field-group">
+                                <label>Condition</label>
+                                <div class="condition-row">
+                                    <button class="cond-btn ${proposal.condition === 1 ? 'good' : ''}"
+                                        onclick="setCondition('${proposal.id}', 1, this.closest('.condition-row'))">
+                                        Good
+                                    </button>
+                                    <button class="cond-btn ${proposal.condition === 2 ? 'fair' : ''}"
+                                        onclick="setCondition('${proposal.id}', 2, this.closest('.condition-row'))">
+                                        Fair
+                                    </button>
+                                    <button class="cond-btn ${proposal.condition === 3 ? 'broken' : ''}"
+                                        onclick="setCondition('${proposal.id}', 3, this.closest('.condition-row'))">
+                                        Broken
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="field-group">
+                                <label>Experience (stars)</label>
+                                <div class="stars-row" id="stars-${proposal.id}">
+                                    ${[1,2,3,4,5].map(n =>
+                                        `<button class="star-btn ${n <= (proposal.experience||0) ? 'active' : ''}"
+                                            onclick="setStars('${proposal.id}', ${n})">★</button>`
+                                    ).join('')}
+                                </div>
+                            </div>
+
+                            <div class="field-group">
+                                <label>Amenities</label>
+                                <div class="toggle-row">
+                                    <button class="toggle-btn ${proposal.water ? 'active' : ''}"
+                                        id="water-${proposal.id}"
+                                        onclick="toggleAmenity('${proposal.id}', 'water')">
+                                        💧 Water
+                                    </button>
+                                    <button class="toggle-btn ${proposal.seats ? 'active' : ''}"
+                                        id="seats-${proposal.id}"
+                                        onclick="toggleAmenity('${proposal.id}', 'seats')">
+                                        🪑 Seats
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="actions">
-                                <button class="btn btn-approve" onclick="updateStatus('${proposal.id}', 'approved', this)">
+                                <button class="btn btn-approve"
+                                    onclick="approveWithEdits('${proposal.id}', this)">
                                     ✓ Approve
                                 </button>
-                                <button class="btn btn-reject" onclick="updateStatus('${proposal.id}', 'rejected', this)">
+                                <button class="btn btn-reject"
+                                    onclick="updateStatus('${proposal.id}', 'rejected', this)">
                                     ✗ Reject
                                 </button>
                             </div>
@@ -226,18 +263,69 @@
                 content.innerHTML = '';
                 content.appendChild(grid);
             } catch (e) {
-                content.innerHTML = '<div class="empty">Error loading proposals: ' + e.message + '</div>';
+                content.innerHTML = '<div class="empty">Error: ' + e.message + '</div>';
             }
         }
 
-        window.updateStatus = async function(proposalId, status, btn) {
+        window.updateState = (id, field, value) => {
+            cardState[id][field] = value;
+        };
+
+        window.setCondition = (id, value, row) => {
+            cardState[id].condition = value;
+            row.querySelectorAll('.cond-btn').forEach((btn, i) => {
+                btn.className = 'cond-btn';
+                if (i + 1 === value) {
+                    btn.classList.add(value === 1 ? 'good' : value === 2 ? 'fair' : 'broken');
+                }
+            });
+        };
+
+        window.setStars = (id, value) => {
+            cardState[id].experience = value;
+            const row = document.getElementById('stars-' + id);
+            row.querySelectorAll('.star-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i < value);
+            });
+        };
+
+        window.toggleAmenity = (id, field) => {
+            const current = cardState[id][field];
+            cardState[id][field] = current ? 0 : 1;
+            const btn = document.getElementById(field + '-' + id);
+            btn.classList.toggle('active', cardState[id][field] === 1);
+        };
+
+        window.approveWithEdits = async (id, btn) => {
             const actions = btn.parentElement;
             actions.querySelectorAll('button').forEach(b => b.disabled = true);
             try {
-                await updateDoc(doc(db, 'proposals', proposalId), { status });
-                btn.textContent = status === 'approved' ? '✓ Approved!' : '✗ Rejected';
-                btn.style.opacity = '1';
-                setTimeout(() => loadProposals(), 1000);
+                const state = cardState[id];
+                await updateDoc(doc(db, 'proposals', id), {
+                    status: 'approved',
+                    sport: state.sport,
+                    description: state.description,
+                    neighbourhood: state.neighbourhood,
+                    condition: state.condition,
+                    water: state.water,
+                    seats: state.seats,
+                    experience: state.experience
+                });
+                btn.textContent = '✓ Approved!';
+                setTimeout(() => loadProposals(), 1200);
+            } catch (e) {
+                actions.querySelectorAll('button').forEach(b => b.disabled = false);
+                alert('Error: ' + e.message);
+            }
+        };
+
+        window.updateStatus = async (id, status, btn) => {
+            const actions = btn.parentElement;
+            actions.querySelectorAll('button').forEach(b => b.disabled = true);
+            try {
+                await updateDoc(doc(db, 'proposals', id), { status });
+                btn.textContent = '✗ Rejected';
+                setTimeout(() => loadProposals(), 1200);
             } catch (e) {
                 actions.querySelectorAll('button').forEach(b => b.disabled = false);
                 alert('Error: ' + e.message);
