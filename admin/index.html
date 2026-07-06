@@ -30,17 +30,19 @@
             display: flex;
             gap: 8px;
             padding: 12px;
-            overflow-x: auto;
             background: #1C2230;
+            flex-wrap: nowrap;
+            justify-content: center;
         }
         .photo-item {
             position: relative;
-            flex-shrink: 0;
+            flex: 1;
             cursor: pointer;
+            min-width: 0;
         }
         .photo-item img {
-            width: 100px;
-            height: 160px;
+            width: 100%;
+            aspect-ratio: 9/16;
             object-fit: cover;
             border-radius: 8px;
             border: 3px solid transparent;
