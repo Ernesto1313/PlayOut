@@ -18,6 +18,14 @@ class FacilityRepository @Inject constructor(
     fun getAllFacilities(): Flow<List<Facility>> =
         combine(dao.getAll(), customFacilityDao.getAll()) { assets, customs ->
             val customMapped = customs.map { c ->
+                val photoUrlsJson = if (c.photo?.startsWith("https://") == true) {
+                    // Extract base URL and reconstruct all 4 photo URLs
+                    // photo is like: https://.../proposals/temp_10000/main.jpg
+                    // Replace "main.jpg" with each suffix
+                    val baseUrl = c.photo!!.substringBeforeLast("/")
+                    "$baseUrl/main.jpg,$baseUrl/extra1.jpg,$baseUrl/extra2.jpg,$baseUrl/extra3.jpg"
+                } else null
+
                 Facility(
                     fid = c.fid,
                     name = c.name,
@@ -29,7 +37,8 @@ class FacilityRepository @Inject constructor(
                     seats = c.seats,
                     experience = c.experience,
                     longitude = c.longitude,
-                    latitude = c.latitude
+                    latitude = c.latitude,
+                    photoUrlsJson = photoUrlsJson
                 )
             }
             assets + customMapped
