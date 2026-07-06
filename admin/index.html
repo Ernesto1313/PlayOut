@@ -26,8 +26,43 @@
         }
         .card { background: #2C332D; border-radius: 12px; overflow: hidden; }
         .card img { width: 100%; height: 200px; object-fit: cover; background: #1C2230; display: block; }
-        .photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
-        .photos img { width: 100%; height: 80px; object-fit: cover; background: #1C2230; }
+        .photos-scroll {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            overflow-x: auto;
+            background: #1C2230;
+        }
+        .photo-item {
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .photo-item img {
+            width: 100px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            display: block;
+            transition: border-color 0.2s;
+        }
+        .photo-item.is-main img {
+            border-color: #00AEFF;
+        }
+        .main-badge {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00AEFF;
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
         .card-body { padding: 16px; }
         .sport-badge {
             display: inline-block; background: #00AEFF; color: white;
@@ -149,6 +184,8 @@
 
                 pending.forEach(proposal => {
                     // Init state
+                    const photoUrls = proposal.photoUrls || [];
+
                     cardState[proposal.id] = {
                         sport: proposal.sport || '',
                         description: proposal.description || '',
@@ -156,19 +193,24 @@
                         condition: proposal.condition || 1,
                         water: proposal.water || 0,
                         seats: proposal.seats || 0,
-                        experience: proposal.experience || 0
+                        experience: proposal.experience || 0,
+                        mainPhotoIndex: 0,
+                        photoUrls: photoUrls
                     };
-
-                    const photoUrls = proposal.photoUrls || [];
-                    const photosHtml = photoUrls.map(url =>
-                        `<img src="${url}" onerror="this.style.background='#1C2230'">`
-                    ).join('');
 
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.id = 'card-' + proposal.id;
                     card.innerHTML = `
-                        <div class="photos">${photosHtml}</div>
+                        <div class="photos-scroll" id="photos-${proposal.id}">
+                            ${photoUrls.map((url, index) => `
+                                <div class="photo-item ${index === 0 ? 'is-main' : ''}"
+                                     onclick="setMainPhoto('${proposal.id}', ${index})">
+                                    <img src="${url}" onerror="this.style.background='#1C2230'">
+                                    ${index === 0 ? '<div class="main-badge">MAIN</div>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
                         <div class="card-body">
                             <span class="sport-badge">${proposal.sport || 'Unknown'}</span>
 
@@ -296,11 +338,36 @@
             btn.classList.toggle('active', cardState[id][field] === 1);
         };
 
+        window.setMainPhoto = (id, index) => {
+            cardState[id].mainPhotoIndex = index;
+            const container = document.getElementById('photos-' + id);
+            container.querySelectorAll('.photo-item').forEach((item, i) => {
+                item.classList.toggle('is-main', i === index);
+                const badge = item.querySelector('.main-badge');
+                if (i === index) {
+                    if (!badge) {
+                        const b = document.createElement('div');
+                        b.className = 'main-badge';
+                        b.textContent = 'MAIN';
+                        item.appendChild(b);
+                    }
+                } else {
+                    if (badge) badge.remove();
+                }
+            });
+        };
+
         window.approveWithEdits = async (id, btn) => {
             const actions = btn.parentElement;
             actions.querySelectorAll('button').forEach(b => b.disabled = true);
             try {
                 const state = cardState[id];
+                const urls = cardState[id].photoUrls;
+                const mainIdx = cardState[id].mainPhotoIndex;
+                const reorderedUrls = [
+                    urls[mainIdx],
+                    ...urls.filter((_, i) => i !== mainIdx)
+                ];
                 await updateDoc(doc(db, 'proposals', id), {
                     status: 'approved',
                     sport: state.sport,
@@ -309,7 +376,8 @@
                     condition: state.condition,
                     water: state.water,
                     seats: state.seats,
-                    experience: state.experience
+                    experience: state.experience,
+                    photoUrls: reorderedUrls
                 });
                 btn.textContent = '✓ Approved!';
                 setTimeout(() => loadProposals(), 1200);
