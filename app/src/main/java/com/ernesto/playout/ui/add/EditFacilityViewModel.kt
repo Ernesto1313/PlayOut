@@ -123,7 +123,8 @@ class EditFacilityViewModel @Inject constructor(
                             "condition" to (condition.value ?: 1),
                             "water" to if (water.value) 1 else 0,
                             "seats" to if (seats.value) 1 else 0,
-                            "experience" to experience.value
+                            "experience" to experience.value,
+                            "status" to "pending"
                         )).await()
                         Log.d("PlayOut_Firebase", "Proposal updated for fid $fid")
                     }

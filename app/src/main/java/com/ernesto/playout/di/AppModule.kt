@@ -51,6 +51,7 @@ object AppModule {
     @Singleton
     fun provideFirebaseSyncManager(
         firestoreDataSource: FirestoreDataSource,
-        facilityDao: FacilityDao
-    ): FirebaseSyncManager = FirebaseSyncManager(firestoreDataSource, facilityDao)
+        facilityDao: FacilityDao,
+        customFacilityDao: CustomFacilityDao
+    ): FirebaseSyncManager = FirebaseSyncManager(firestoreDataSource, facilityDao, customFacilityDao)
 }

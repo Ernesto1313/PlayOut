@@ -1,6 +1,7 @@
 package com.ernesto.playout.data.remote
 
 import android.util.Log
+import com.ernesto.playout.data.db.CustomFacilityDao
 import com.ernesto.playout.data.db.FacilityDao
 import com.ernesto.playout.data.model.Facility
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class FirebaseSyncManager @Inject constructor(
     private val firestoreDataSource: FirestoreDataSource,
-    private val facilityDao: FacilityDao
+    private val facilityDao: FacilityDao,
+    private val customFacilityDao: CustomFacilityDao
 ) {
     fun syncFacilities() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -23,6 +25,27 @@ class FirebaseSyncManager @Inject constructor(
                 Log.d("PlayOut_Firebase", "Approved proposals count: ${approved.size}")
                 approved.forEach {
                     Log.d("PlayOut_Firebase", "Approved proposal: fid=${it.fid} sport=${it.sport} name=${it.name}")
+                }
+                approved.forEach { approvedFacility ->
+                    try {
+                        val existing = customFacilityDao.getByIdOnce(approvedFacility.fid)
+                        if (existing != null) {
+                            val updated = existing.copy(
+                                sport = approvedFacility.sport,
+                                description = approvedFacility.description,
+                                condition = approvedFacility.condition,
+                                water = approvedFacility.water,
+                                seats = approvedFacility.seats,
+                                experience = approvedFacility.experience,
+                                photo = approvedFacility.photo
+                            )
+                            customFacilityDao.update(updated)
+                            Log.d("PlayOut_Firebase",
+                                "Updated local custom facility ${approvedFacility.fid} with approved data")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("PlayOut_Firebase", "Failed to update local facility: ${e.message}")
+                    }
                 }
                 val allFacilities = facilities + approved
                 facilityDao.deleteAll()
