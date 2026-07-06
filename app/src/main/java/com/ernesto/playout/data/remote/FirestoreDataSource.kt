@@ -2,6 +2,7 @@ package com.ernesto.playout.data.remote
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.ernesto.playout.data.model.Facility
 import com.ernesto.playout.data.model.Proposal
 import kotlinx.coroutines.tasks.await
@@ -14,7 +15,7 @@ class FirestoreDataSource @Inject constructor() {
     private val db = FirebaseFirestore.getInstance()
 
     suspend fun fetchAllFacilities(): List<Facility> {
-        val snapshot = db.collection("facilities").get().await()
+        val snapshot = db.collection("facilities").get(Source.SERVER).await()
         return snapshot.documents.mapNotNull { doc ->
             try {
                 val photoUrls = doc.get("photoUrls") as? List<*>
@@ -86,7 +87,8 @@ class FirestoreDataSource @Inject constructor() {
     suspend fun fetchApprovedProposals(): List<Facility> {
         val snapshot = db.collection("proposals")
             .whereEqualTo("status", "approved")
-            .get().await()
+            .get(Source.SERVER)
+            .await()
         return snapshot.documents.mapNotNull { doc ->
             try {
                 val photoUrls = doc.get("photoUrls") as? List<*>
