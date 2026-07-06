@@ -255,12 +255,15 @@ fun SettingsScreen(
                             tint = Color(0xFF00AEFF)
                         )
                     }
-                    IconButton(onClick = { viewModel.delete(inst) }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color(0xFFF44336)
-                        )
+                    // Only show delete if not approved
+                    if (proposalStatus != "approved") {
+                        IconButton(onClick = { viewModel.delete(inst) }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color(0xFFF44336)
+                            )
+                        }
                     }
                 }
                 HorizontalDivider(color = Color(0xFF2C332D), thickness = 1.dp)

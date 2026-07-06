@@ -212,7 +212,14 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("add") {
-                        AddFacilityScreen(onBack = { navController.navigateUp() })
+                        AddFacilityScreen(
+                            onBack = { navController.navigateUp() },
+                            onNavigateToSettings = {
+                                navController.navigate("settings") {
+                                    popUpTo("settings") { inclusive = true }
+                                }
+                            }
+                        )
                     }
                     composable(
                         route = "edit/{fid}",
@@ -222,7 +229,12 @@ class MainActivity : ComponentActivity() {
                             ?: return@composable
                         EditFacilityScreen(
                             fid = fid,
-                            onBack = { navController.navigateUp() }
+                            onBack = { navController.navigateUp() },
+                            onNavigateToSettings = {
+                                navController.navigate("settings") {
+                                    popUpTo("settings") { inclusive = true }
+                                }
+                            }
                         )
                     }
                 }

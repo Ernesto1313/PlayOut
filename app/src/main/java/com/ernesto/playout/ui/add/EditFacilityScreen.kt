@@ -79,6 +79,7 @@ private val editCategories = listOf(
 fun EditFacilityScreen(
     fid: Int,
     onBack: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: EditFacilityViewModel = hiltViewModel()
 ) {
     val sport by viewModel.sport.collectAsStateWithLifecycle()
@@ -97,7 +98,9 @@ fun EditFacilityScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(saveSuccess) {
-        if (saveSuccess) onBack()
+        if (saveSuccess) {
+            onNavigateToSettings()
+        }
     }
 
     LaunchedEffect(validationError) {

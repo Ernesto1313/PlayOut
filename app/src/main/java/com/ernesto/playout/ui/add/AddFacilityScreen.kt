@@ -118,6 +118,7 @@ private val categories = listOf(
 @Composable
 fun AddFacilityScreen(
     onBack: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: AddFacilityViewModel = hiltViewModel()
 ) {
     val sport by viewModel.sport.collectAsStateWithLifecycle()
@@ -137,7 +138,9 @@ fun AddFacilityScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(saveSuccess) {
-        if (saveSuccess) onBack()
+        if (saveSuccess) {
+            onNavigateToSettings()
+        }
     }
 
     LaunchedEffect(validationError) {
