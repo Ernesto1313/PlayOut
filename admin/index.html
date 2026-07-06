@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayOut Admin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #806B40;
+            color: #F5F5F5;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #F5F5F5;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #F5F5F5;
+            opacity: 0.7;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        .empty {
+            text-align: center;
+            padding: 60px;
+            opacity: 0.6;
+            font-size: 16px;
+        }
+        .proposals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #2C332D;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #1C2230;
+        }
+        .card-body {
+            padding: 16px;
+        }
+        .sport-badge {
+            display: inline-block;
+            background: #00AEFF;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .card-body h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #F5F5F5;
+        }
+        .card-body p {
+            font-size: 12px;
+            color: #8B949E;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        .meta {
+            font-size: 11px;
+            color: #8B949E;
+            margin-bottom: 12px;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-approve {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-reject {
+            background: #F44336;
+            color: white;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 16px;
+            opacity: 0.7;
+        }
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: #2C332D;
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00AEFF;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #8B949E;
+        }
+    </style>
+</head>
+<body>
+    <h1>PlayOut Admin</h1>
+    <p class="subtitle">Review and approve facility proposals</p>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number" id="pendingCount">-</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="approvedCount">-</div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="rejectedCount">-</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+    </div>
+
+    <div id="content" class="loading">Loading proposals...</div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCybtOSVwlmfF0xSQYJXBn00736r7YRzDQ",
+            authDomain: "playout-fd72f.firebaseapp.com",
+            projectId: "playout-fd72f",
+            storageBucket: "playout-fd72f.firebasestorage.app",
+            messagingSenderId: "958420111272",
+            appId: "1:958420111272:web:e90e6aeb22ea8eb9d0579d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadProposals() {
+            const content = document.getElementById('content');
+            try {
+                const snapshot = await getDocs(collection(db, 'proposals'));
+                const all = [];
+                snapshot.forEach(d => all.push({ id: d.id, ...d.data() }));
+
+                const pending = all.filter(p => p.status === 'pending');
+                const approved = all.filter(p => p.status === 'approved');
+                const rejected = all.filter(p => p.status === 'rejected');
+
+                document.getElementById('pendingCount').textContent = pending.length;
+                document.getElementById('approvedCount').textContent = approved.length;
+                document.getElementById('rejectedCount').textContent = rejected.length;
+
+                if (pending.length === 0) {
+                    content.innerHTML = '<div class="empty">No pending proposals</div>';
+                    return;
+                }
+
+                const grid = document.createElement('div');
+                grid.className = 'proposals-grid';
+
+                pending.forEach(proposal => {
+                    const photoUrl = proposal.photoUrls?.[0] || '';
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${photoUrl}" alt="Facility photo"
+                             onerror="this.style.background='#1C2230'">
+                        <div class="card-body">
+                            <span class="sport-badge">${proposal.sport || 'Unknown'}</span>
+                            <h3>${proposal.neighbourhood || 'No neighbourhood'}</h3>
+                            <p>${proposal.description || 'No description'}</p>
+                            <div class="meta">
+                                ⭐ ${proposal.experience || 0}/5 &nbsp;|&nbsp;
+                                💧 ${proposal.water ? 'Yes' : 'No'} &nbsp;|&nbsp;
+                                🪑 ${proposal.seats ? 'Yes' : 'No'} &nbsp;|&nbsp;
+                                📍 ${proposal.latitude?.toFixed(4)}, ${proposal.longitude?.toFixed(4)}
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-approve" onclick="updateStatus('${proposal.id}', 'approved', this)">
+                                    ✓ Approve
+                                </button>
+                                <button class="btn btn-reject" onclick="updateStatus('${proposal.id}', 'rejected', this)">
+                                    ✗ Reject
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                content.innerHTML = '';
+                content.appendChild(grid);
+            } catch (e) {
+                content.innerHTML = '<div class="empty">Error loading proposals: ' + e.message + '</div>';
+            }
+        }
+
+        window.updateStatus = async function(proposalId, status, btn) {
+            const actions = btn.parentElement;
+            actions.querySelectorAll('button').forEach(b => b.disabled = true);
+            try {
+                await updateDoc(doc(db, 'proposals', proposalId), { status });
+                btn.textContent = status === 'approved' ? '✓ Approved!' : '✗ Rejected';
+                btn.style.opacity = '1';
+                setTimeout(() => loadProposals(), 1000);
+            } catch (e) {
+                actions.querySelectorAll('button').forEach(b => b.disabled = false);
+                alert('Error: ' + e.message);
+            }
+        };
+
+        loadProposals();
+    </script>
+</body>
+</html>
