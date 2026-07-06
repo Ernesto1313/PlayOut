@@ -2,20 +2,25 @@ package com.ernesto.playout.ui.add
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ernesto.playout.data.model.CustomFacility
+import com.ernesto.playout.data.remote.FirestoreDataSource
 import com.ernesto.playout.data.repository.FacilityRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
 class EditFacilityViewModel @Inject constructor(
     private val repository: FacilityRepository,
+    private val firestoreDataSource: FirestoreDataSource,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -101,6 +106,32 @@ class EditFacilityViewModel @Inject constructor(
                 photo = photoPaths.value[0]
             )
             repository.updateCustomFacility(updated)
+
+            viewModelScope.launch {
+                try {
+                    // Find the proposal in Firestore by localFid and update it
+                    val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    val snapshot = db.collection("proposals")
+                        .whereEqualTo("localFid", fid)
+                        .get()
+                        .await()
+
+                    snapshot.documents.firstOrNull()?.let { doc ->
+                        doc.reference.update(mapOf(
+                            "sport" to (sport.value ?: ""),
+                            "description" to description.value,
+                            "condition" to (condition.value ?: 1),
+                            "water" to if (water.value) 1 else 0,
+                            "seats" to if (seats.value) 1 else 0,
+                            "experience" to experience.value
+                        )).await()
+                        Log.d("PlayOut_Firebase", "Proposal updated for fid $fid")
+                    }
+                } catch (e: Exception) {
+                    Log.e("PlayOut_Firebase", "Failed to update proposal: ${e.message}")
+                }
+            }
+
             isSaving.value = false
             saveSuccess.value = true
         }
