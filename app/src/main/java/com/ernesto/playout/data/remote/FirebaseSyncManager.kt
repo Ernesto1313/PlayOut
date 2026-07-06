@@ -20,6 +20,10 @@ class FirebaseSyncManager @Inject constructor(
                 Log.d("PlayOut_Firebase", "Syncing facilities from Firestore...")
                 val facilities = firestoreDataSource.fetchAllFacilities()
                 val approved = firestoreDataSource.fetchApprovedProposals()
+                Log.d("PlayOut_Firebase", "Approved proposals count: ${approved.size}")
+                approved.forEach {
+                    Log.d("PlayOut_Firebase", "Approved proposal: fid=${it.fid} sport=${it.sport} name=${it.name}")
+                }
                 val allFacilities = facilities + approved
                 facilityDao.deleteAll()
                 facilityDao.insertAll(allFacilities)
