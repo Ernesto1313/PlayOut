@@ -12,7 +12,7 @@ PHOTOS_DIR = os.path.join(PROJECT_ROOT, "app", "src", "main", "assets", "photos"
 
 cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
 firebase_admin.initialize_app(cred, {
-    "storageBucket": "playout-app.firebasestorage.app"
+    "storageBucket": "playout-fd72f.firebasestorage.app"
 })
 
 db = firestore.client()
