@@ -18,4 +18,13 @@ class FirebaseStorageDataSource @Inject constructor() {
         ref.putFile(Uri.fromFile(file)).await()
         return ref.downloadUrl.await().toString()
     }
+
+    suspend fun uploadReviewPhoto(localPath: String, reviewFolderId: String, suffix: String): String {
+        val file = java.io.File(localPath)
+        if (!file.exists()) return ""
+        val ref = storage.reference
+            .child("reviews/$reviewFolderId/$suffix.jpg")
+        ref.putFile(Uri.fromFile(file)).await()
+        return ref.downloadUrl.await().toString()
+    }
 }

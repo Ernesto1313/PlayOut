@@ -11,6 +11,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,21 +30,36 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +74,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -64,6 +82,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
+import com.ernesto.playout.data.model.Review
+import com.ernesto.playout.data.util.RatingCalculator.RatingResult
+import kotlinx.coroutines.launch
 
 private fun getPhotoModel(path: String?): Any {
     return when {
@@ -139,6 +160,11 @@ private fun ConditionText(condition: Int?, modifier: Modifier = Modifier) {
     }
 }
 
+private fun formatDate(timestamp: Long): String {
+    val sdf = java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.ENGLISH)
+    return sdf.format(java.util.Date(timestamp))
+}
+
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
@@ -146,8 +172,27 @@ fun DetailScreen(
 ) {
     val facility by viewModel.facility.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val reviews by viewModel.reviews.collectAsStateWithLifecycle()
+    val rating by viewModel.rating.collectAsStateWithLifecycle()
+    val userExistingReview by viewModel.userExistingReview.collectAsStateWithLifecycle()
     var isImmersive by remember { mutableStateOf(true) }
     var currentSlide by remember { mutableStateOf(0) }
+    var showReviewDialog by remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val onRateClick: () -> Unit = {
+        when {
+            !viewModel.isLoggedIn -> scope.launch {
+                snackbarHostState.showSnackbar("Sign in from Settings to leave a review")
+            }
+            !viewModel.isEmailVerified -> scope.launch {
+                snackbarHostState.showSnackbar("Please verify your email to leave a review")
+            }
+            else -> showReviewDialog = true
+        }
+    }
 
     val inst = facility
     if (inst == null) {
@@ -165,40 +210,71 @@ fun DetailScreen(
     val descSlide1 = sentences.take(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
     val descSlide2 = sentences.drop(halfCount).joinToString(". ").let { if (it.isNotEmpty()) "$it." else "" }
 
-    AnimatedContent(
-        targetState = isImmersive,
-        transitionSpec = {
-            if (targetState) {
-                (fadeIn(tween(300)) + slideInVertically(tween(300)) { it })
-                    .togetherWith(fadeOut(tween(300)) + slideOutVertically(tween(300)) { it })
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimatedContent(
+            targetState = isImmersive,
+            transitionSpec = {
+                if (targetState) {
+                    (fadeIn(tween(300)) + slideInVertically(tween(300)) { it })
+                        .togetherWith(fadeOut(tween(300)) + slideOutVertically(tween(300)) { it })
+                } else {
+                    (slideInVertically(tween(300)) { it } + fadeIn(tween(300)))
+                        .togetherWith(slideOutVertically(tween(300)) { -it } + fadeOut(tween(300)))
+                }
+            },
+            label = "modeTransition"
+        ) { immersive ->
+            if (immersive) {
+                ImmersiveMode(
+                    inst = inst,
+                    bgColor = bgColor,
+                    currentSlide = currentSlide,
+                    descSlide1 = descSlide1,
+                    descSlide2 = descSlide2,
+                    onSlideLeft = { if (currentSlide > 0) currentSlide-- },
+                    onSlideRight = { if (currentSlide < 3) currentSlide++ },
+                    onSwipeUp = { isImmersive = false },
+                    onBack = onBack,
+                    onRateClick = onRateClick
+                )
             } else {
-                (slideInVertically(tween(300)) { it } + fadeIn(tween(300)))
-                    .togetherWith(slideOutVertically(tween(300)) { -it } + fadeOut(tween(300)))
+                ProfileMode(
+                    inst = inst,
+                    bgColor = bgColor,
+                    description = desc,
+                    currentSlide = currentSlide,
+                    userLocation = userLocation,
+                    rating = rating,
+                    reviews = reviews,
+                    onSwipeDown = { isImmersive = true },
+                    onBack = onBack,
+                    onRateClick = onRateClick
+                )
             }
-        },
-        label = "modeTransition"
-    ) { immersive ->
-        if (immersive) {
-            ImmersiveMode(
-                inst = inst,
-                bgColor = bgColor,
-                currentSlide = currentSlide,
-                descSlide1 = descSlide1,
-                descSlide2 = descSlide2,
-                onSlideLeft = { if (currentSlide > 0) currentSlide-- },
-                onSlideRight = { if (currentSlide < 3) currentSlide++ },
-                onSwipeUp = { isImmersive = false },
-                onBack = onBack
-            )
-        } else {
-            ProfileMode(
-                inst = inst,
-                bgColor = bgColor,
-                description = desc,
-                currentSlide = currentSlide,
-                userLocation = userLocation,
-                onSwipeDown = { isImmersive = true },
-                onBack = onBack
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+
+        if (showReviewDialog) {
+            ReviewDialog(
+                existingReview = userExistingReview,
+                onDismiss = { showReviewDialog = false },
+                onSubmit = { stars, condition, comment, photoUris ->
+                    viewModel.submitReviewWithPhotos(stars, condition, comment, photoUris) {
+                        showReviewDialog = false
+                    }
+                },
+                onUpdate = { reviewId, stars, condition, comment, existingUrls, newUris ->
+                    viewModel.updateReviewWithPhotos(
+                        reviewId, stars, condition, comment, existingUrls, newUris
+                    ) { showReviewDialog = false }
+                },
+                onDelete = { reviewId ->
+                    viewModel.deleteReview(reviewId) { showReviewDialog = false }
+                }
             )
         }
     }
@@ -214,7 +290,8 @@ private fun ImmersiveMode(
     onSlideLeft: () -> Unit,
     onSlideRight: () -> Unit,
     onSwipeUp: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRateClick: () -> Unit
 ) {
     val photoModel = photoModelForSlide(inst, currentSlide)
 
@@ -290,16 +367,30 @@ private fun ImmersiveMode(
             )
         }
 
-        // Bocadillo
-        Box(
+        // Rate button + Bocadillo
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                .background(Color(0xFF806B40).copy(alpha = 0.85f))
-                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (currentSlide) {
+            Button(
+                onClick = onRateClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Rate this facility", color = Color.White)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                    .background(Color(0xFF806B40).copy(alpha = 0.85f))
+                    .padding(16.dp)
+            ) {
+                when (currentSlide) {
                 0 -> Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = inst.sport ?: "",
@@ -368,6 +459,7 @@ private fun ImmersiveMode(
                 }
             }
         }
+        }
     }
 }
 
@@ -378,8 +470,11 @@ private fun ProfileMode(
     description: String,
     currentSlide: Int,
     userLocation: android.location.Location?,
+    rating: RatingResult,
+    reviews: List<Review>,
     onSwipeDown: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRateClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -481,14 +576,27 @@ private fun ProfileMode(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Condition: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
-                ConditionText(inst.condition)
+                if (rating.reviewCount > 0) {
+                    ConditionText(rating.avgCondition)
+                } else {
+                    ConditionText(inst.condition)
+                }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text("Experience: ", color = Color(0xFFF5F5F5), style = MaterialTheme.typography.bodyMedium)
-                StarRating(value = inst.experience, starSize = 20)
+                if (rating.reviewCount > 0) {
+                    StarRating(value = rating.avgStars.let { Math.round(it).toInt() }, starSize = 20)
+                    Text(
+                        " (${rating.reviewCount})",
+                        color = Color(0xFF8B949E),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                } else {
+                    StarRating(value = inst.experience, starSize = 20)
+                }
             }
             val distance = userLocation?.let { loc ->
                 val results = FloatArray(1)
@@ -605,6 +713,119 @@ private fun ProfileMode(
                     )
                 }
             }
+
+            HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
+            Text(
+                "Reviews",
+                color = Color(0xFFF5F5F5),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            if (reviews.isEmpty()) {
+                Text(
+                    "No reviews yet.",
+                    color = Color(0xFFF5F5F5),
+                    fontSize = 14.sp
+                )
+            } else {
+                reviews.forEach { review ->
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C332D)),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    ) {
+                        Column(Modifier.padding(12.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF00AEFF)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        review.username.firstOrNull()?.uppercase() ?: "?",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        review.username,
+                                        color = Color(0xFFF5F5F5),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                    Text(
+                                        formatDate(review.timestamp),
+                                        color = Color(0xFF8B949E),
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                if (review.isInitial) {
+                                    Spacer(Modifier.weight(1f))
+                                    Text("Creator", color = Color(0xFF00AEFF), fontSize = 10.sp)
+                                }
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row {
+                                    repeat(review.stars) {
+                                        Icon(
+                                            Icons.Default.Star, null,
+                                            tint = Color(0xFF00AEFF),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                    }
+                                }
+                                val (condText, condColor) = when (review.condition) {
+                                    1 -> "Good" to Color(0xFF4CAF50)
+                                    2 -> "Fair" to Color(0xFFFFC107)
+                                    else -> "Broken" to Color(0xFFF44336)
+                                }
+                                Text(
+                                    condText, color = condColor, fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            if (review.comment.isNotBlank()) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(review.comment, color = Color(0xFFF5F5F5), fontSize = 13.sp)
+                            }
+                            if (review.photoUrls.isNotEmpty()) {
+                                Spacer(Modifier.height(8.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    review.photoUrls.forEach { url ->
+                                        AsyncImage(
+                                            model = url,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(80.dp)
+                                                .clip(RoundedCornerShape(8.dp)),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Button(
+                onClick = onRateClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp)
+            ) {
+                Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Rate this facility", color = Color.White)
+            }
         }
     }
 }
@@ -619,6 +840,223 @@ private fun StarRating(value: Int?, starSize: Int) {
                 fontSize = starSize.sp,
                 color = if (index < filled) Color(0xFF00AEFF) else Color.Gray
             )
+        }
+    }
+}
+
+@Composable
+private fun ReviewDialog(
+    existingReview: Review?,
+    onDismiss: () -> Unit,
+    onSubmit: (stars: Int, condition: Int, comment: String, photoUris: List<Uri>) -> Unit,
+    onUpdate: (
+        reviewId: String, stars: Int, condition: Int, comment: String,
+        existingPhotoUrls: List<String>, newPhotoUris: List<Uri>
+    ) -> Unit,
+    onDelete: (reviewId: String) -> Unit
+) {
+    var stars by remember { mutableStateOf(existingReview?.stars ?: 0) }
+    var condition by remember { mutableStateOf(existingReview?.condition ?: 0) }
+    var comment by remember { mutableStateOf(existingReview?.comment ?: "") }
+    var photoSlots by remember {
+        mutableStateOf<List<Any?>>(
+            existingReview?.photoUrls?.take(2)?.let { it + List(2 - it.size) { null } }
+                ?: listOf(null, null)
+        )
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            val current = photoSlots.toMutableList()
+            var uriIndex = 0
+            for (i in current.indices) {
+                if (current[i] == null && uriIndex < uris.size) {
+                    current[i] = uris[uriIndex]
+                    uriIndex++
+                }
+            }
+            photoSlots = current
+        }
+    }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0xFF806B40))
+                .padding(20.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = if (existingReview != null) "Edit your review" else "Rate this facility",
+                    color = Color(0xFFF5F5F5),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(16.dp))
+
+                Text("Stars", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Row {
+                    repeat(5) { index ->
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = if (index < stars) Color(0xFF00AEFF) else Color(0xFF8B949E),
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clickable { stars = index + 1 }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Text("Condition", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(
+                        Triple(1, "Good", Color(0xFF4CAF50)),
+                        Triple(2, "Fair", Color(0xFFFFC107)),
+                        Triple(3, "Broken", Color(0xFFF44336))
+                    ).forEach { (value, label, color) ->
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(if (condition == value) color else Color(0xFF2C332D))
+                                .clickable { condition = value }
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Text(label, color = Color(0xFFF5F5F5))
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Text("Comment", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                OutlinedTextField(
+                    value = comment,
+                    onValueChange = { comment = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF2C332D),
+                        unfocusedContainerColor = Color(0xFF2C332D),
+                        focusedBorderColor = Color(0xFF00AEFF),
+                        unfocusedBorderColor = Color(0xFF00AEFF).copy(alpha = 0.5f),
+                        focusedTextColor = Color(0xFFF5F5F5),
+                        unfocusedTextColor = Color(0xFFF5F5F5),
+                        cursorColor = Color(0xFF00AEFF)
+                    ),
+                    placeholder = { Text("Optional comment...", color = Color(0xFF8B949E)) }
+                )
+
+                Spacer(Modifier.height(16.dp))
+                Text("Photos (optional, up to 2)", color = Color(0xFFF5F5F5), fontSize = 14.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    photoSlots.forEachIndexed { index, slot ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(80.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF2C332D))
+                                .clickable { galleryLauncher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (slot != null) {
+                                AsyncImage(
+                                    model = slot,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(4.dp)
+                                        .size(20.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Black.copy(alpha = 0.6f))
+                                        .clickable {
+                                            val current = photoSlots.toMutableList()
+                                            current[index] = null
+                                            photoSlots = current
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = "Remove photo",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            } else {
+                                Icon(
+                                    Icons.Default.AddAPhoto,
+                                    contentDescription = "Add photo",
+                                    tint = Color(0xFF8B949E),
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+                val canSave = stars > 0 && condition != 0
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (existingReview != null) {
+                        TextButton(onClick = onDismiss) {
+                            Text("Cancel", color = Color(0xFFF5F5F5))
+                        }
+                        Spacer(Modifier.weight(1f))
+                        Button(
+                            onClick = { onDelete(existingReview.id) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                        ) {
+                            Text("Delete", color = Color.White)
+                        }
+                        Button(
+                            onClick = {
+                                val existingUrls = photoSlots.filterIsInstance<String>()
+                                val newUris = photoSlots.filterIsInstance<Uri>()
+                                onUpdate(existingReview.id, stars, condition, comment, existingUrls, newUris)
+                            },
+                            enabled = canSave,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
+                        ) {
+                            Text("Update", color = Color.White)
+                        }
+                    } else {
+                        TextButton(onClick = onDismiss) {
+                            Text("Cancel", color = Color(0xFFF5F5F5))
+                        }
+                        Spacer(Modifier.weight(1f))
+                        Button(
+                            onClick = {
+                                val newUris = photoSlots.filterIsInstance<Uri>()
+                                onSubmit(stars, condition, comment, newUris)
+                            },
+                            enabled = canSave,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
+                        ) {
+                            Text("Submit", color = Color.White)
+                        }
+                    }
+                }
+            }
         }
     }
 }
