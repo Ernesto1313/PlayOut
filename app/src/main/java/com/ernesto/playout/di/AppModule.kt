@@ -8,6 +8,7 @@ import com.ernesto.playout.data.db.FacilityDao
 import com.ernesto.playout.data.remote.AuthDataSource
 import com.ernesto.playout.data.remote.FirebaseSyncManager
 import com.ernesto.playout.data.remote.FirestoreDataSource
+import com.ernesto.playout.data.remote.ReviewsDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,6 +52,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAuthDataSource(): AuthDataSource = AuthDataSource()
+
+    @Provides
+    @Singleton
+    fun provideReviewsDataSource(): ReviewsDataSource = ReviewsDataSource()
 
     @Provides
     @Singleton
