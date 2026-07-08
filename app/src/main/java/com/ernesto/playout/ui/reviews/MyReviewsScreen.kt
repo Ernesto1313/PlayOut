@@ -78,6 +78,7 @@ private fun formatDate(timestamp: Long): String {
 fun MyReviewsScreen(
     onBack: () -> Unit,
     onReviewClick: (Int) -> Unit,
+    onEditReview: (Int) -> Unit = onReviewClick,
     viewModel: MyReviewsViewModel = hiltViewModel()
 ) {
     val reviews by viewModel.reviews.collectAsStateWithLifecycle()
@@ -171,7 +172,7 @@ fun MyReviewsScreen(
                         MyReviewCard(
                             item = item,
                             onClick = { onReviewClick(item.review.facilityFid) },
-                            onEdit = { onReviewClick(item.review.facilityFid) },
+                            onEdit = { onEditReview(item.review.facilityFid) },
                             onDelete = { viewModel.deleteReview(item.review.id) }
                         )
                     }

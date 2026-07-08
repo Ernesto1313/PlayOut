@@ -4,6 +4,7 @@ import android.util.Log
 import com.ernesto.playout.data.db.CustomFacilityDao
 import com.ernesto.playout.data.db.FacilityDao
 import com.ernesto.playout.data.model.Facility
+import com.ernesto.playout.data.util.RatingsCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import javax.inject.Singleton
 class FirebaseSyncManager @Inject constructor(
     private val firestoreDataSource: FirestoreDataSource,
     private val facilityDao: FacilityDao,
-    private val customFacilityDao: CustomFacilityDao
+    private val customFacilityDao: CustomFacilityDao,
+    private val reviewsDataSource: ReviewsDataSource
 ) {
     fun syncFacilities() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -53,6 +55,10 @@ class FirebaseSyncManager @Inject constructor(
                 Log.d("PlayOut_Photo", "First synced facility photo: ${facilities.firstOrNull()?.photo}")
                 Log.d("PlayOut_Photo", "First synced facility photoUrlsJson: ${facilities.firstOrNull()?.photoUrlsJson}")
                 Log.d("PlayOut_Firebase", "Sync complete: ${allFacilities.size} facilities")
+
+                val allReviews = reviewsDataSource.getAllReviews()
+                RatingsCache.update(allReviews)
+                Log.d("PlayOut_Firebase", "Ratings cache updated: ${allReviews.size} reviews")
             } catch (e: Exception) {
                 Log.e("PlayOut_Firebase", "Sync failed: ${e.message}")
             }

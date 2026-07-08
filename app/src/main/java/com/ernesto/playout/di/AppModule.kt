@@ -62,6 +62,9 @@ object AppModule {
     fun provideFirebaseSyncManager(
         firestoreDataSource: FirestoreDataSource,
         facilityDao: FacilityDao,
-        customFacilityDao: CustomFacilityDao
-    ): FirebaseSyncManager = FirebaseSyncManager(firestoreDataSource, facilityDao, customFacilityDao)
+        customFacilityDao: CustomFacilityDao,
+        reviewsDataSource: ReviewsDataSource
+    ): FirebaseSyncManager = FirebaseSyncManager(
+        firestoreDataSource, facilityDao, customFacilityDao, reviewsDataSource
+    )
 }

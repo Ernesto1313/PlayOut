@@ -79,6 +79,22 @@ class ReviewsDataSource @Inject constructor() {
         db.collection("reviews").document(reviewId).delete().await()
     }
 
+    // Get all reviews across all facilities (used to build the ratings cache)
+    suspend fun getAllReviews(): List<Review> {
+        val snapshot = db.collection("reviews").get(Source.SERVER).await()
+        return snapshot.documents.mapNotNull { doc ->
+            try {
+                Review(
+                    id = doc.id,
+                    facilityFid = doc.getLong("facilityFid")?.toInt() ?: 0,
+                    stars = doc.getLong("stars")?.toInt() ?: 0,
+                    condition = doc.getLong("condition")?.toInt() ?: 0,
+                    timestamp = doc.getLong("timestamp") ?: 0L
+                )
+            } catch (e: Exception) { null }
+        }
+    }
+
     // Get all reviews by a user
     suspend fun getReviewsByUser(userId: String): List<Review> {
         val snapshot = db.collection("reviews")

@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +38,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.ernesto.playout.R
 import com.ernesto.playout.data.model.Facility
+import com.ernesto.playout.data.util.RatingsCache
 import com.ernesto.playout.ui.utils.categoryDrawable
+import kotlin.math.roundToInt
 
 @Composable
 fun FeedCard(
@@ -50,6 +54,9 @@ fun FeedCard(
     distanceMeters: Float?,
     onClick: () -> Unit
 ) {
+    val ratings by RatingsCache.ratings.collectAsStateWithLifecycle()
+    val rating = ratings[facility.fid]
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,7 +128,11 @@ fun FeedCard(
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
             ) {
-                val color = when (facility.condition) {
+                val displayCondition = if (rating != null && rating.reviewCount > 0)
+                    rating.avgCondition
+                else
+                    facility.condition
+                val color = when (displayCondition) {
                     1 -> Color(0xFF4CAF50)
                     2 -> Color(0xFFFFC107)
                     3 -> Color(0xFFF44336)
@@ -178,7 +189,11 @@ fun FeedCard(
                         )
                     )
                 }
-                val stars = facility.experience?.coerceIn(0, 5) ?: 0
+                val displayStars = if (rating != null && rating.reviewCount > 0)
+                    rating.avgStars.roundToInt()
+                else
+                    facility.experience ?: 0
+                val stars = displayStars.coerceIn(0, 5)
                 if (stars > 0) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(2.dp),

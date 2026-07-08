@@ -58,6 +58,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -173,6 +174,7 @@ private fun formatDate(timestamp: Long): String {
 @Composable
 fun DetailScreen(
     onBack: () -> Unit,
+    openReviewOnLaunch: Boolean = false,
     viewModel: DetailViewModel = hiltViewModel()
 ) {
     val facility by viewModel.facility.collectAsStateWithLifecycle()
@@ -187,6 +189,14 @@ fun DetailScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(openReviewOnLaunch, userExistingReview) {
+        if (openReviewOnLaunch && userExistingReview != null) {
+            isImmersive = false
+            editingReview = userExistingReview
+            showReviewDialog = true
+        }
+    }
 
     val showRateButton = userExistingReview == null
 

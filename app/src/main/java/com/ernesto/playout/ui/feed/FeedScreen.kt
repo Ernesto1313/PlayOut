@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ernesto.playout.data.util.RatingsCache
 import com.ernesto.playout.ui.feed.components.FeedCard
 import com.ernesto.playout.ui.list.ListUiState
 import com.ernesto.playout.ui.list.ListViewModel
@@ -63,6 +64,7 @@ fun FeedScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val ratings by RatingsCache.ratings.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     var selectedCategory by remember { mutableStateOf("") }
@@ -87,15 +89,21 @@ fun FeedScreen(
         baseList.mapNotNull { it.sport }.distinct().sorted()
     }
 
-    val filteredList = remember(baseList, selectedCategory, sortField, sortAscending, userLocation) {
+    val filteredList = remember(baseList, selectedCategory, sortField, sortAscending, userLocation, ratings) {
         var result = if (selectedCategory.isNotEmpty()) {
             baseList.filter { it.sport == selectedCategory }
         } else {
             baseList
         }
         result = when (sortField) {
-            "condition" -> result.sortedWith(compareBy(nullsLast()) { it.condition })
-            "experience" -> result.sortedWith(compareBy(nullsLast()) { it.experience })
+            "condition" -> result.sortedWith(compareBy(nullsLast()) { facility ->
+                val ratingCondition = RatingsCache.getRating(facility.fid)?.avgCondition
+                ratingCondition?.toDouble() ?: (facility.condition?.toDouble())
+            })
+            "experience" -> result.sortedWith(compareBy(nullsLast()) { facility ->
+                val ratingStars = RatingsCache.getRating(facility.fid)?.avgStars
+                ratingStars ?: (facility.experience?.toDouble())
+            })
             "distance" -> result.sortedWith(compareBy(nullsLast()) { viewModel.distanceTo(it) })
             else -> result
         }

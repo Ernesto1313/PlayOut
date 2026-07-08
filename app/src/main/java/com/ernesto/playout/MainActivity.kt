@@ -53,8 +53,9 @@ import dagger.hilt.android.AndroidEntryPoint
 sealed class Screen(val route: String) {
     object Map : Screen("map")
     object Feed : Screen("feed")
-    object Detail : Screen("detail/{fid}") {
+    object Detail : Screen("detail/{fid}?openReview={openReview}") {
         fun createRoute(fid: Int) = "detail/$fid"
+        fun createEditRoute(fid: Int) = "detail/$fid?openReview=true"
     }
 }
 
@@ -200,9 +201,19 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(
                         route = Screen.Detail.route,
-                        arguments = listOf(navArgument("fid") { type = NavType.IntType })
-                    ) {
-                        DetailScreen(onBack = { navController.navigateUp() })
+                        arguments = listOf(
+                            navArgument("fid") { type = NavType.IntType },
+                            navArgument("openReview") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val openReview = backStackEntry.arguments?.getBoolean("openReview") ?: false
+                        DetailScreen(
+                            onBack = { navController.navigateUp() },
+                            openReviewOnLaunch = openReview
+                        )
                     }
                     composable("settings") {
                         SettingsScreen(
@@ -218,7 +229,12 @@ class MainActivity : ComponentActivity() {
                     composable("my_reviews") {
                         MyReviewsScreen(
                             onBack = { navController.navigateUp() },
-                            onReviewClick = { fid -> navController.navigate("detail/$fid") }
+                            onReviewClick = { fid ->
+                                navController.navigate(Screen.Detail.createRoute(fid))
+                            },
+                            onEditReview = { fid ->
+                                navController.navigate(Screen.Detail.createEditRoute(fid))
+                            }
                         )
                     }
                     composable("add") {
