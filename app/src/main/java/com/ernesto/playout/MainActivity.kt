@@ -45,6 +45,7 @@ import com.ernesto.playout.ui.add.EditFacilityScreen
 import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.feed.FeedScreen
 import com.ernesto.playout.ui.map.MapScreen
+import com.ernesto.playout.ui.reviews.MyReviewsScreen
 import com.ernesto.playout.ui.settings.SettingsScreen
 import com.ernesto.playout.ui.theme.PlayOutTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -209,9 +210,15 @@ class MainActivity : ComponentActivity() {
                             onEditFacility = { fid ->
                                 navController.navigate("edit/$fid")
                             },
-                            onReviewClick = { fid ->
-                                navController.navigate(Screen.Detail.createRoute(fid))
+                            onNavigateToReviews = {
+                                navController.navigate("my_reviews")
                             }
+                        )
+                    }
+                    composable("my_reviews") {
+                        MyReviewsScreen(
+                            onBack = { navController.navigateUp() },
+                            onReviewClick = { fid -> navController.navigate("detail/$fid") }
                         )
                     }
                     composable("add") {

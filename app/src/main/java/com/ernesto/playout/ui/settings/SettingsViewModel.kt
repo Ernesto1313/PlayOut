@@ -43,9 +43,6 @@ class SettingsViewModel @Inject constructor(
     private val _userReviews = MutableStateFlow<List<Review>>(emptyList())
     val userReviews: StateFlow<List<Review>> = _userReviews
 
-    private val _facilityNames = MutableStateFlow<Map<Int, String?>>(emptyMap())
-    val facilityNames: StateFlow<Map<Int, String?>> = _facilityNames
-
     fun fetchProposalStatuses(localFids: List<Int>) {
         viewModelScope.launch {
             try {
@@ -60,22 +57,7 @@ class SettingsViewModel @Inject constructor(
     fun loadUserReviews() {
         viewModelScope.launch {
             val userId = authDataSource.currentUserId ?: return@launch
-            val list = reviewsDataSource.getReviewsByUser(userId)
-            _userReviews.value = list
-
-            val names = mutableMapOf<Int, String?>()
-            list.map { it.facilityFid }.distinct().forEach { fid ->
-                val facility = repository.getFacilityById(fid).first()
-                names[fid] = facility?.name ?: facility?.sport
-            }
-            _facilityNames.value = names
-        }
-    }
-
-    fun deleteUserReview(reviewId: String) {
-        viewModelScope.launch {
-            reviewsDataSource.deleteReview(reviewId)
-            loadUserReviews()
+            _userReviews.value = reviewsDataSource.getReviewsByUser(userId)
         }
     }
 

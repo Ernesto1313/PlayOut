@@ -19,14 +19,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -63,7 +61,7 @@ import com.ernesto.playout.data.remote.UploadStatusTracker
 fun SettingsScreen(
     onBack: () -> Unit,
     onEditFacility: (Int) -> Unit = {},
-    onReviewClick: (Int) -> Unit = {},
+    onNavigateToReviews: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
@@ -71,7 +69,6 @@ fun SettingsScreen(
     val proposalStatuses by viewModel.proposalStatuses.collectAsStateWithLifecycle()
     val uploadStatuses by UploadStatusTracker.statuses.collectAsStateWithLifecycle()
     val userReviews by viewModel.userReviews.collectAsStateWithLifecycle()
-    val facilityNames by viewModel.facilityNames.collectAsStateWithLifecycle()
 
     val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val isEmailVerified by authViewModel.isEmailVerified.collectAsStateWithLifecycle()
@@ -79,8 +76,6 @@ fun SettingsScreen(
     val authError by authViewModel.errorMessage.collectAsStateWithLifecycle()
     val authLoading by authViewModel.isLoading.collectAsStateWithLifecycle()
     val registrationSuccess by authViewModel.registrationSuccess.collectAsStateWithLifecycle()
-
-    var showUserReviews by remember { mutableStateOf(false) }
 
     LaunchedEffect(customInstalaciones) {
         if (customInstalaciones.isNotEmpty()) {
@@ -259,7 +254,7 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showUserReviews = !showUserReviews }
+                            .clickable { onNavigateToReviews() }
                     ) {
                         Text(
                             text = "${userReviews.size} reviews",
@@ -268,79 +263,10 @@ fun SettingsScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Icon(
-                            imageVector = if (showUserReviews) Icons.Default.ExpandLess
-                                          else Icons.Default.ExpandMore,
+                            imageVector = Icons.Default.ChevronRight,
                             contentDescription = null,
                             tint = Color(0xFF00AEFF)
                         )
-                    }
-                    if (showUserReviews) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (userReviews.isEmpty()) {
-                            Text(
-                                "You haven't written any reviews yet.",
-                                color = Color(0xFF8B949E),
-                                fontSize = 13.sp
-                            )
-                        } else {
-                            userReviews.forEach { review ->
-                                Card(
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2C332D)),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp)
-                                        .clickable { onReviewClick(review.facilityFid) }
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            text = facilityNames[review.facilityFid]
-                                                ?: "Facility #${review.facilityFid}",
-                                            color = Color(0xFFF5F5F5),
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 14.sp
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                        ) {
-                                            Row {
-                                                repeat(review.stars) {
-                                                    Icon(
-                                                        Icons.Default.Star,
-                                                        contentDescription = null,
-                                                        tint = Color(0xFF00AEFF),
-                                                        modifier = Modifier.size(14.dp)
-                                                    )
-                                                }
-                                            }
-                                            val (condText, condColor) = when (review.condition) {
-                                                1 -> "Good" to Color(0xFF4CAF50)
-                                                2 -> "Fair" to Color(0xFFFFC107)
-                                                else -> "Broken" to Color(0xFFF44336)
-                                            }
-                                            Text(
-                                                condText,
-                                                color = condColor,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            TextButton(onClick = { onReviewClick(review.facilityFid) }) {
-                                                Text("Edit", color = Color(0xFF00AEFF))
-                                            }
-                                            TextButton(onClick = {
-                                                viewModel.deleteUserReview(review.id)
-                                            }) {
-                                                Text("Delete", color = Color(0xFFF44336))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                     if (!isEmailVerified) {
                         Spacer(modifier = Modifier.height(12.dp))
