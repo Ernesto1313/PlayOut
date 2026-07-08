@@ -23,21 +23,30 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,11 +58,18 @@ import com.ernesto.playout.data.remote.UploadStatusTracker
 fun SettingsScreen(
     onBack: () -> Unit,
     onEditFacility: (Int) -> Unit = {},
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val customInstalaciones by viewModel.customInstalaciones.collectAsStateWithLifecycle()
     val proposalStatuses by viewModel.proposalStatuses.collectAsStateWithLifecycle()
     val uploadStatuses by UploadStatusTracker.statuses.collectAsStateWithLifecycle()
+
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val isEmailVerified by authViewModel.isEmailVerified.collectAsStateWithLifecycle()
+    val userProfile by authViewModel.userProfile.collectAsStateWithLifecycle()
+    val authError by authViewModel.errorMessage.collectAsStateWithLifecycle()
+    val authLoading by authViewModel.isLoading.collectAsStateWithLifecycle()
 
     LaunchedEffect(customInstalaciones) {
         if (customInstalaciones.isNotEmpty()) {
@@ -86,6 +102,151 @@ fun SettingsScreen(
             thickness = 1.dp,
             modifier = Modifier.padding(top = 8.dp)
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (!isLoggedIn) {
+            var isRegisterMode by remember { mutableStateOf(false) }
+            var email by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+            var username by remember { mutableStateOf("") }
+
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF806B40)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = if (isRegisterMode) "Create account" else "Sign in",
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email", color = Color(0xFFF5F5F5)) },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFF2C332D))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password", color = Color(0xFFF5F5F5)) },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xFF2C332D))
+                    )
+                    if (isRegisterMode) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = username,
+                            onValueChange = { username = it },
+                            label = { Text("Username", color = Color(0xFFF5F5F5)) },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFF2C332D))
+                        )
+                    }
+                    if (authError != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(authError ?: "", color = Color(0xFFF44336), fontSize = 13.sp)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            if (isRegisterMode) authViewModel.register(email, password, username)
+                            else authViewModel.login(email, password)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00AEFF)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (authLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = Color(0xFFF5F5F5)
+                            )
+                        } else {
+                            Text(if (isRegisterMode) "Register" else "Login")
+                        }
+                    }
+                    TextButton(onClick = {
+                        isRegisterMode = !isRegisterMode
+                        authViewModel.clearError()
+                    }) {
+                        Text(
+                            text = if (isRegisterMode) "Already have an account? Sign in"
+                                   else "No account? Register",
+                            color = Color(0xFF00AEFF)
+                        )
+                    }
+                }
+            }
+        } else {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF806B40)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = userProfile?.username ?: "",
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = userProfile?.email ?: "",
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Reviews: ${userProfile?.reviewCount ?: 0}",
+                        color = Color(0xFFF5F5F5),
+                        fontSize = 14.sp
+                    )
+                    if (!isEmailVerified) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Please verify your email",
+                            color = Color(0xFFFFC107),
+                            fontSize = 13.sp
+                        )
+                        TextButton(onClick = { authViewModel.resendVerification() }) {
+                            Text("Resend email", color = Color(0xFF00AEFF))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = { authViewModel.logout() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF00AEFF)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Logout")
+                    }
+                }
+            }
+        }
+
+        HorizontalDivider(
+            color = Color(0xFF00AEFF),
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),

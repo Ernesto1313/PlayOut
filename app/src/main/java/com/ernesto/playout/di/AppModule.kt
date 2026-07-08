@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.ernesto.playout.data.db.AppDatabase
 import com.ernesto.playout.data.db.CustomFacilityDao
 import com.ernesto.playout.data.db.FacilityDao
+import com.ernesto.playout.data.remote.AuthDataSource
 import com.ernesto.playout.data.remote.FirebaseSyncManager
 import com.ernesto.playout.data.remote.FirestoreDataSource
 import dagger.Module
@@ -46,6 +47,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirestoreDataSource(): FirestoreDataSource = FirestoreDataSource()
+
+    @Provides
+    @Singleton
+    fun provideAuthDataSource(): AuthDataSource = AuthDataSource()
 
     @Provides
     @Singleton
