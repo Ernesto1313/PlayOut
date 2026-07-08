@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Star
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -201,6 +204,10 @@ private fun MyReviewCard(
     val review = item.review
     val facility = item.facility
     var showMenu by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    var enlargedPhoto by remember { mutableStateOf<String?>(null) }
+
+    val showExpandArrow = review.comment.length > 80 || review.photoUrls.isNotEmpty()
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF2C332D)),
@@ -208,88 +215,137 @@ private fun MyReviewCard(
             .fillMaxWidth()
             .clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            AsyncImage(
-                model = photoModel(facility?.photo),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Image(
-                        painter = painterResource(categoryDrawable(facility?.sport)),
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        colorFilter = ColorFilter.tint(Color(0xFF00AEFF))
-                    )
-                    Text(
-                        facility?.neighbourhood ?: facility?.sport ?: "Unknown location",
-                        color = Color(0xFFF5F5F5),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row {
-                        repeat(review.stars) {
-                            Icon(
-                                Icons.Default.Star, null,
-                                tint = Color(0xFF00AEFF),
-                                modifier = Modifier.size(14.dp)
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                AsyncImage(
+                    model = photoModel(facility?.photo),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(categoryDrawable(facility?.sport)),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            colorFilter = ColorFilter.tint(Color(0xFF00AEFF))
+                        )
+                        Text(
+                            facility?.neighbourhood ?: facility?.sport ?: "Unknown location",
+                            color = Color(0xFFF5F5F5),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row {
+                            repeat(review.stars) {
+                                Icon(
+                                    Icons.Default.Star, null,
+                                    tint = Color(0xFF00AEFF),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                        val (condText, condColor) = when (review.condition) {
+                            1 -> "Good" to Color(0xFF4CAF50)
+                            2 -> "Fair" to Color(0xFFFFC107)
+                            else -> "Broken" to Color(0xFFF44336)
+                        }
+                        Text(condText, color = condColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(formatDate(review.timestamp), color = Color(0xFF8B949E), fontSize = 11.sp)
+                    if (review.comment.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (expanded) {
+                            Text(
+                                review.comment,
+                                color = Color(0xFFF5F5F5),
+                                fontSize = 13.sp
+                            )
+                        } else {
+                            Text(
+                                review.comment,
+                                color = Color(0xFFF5F5F5),
+                                fontSize = 13.sp,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
-                    val (condText, condColor) = when (review.condition) {
-                        1 -> "Good" to Color(0xFF4CAF50)
-                        2 -> "Fair" to Color(0xFFFFC107)
-                        else -> "Broken" to Color(0xFFF44336)
+                }
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More", tint = Color(0xFF8B949E))
                     }
-                    Text(condText, color = condColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(formatDate(review.timestamp), color = Color(0xFF8B949E), fontSize = 11.sp)
-                if (review.comment.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        review.comment,
-                        color = Color(0xFFF5F5F5),
-                        fontSize = 13.sp,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = { showMenu = false; onEdit() }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = { showMenu = false; onDelete() }
+                        )
+                    }
                 }
             }
-            Box {
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More", tint = Color(0xFF8B949E))
-                }
-                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                    DropdownMenuItem(
-                        text = { Text("Edit") },
-                        onClick = { showMenu = false; onEdit() }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Delete") },
-                        onClick = { showMenu = false; onDelete() }
-                    )
+            if (expanded && review.photoUrls.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    review.photoUrls.forEach { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { enlargedPhoto = url }
+                        )
+                    }
                 }
             }
+            if (showExpandArrow) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            if (expanded) Icons.Default.KeyboardArrowUp
+                            else Icons.Default.KeyboardArrowDown,
+                            contentDescription = if (expanded) "Collapse" else "Expand",
+                            tint = Color(0xFF00AEFF)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    enlargedPhoto?.let { url ->
+        Dialog(onDismissRequest = { enlargedPhoto = null }) {
+            AsyncImage(
+                model = url,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { enlargedPhoto = null }
+            )
         }
     }
 }

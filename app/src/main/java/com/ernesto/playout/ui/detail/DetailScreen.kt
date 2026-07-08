@@ -13,6 +13,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,8 +66,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -684,6 +688,10 @@ private fun ProfileMode(
                 }
             }
             HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
+            if (reviews.size >= 2) {
+                ReviewEvolutionChart(reviews)
+                HorizontalDivider(color = Color(0xFFF5F5F5).copy(alpha = 0.3f))
+            }
             // 2x2 photo gallery
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(
@@ -1130,5 +1138,117 @@ private fun ReviewDialog(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ReviewEvolutionChart(reviews: List<Review>) {
+    if (reviews.size < 2) return
+    // Sort chronologically (oldest to newest)
+    val sorted = reviews.sortedBy { it.timestamp }
+    val dateFormat = remember { java.text.SimpleDateFormat("d MMM", java.util.Locale.ENGLISH) }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
+        Text(
+            "Rating evolution", color = Color(0xFFF5F5F5),
+            fontWeight = FontWeight.Bold, fontSize = 14.sp
+        )
+        Spacer(Modifier.height(8.dp))
+
+        Canvas(modifier = Modifier.fillMaxWidth().height(140.dp)) {
+            val n = sorted.size
+            val leftPad = 30f
+            val rightPad = 20f
+            val topPad = 20f
+            val bottomPad = 40f
+            val chartWidth = size.width - leftPad - rightPad
+            val chartHeight = size.height - topPad - bottomPad
+            val stepX = if (n > 1) chartWidth / (n - 1) else chartWidth
+
+            // Y axis: stars 1..5
+            // Draw horizontal gridlines for 1..5
+            for (star in 1..5) {
+                val y = topPad + chartHeight * (1f - (star - 1) / 4f)
+                drawLine(
+                    color = Color(0xFF8B949E).copy(alpha = 0.2f),
+                    start = Offset(leftPad, y),
+                    end = Offset(size.width - rightPad, y),
+                    strokeWidth = 1f
+                )
+            }
+
+            // Line connecting star ratings
+            val points = sorted.mapIndexed { i, review ->
+                val x = leftPad + stepX * i
+                val y = topPad + chartHeight * (1f - (review.stars - 1) / 4f)
+                Offset(x, y)
+            }
+            for (i in 0 until points.size - 1) {
+                drawLine(
+                    color = Color(0xFF00AEFF),
+                    start = points[i],
+                    end = points[i + 1],
+                    strokeWidth = 3f
+                )
+            }
+            // Star points
+            points.forEach { p ->
+                drawCircle(color = Color(0xFF00AEFF), radius = 5f, center = p)
+            }
+            // Condition dots below chart
+            sorted.forEachIndexed { i, review ->
+                val x = leftPad + stepX * i
+                val condColor = when (review.condition) {
+                    1 -> Color(0xFF4CAF50)
+                    2 -> Color(0xFFFFC107)
+                    else -> Color(0xFFF44336)
+                }
+                drawCircle(
+                    color = condColor,
+                    radius = 6f,
+                    center = Offset(x, size.height - bottomPad + 20f)
+                )
+            }
+            // X-axis date labels
+            sorted.forEachIndexed { i, review ->
+                val x = leftPad + stepX * i
+                drawDateLabel(
+                    text = dateFormat.format(java.util.Date(review.timestamp)),
+                    x = x,
+                    y = size.height - 4f
+                )
+            }
+        }
+
+        // Legend
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(top = 4.dp)
+        ) {
+            LegendDot(Color(0xFF4CAF50), "Good")
+            LegendDot(Color(0xFFFFC107), "Fair")
+            LegendDot(Color(0xFFF44336), "Broken")
+        }
+    }
+}
+
+private fun DrawScope.drawDateLabel(text: String, x: Float, y: Float) {
+    val paint = android.graphics.Paint().apply {
+        color = android.graphics.Color.parseColor("#8B949E")
+        textSize = 22f
+        textAlign = android.graphics.Paint.Align.CENTER
+        isAntiAlias = true
+    }
+    drawContext.canvas.nativeCanvas.drawText(text, x, y, paint)
+}
+
+@Composable
+private fun LegendDot(color: Color, label: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(label, color = Color(0xFFF5F5F5), fontSize = 10.sp)
     }
 }
