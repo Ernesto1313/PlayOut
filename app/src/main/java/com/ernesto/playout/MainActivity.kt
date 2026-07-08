@@ -208,6 +208,9 @@ class MainActivity : ComponentActivity() {
                             onBack = { navController.navigateUp() },
                             onEditFacility = { fid ->
                                 navController.navigate("edit/$fid")
+                            },
+                            onReviewClick = { fid ->
+                                navController.navigate(Screen.Detail.createRoute(fid))
                             }
                         )
                     }

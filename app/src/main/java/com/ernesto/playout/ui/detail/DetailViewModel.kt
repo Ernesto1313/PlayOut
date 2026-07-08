@@ -56,6 +56,7 @@ class DetailViewModel @Inject constructor(
 
     val isLoggedIn: Boolean get() = authDataSource.isLoggedIn
     val isEmailVerified: Boolean get() = authDataSource.isEmailVerified
+    val currentUserId: String? get() = authDataSource.currentUserId
 
     private var reviewsLoaded = false
 
@@ -77,10 +78,13 @@ class DetailViewModel @Inject constructor(
     fun loadReviews() {
         viewModelScope.launch {
             val list = reviewsDataSource.getReviewsForFacility(fid)
-            _reviews.value = list.sortedByDescending { it.timestamp }
+            val userId = authDataSource.currentUserId
+            _reviews.value = list.sortedWith(
+                compareByDescending<Review> { it.userId == userId }
+                    .thenByDescending { it.timestamp }
+            )
             _rating.value = RatingCalculator.calculate(list)
 
-            val userId = authDataSource.currentUserId
             if (userId != null) {
                 val existing = list.firstOrNull { it.userId == userId }
                 _userExistingReview.value = existing

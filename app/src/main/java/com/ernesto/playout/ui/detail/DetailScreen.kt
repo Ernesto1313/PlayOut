@@ -15,6 +15,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -178,9 +179,12 @@ fun DetailScreen(
     var isImmersive by remember { mutableStateOf(true) }
     var currentSlide by remember { mutableStateOf(0) }
     var showReviewDialog by remember { mutableStateOf(false) }
+    var editingReview by remember { mutableStateOf<Review?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val showRateButton = userExistingReview == null
 
     val onRateClick: () -> Unit = {
         when {
@@ -190,8 +194,16 @@ fun DetailScreen(
             !viewModel.isEmailVerified -> scope.launch {
                 snackbarHostState.showSnackbar("Please verify your email to leave a review")
             }
-            else -> showReviewDialog = true
+            else -> {
+                editingReview = null
+                showReviewDialog = true
+            }
         }
+    }
+
+    val onEditReview: (Review) -> Unit = { review ->
+        editingReview = review
+        showReviewDialog = true
     }
 
     val inst = facility
@@ -235,6 +247,7 @@ fun DetailScreen(
                     onSlideRight = { if (currentSlide < 3) currentSlide++ },
                     onSwipeUp = { isImmersive = false },
                     onBack = onBack,
+                    showRateButton = showRateButton,
                     onRateClick = onRateClick
                 )
             } else {
@@ -246,9 +259,13 @@ fun DetailScreen(
                     userLocation = userLocation,
                     rating = rating,
                     reviews = reviews,
+                    currentUserId = viewModel.currentUserId,
                     onSwipeDown = { isImmersive = true },
                     onBack = onBack,
-                    onRateClick = onRateClick
+                    showRateButton = showRateButton,
+                    onRateClick = onRateClick,
+                    onEditReview = onEditReview,
+                    onDeleteReview = { reviewId -> viewModel.deleteReview(reviewId) { } }
                 )
             }
         }
@@ -260,17 +277,21 @@ fun DetailScreen(
 
         if (showReviewDialog) {
             ReviewDialog(
-                existingReview = userExistingReview,
+                existingReview = editingReview,
                 onDismiss = { showReviewDialog = false },
                 onSubmit = { stars, condition, comment, photoUris ->
                     viewModel.submitReviewWithPhotos(stars, condition, comment, photoUris) {
+                        scope.launch { snackbarHostState.showSnackbar("Review submitted, thanks!") }
                         showReviewDialog = false
                     }
                 },
                 onUpdate = { reviewId, stars, condition, comment, existingUrls, newUris ->
                     viewModel.updateReviewWithPhotos(
                         reviewId, stars, condition, comment, existingUrls, newUris
-                    ) { showReviewDialog = false }
+                    ) {
+                        scope.launch { snackbarHostState.showSnackbar("Review updated!") }
+                        showReviewDialog = false
+                    }
                 },
                 onDelete = { reviewId ->
                     viewModel.deleteReview(reviewId) { showReviewDialog = false }
@@ -291,6 +312,7 @@ private fun ImmersiveMode(
     onSlideRight: () -> Unit,
     onSwipeUp: () -> Unit,
     onBack: () -> Unit,
+    showRateButton: Boolean,
     onRateClick: () -> Unit
 ) {
     val photoModel = photoModelForSlide(inst, currentSlide)
@@ -374,14 +396,16 @@ private fun ImmersiveMode(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = onRateClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Rate this facility", color = Color.White)
+            if (showRateButton) {
+                Button(
+                    onClick = onRateClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Rate this facility", color = Color.White)
+                }
             }
             Box(
                 modifier = Modifier
@@ -472,9 +496,13 @@ private fun ProfileMode(
     userLocation: android.location.Location?,
     rating: RatingResult,
     reviews: List<Review>,
+    currentUserId: String?,
     onSwipeDown: () -> Unit,
     onBack: () -> Unit,
-    onRateClick: () -> Unit
+    showRateButton: Boolean,
+    onRateClick: () -> Unit,
+    onEditReview: (Review) -> Unit,
+    onDeleteReview: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -729,9 +757,17 @@ private fun ProfileMode(
                 )
             } else {
                 reviews.forEach { review ->
+                    val isOwnReview = currentUserId != null && review.userId == currentUserId
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF2C332D)),
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .let {
+                                if (isOwnReview) {
+                                    it.border(1.dp, Color(0xFF00AEFF), RoundedCornerShape(12.dp))
+                                } else it
+                            }
                     ) {
                         Column(Modifier.padding(12.dp)) {
                             Row(
@@ -764,8 +800,10 @@ private fun ProfileMode(
                                         fontSize = 11.sp
                                     )
                                 }
-                                if (review.isInitial) {
-                                    Spacer(Modifier.weight(1f))
+                                Spacer(Modifier.weight(1f))
+                                if (isOwnReview) {
+                                    Text("Your review", color = Color(0xFF00AEFF), fontSize = 10.sp)
+                                } else if (review.isInitial) {
                                     Text("Creator", color = Color(0xFF00AEFF), fontSize = 10.sp)
                                 }
                             }
@@ -812,19 +850,32 @@ private fun ProfileMode(
                                     }
                                 }
                             }
+                            if (isOwnReview) {
+                                Spacer(Modifier.height(8.dp))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    TextButton(onClick = { onEditReview(review) }) {
+                                        Text("Edit", color = Color(0xFF00AEFF))
+                                    }
+                                    TextButton(onClick = { onDeleteReview(review.id) }) {
+                                        Text("Delete", color = Color(0xFFF44336))
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            Button(
-                onClick = onRateClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp)
-            ) {
-                Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Rate this facility", color = Color.White)
+            if (showRateButton) {
+                Button(
+                    onClick = onRateClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF)),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp)
+                ) {
+                    Icon(Icons.Default.Star, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Rate this facility", color = Color.White)
+                }
             }
         }
     }
@@ -855,9 +906,11 @@ private fun ReviewDialog(
     ) -> Unit,
     onDelete: (reviewId: String) -> Unit
 ) {
+    val isEditMode = existingReview != null
     var stars by remember { mutableStateOf(existingReview?.stars ?: 0) }
     var condition by remember { mutableStateOf(existingReview?.condition ?: 0) }
     var comment by remember { mutableStateOf(existingReview?.comment ?: "") }
+    var isSubmitting by remember { mutableStateOf(false) }
     var photoSlots by remember {
         mutableStateOf<List<Any?>>(
             existingReview?.photoUrls?.take(2)?.let { it + List(2 - it.size) { null } }
@@ -1018,41 +1071,60 @@ private fun ReviewDialog(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (existingReview != null) {
-                        TextButton(onClick = onDismiss) {
+                        TextButton(onClick = onDismiss, enabled = !isSubmitting) {
                             Text("Cancel", color = Color(0xFFF5F5F5))
                         }
                         Spacer(Modifier.weight(1f))
                         Button(
                             onClick = { onDelete(existingReview.id) },
+                            enabled = !isSubmitting,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
                         ) {
                             Text("Delete", color = Color.White)
                         }
                         Button(
                             onClick = {
+                                isSubmitting = true
                                 val existingUrls = photoSlots.filterIsInstance<String>()
                                 val newUris = photoSlots.filterIsInstance<Uri>()
                                 onUpdate(existingReview.id, stars, condition, comment, existingUrls, newUris)
                             },
-                            enabled = canSave,
+                            enabled = canSave && !isSubmitting,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
                         ) {
-                            Text("Update", color = Color.White)
+                            if (isSubmitting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                            } else {
+                                Text(if (isEditMode) "Update" else "Submit", color = Color.White)
+                            }
                         }
                     } else {
-                        TextButton(onClick = onDismiss) {
+                        TextButton(onClick = onDismiss, enabled = !isSubmitting) {
                             Text("Cancel", color = Color(0xFFF5F5F5))
                         }
                         Spacer(Modifier.weight(1f))
                         Button(
                             onClick = {
+                                isSubmitting = true
                                 val newUris = photoSlots.filterIsInstance<Uri>()
                                 onSubmit(stars, condition, comment, newUris)
                             },
-                            enabled = canSave,
+                            enabled = canSave && !isSubmitting,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00AEFF))
                         ) {
-                            Text("Submit", color = Color.White)
+                            if (isSubmitting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
+                                )
+                            } else {
+                                Text(if (isEditMode) "Update" else "Submit", color = Color.White)
+                            }
                         }
                     }
                 }
