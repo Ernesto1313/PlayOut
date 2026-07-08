@@ -120,30 +120,63 @@
         .cond-btn.good { border-color: #4CAF50; color: #4CAF50; background: #4CAF5020; }
         .cond-btn.fair { border-color: #FFC107; color: #FFC107; background: #FFC10720; }
         .cond-btn.broken { border-color: #F44336; color: #F44336; background: #F4433620; }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #F5F5F540;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #8B949E;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            color: #F5F5F5;
+            border-bottom-color: #00AEFF;
+        }
     </style>
 </head>
 <body>
     <h1>PlayOut Admin</h1>
     <p class="subtitle">Review and approve facility proposals</p>
-    <div class="stats">
-        <div class="stat">
-            <div class="stat-number" id="pendingCount">-</div>
-            <div class="stat-label">Pending</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number" id="approvedCount">-</div>
-            <div class="stat-label">Approved</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number" id="rejectedCount">-</div>
-            <div class="stat-label">Rejected</div>
-        </div>
+    <div class="tabs">
+        <button class="tab active" id="tab-proposals" onclick="switchTab('proposals')">
+            Proposals
+        </button>
+        <button class="tab" id="tab-reviews" onclick="switchTab('reviews')">
+            Reviews
+        </button>
     </div>
-    <div id="content" class="loading">Loading proposals...</div>
+    <div id="proposals-content">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="pendingCount">-</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="approvedCount">-</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="rejectedCount">-</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+        <div id="content" class="loading">Loading proposals...</div>
+    </div>
+    <div id="reviews-content" style="display:none;">
+        <div id="reviews-list" class="loading">Loading reviews...</div>
+    </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-        import { getFirestore, collection, getDocs, doc, updateDoc }
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc }
             from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -398,6 +431,89 @@
                 setTimeout(() => loadProposals(), 1200);
             } catch (e) {
                 actions.querySelectorAll('button').forEach(b => b.disabled = false);
+                alert('Error: ' + e.message);
+            }
+        };
+
+        window.switchTab = function(tab) {
+            document.getElementById('tab-proposals').classList.toggle('active', tab === 'proposals');
+            document.getElementById('tab-reviews').classList.toggle('active', tab === 'reviews');
+            document.getElementById('proposals-content').style.display = tab === 'proposals' ? 'block' : 'none';
+            document.getElementById('reviews-content').style.display = tab === 'reviews' ? 'block' : 'none';
+            if (tab === 'reviews') loadReviews();
+        };
+
+        window.loadReviews = async function() {
+            const container = document.getElementById('reviews-list');
+            try {
+                const snapshot = await getDocs(collection(db, 'reviews'));
+                const reviews = [];
+                snapshot.forEach(d => reviews.push({ id: d.id, ...d.data() }));
+
+                if (reviews.length === 0) {
+                    container.innerHTML = '<div class="empty">No reviews yet</div>';
+                    return;
+                }
+
+                // Sort by timestamp desc (newest first)
+                reviews.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                const grid = document.createElement('div');
+                grid.className = 'proposals-grid';
+
+                reviews.forEach(review => {
+                    const date = review.timestamp
+                        ? new Date(review.timestamp).toLocaleDateString()
+                        : 'Unknown date';
+                    const condText = review.condition === 1 ? 'Good'
+                        : review.condition === 2 ? 'Fair' : 'Broken';
+                    const condColor = review.condition === 1 ? '#4CAF50'
+                        : review.condition === 2 ? '#FFC107' : '#F44336';
+                    const stars = '★'.repeat(review.stars || 0);
+                    const photosHtml = (review.photoUrls || []).map(url =>
+                        `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;margin-right:6px;">`
+                    ).join('');
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-body">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                <strong style="color:#F5F5F5;">${review.username || 'Anonymous'}</strong>
+                                <span style="color:#8B949E;font-size:11px;">${date}</span>
+                            </div>
+                            <div style="margin-bottom:8px;">
+                                <span style="color:#00AEFF;">${stars}</span>
+                                <span style="color:${condColor};font-weight:bold;margin-left:8px;">${condText}</span>
+                                <span style="color:#8B949E;font-size:11px;margin-left:8px;">Facility #${review.facilityFid}</span>
+                            </div>
+                            ${review.comment ? `<p style="color:#F5F5F5;font-size:13px;margin-bottom:8px;">${review.comment}</p>` : ''}
+                            ${photosHtml ? `<div style="margin-bottom:8px;">${photosHtml}</div>` : ''}
+                            <button class="btn btn-reject" style="flex:none;width:100%;"
+                                onclick="deleteReview('${review.id}', this)">
+                                🗑 Delete review
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                container.innerHTML = '';
+                container.appendChild(grid);
+            } catch (e) {
+                container.innerHTML = '<div class="empty">Error: ' + e.message + '</div>';
+            }
+        };
+
+        window.deleteReview = async function(reviewId, btn) {
+            if (!confirm('Delete this review permanently?')) return;
+            btn.disabled = true;
+            btn.textContent = 'Deleting...';
+            try {
+                await deleteDoc(doc(db, 'reviews', reviewId));
+                setTimeout(() => loadReviews(), 500);
+            } catch (e) {
+                btn.disabled = false;
                 alert('Error: ' + e.message);
             }
         };
