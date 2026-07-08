@@ -32,6 +32,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -70,6 +71,7 @@ fun SettingsScreen(
     val userProfile by authViewModel.userProfile.collectAsStateWithLifecycle()
     val authError by authViewModel.errorMessage.collectAsStateWithLifecycle()
     val authLoading by authViewModel.isLoading.collectAsStateWithLifecycle()
+    val registrationSuccess by authViewModel.registrationSuccess.collectAsStateWithLifecycle()
 
     LaunchedEffect(customInstalaciones) {
         if (customInstalaciones.isNotEmpty()) {
@@ -111,6 +113,27 @@ fun SettingsScreen(
             var password by remember { mutableStateOf("") }
             var username by remember { mutableStateOf("") }
 
+            val authTextFieldColors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF2C332D),
+                unfocusedContainerColor = Color(0xFF2C332D),
+                focusedBorderColor = Color(0xFF00AEFF),
+                unfocusedBorderColor = Color(0xFF00AEFF).copy(alpha = 0.5f),
+                focusedTextColor = Color(0xFFF5F5F5),
+                unfocusedTextColor = Color(0xFFF5F5F5),
+                focusedLabelColor = Color(0xFF00AEFF),
+                unfocusedLabelColor = Color(0xFF8B949E),
+                cursorColor = Color(0xFF00AEFF)
+            )
+
+            LaunchedEffect(registrationSuccess) {
+                if (registrationSuccess) {
+                    isRegisterMode = false
+                    email = ""
+                    password = ""
+                    username = ""
+                }
+            }
+
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF806B40)),
                 modifier = Modifier.fillMaxWidth()
@@ -122,37 +145,42 @@ fun SettingsScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
+                    if (registrationSuccess) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Verification email sent. Please verify your email and sign in.",
+                            color = Color(0xFF00AEFF),
+                            fontSize = 13.sp
+                        )
+                    }
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email", color = Color(0xFFF5F5F5)) },
+                        label = { Text("Email") },
                         singleLine = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFF2C332D))
+                        colors = authTextFieldColors,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password", color = Color(0xFFF5F5F5)) },
+                        label = { Text("Password") },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFF2C332D))
+                        colors = authTextFieldColors,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     if (isRegisterMode) {
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = username,
                             onValueChange = { username = it },
-                            label = { Text("Username", color = Color(0xFFF5F5F5)) },
+                            label = { Text("Username") },
                             singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFF2C332D))
+                            colors = authTextFieldColors,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     if (authError != null) {
@@ -183,6 +211,7 @@ fun SettingsScreen(
                     TextButton(onClick = {
                         isRegisterMode = !isRegisterMode
                         authViewModel.clearError()
+                        authViewModel.clearRegistrationSuccess()
                     }) {
                         Text(
                             text = if (isRegisterMode) "Already have an account? Sign in"

@@ -30,6 +30,9 @@ class AuthViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _registrationSuccess = MutableStateFlow(false)
+    val registrationSuccess: StateFlow<Boolean> = _registrationSuccess
+
     init {
         if (authDataSource.isLoggedIn) loadProfile()
     }
@@ -41,11 +44,11 @@ class AuthViewModel @Inject constructor(
             val result = authDataSource.register(email, password, username)
             _isLoading.value = false
             if (result.isSuccess) {
-                _isLoggedIn.value = true
-                _isEmailVerified.value = false
-                loadProfile()
+                authDataSource.logout()
+                _isLoggedIn.value = false
+                _registrationSuccess.value = true
             } else {
-                _errorMessage.value = result.exceptionOrNull()?.message ?: "Registration failed"
+                _errorMessage.value = friendlyError(result.exceptionOrNull())
             }
         }
     }
@@ -54,6 +57,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
+            _registrationSuccess.value = false
             val result = authDataSource.login(email, password)
             _isLoading.value = false
             if (result.isSuccess) {
@@ -61,7 +65,7 @@ class AuthViewModel @Inject constructor(
                 _isEmailVerified.value = authDataSource.isEmailVerified
                 loadProfile()
             } else {
-                _errorMessage.value = result.exceptionOrNull()?.message ?: "Login failed"
+                _errorMessage.value = friendlyError(result.exceptionOrNull())
             }
         }
     }
@@ -80,9 +84,34 @@ class AuthViewModel @Inject constructor(
 
     fun clearError() { _errorMessage.value = null }
 
+    fun clearRegistrationSuccess() { _registrationSuccess.value = false }
+
     private fun loadProfile() {
         viewModelScope.launch {
             _userProfile.value = authDataSource.getUserProfile()
+        }
+    }
+
+    private fun friendlyError(e: Throwable?): String {
+        val msg = e?.message ?: return "Something went wrong"
+        return when {
+            msg.contains("password is invalid", true) ||
+            msg.contains("supplied auth credential", true) ||
+            msg.contains("INVALID_LOGIN_CREDENTIALS", true) ->
+                "Incorrect email or password"
+            msg.contains("no user record", true) ->
+                "No account found with this email"
+            msg.contains("email address is already in use", true) ->
+                "This email is already registered"
+            msg.contains("badly formatted", true) ->
+                "Please enter a valid email address"
+            msg.contains("at least 6 characters", true) ->
+                "Password must be at least 6 characters"
+            msg.contains("Username already taken", true) ->
+                "That username is already taken"
+            msg.contains("network error", true) ->
+                "Network error. Check your connection"
+            else -> "Incorrect email or password"
         }
     }
 }
