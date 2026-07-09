@@ -470,9 +470,13 @@
                     const condColor = review.condition === 1 ? '#4CAF50'
                         : review.condition === 2 ? '#FFC107' : '#F44336';
                     const stars = '★'.repeat(review.stars || 0);
-                    const photosHtml = (review.photoUrls || []).map(url =>
-                        `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;margin-right:6px;">`
-                    ).join('');
+                    const photosHtml = (review.photoUrls || []).length > 0
+                        ? `<div style="display:flex;gap:6px;margin-bottom:8px;">` +
+                          (review.photoUrls || []).map(url =>
+                            `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">`
+                          ).join('') +
+                          `</div>`
+                        : '';
 
                     const card = document.createElement('div');
                     card.className = 'card';
@@ -488,7 +492,7 @@
                                 <span style="color:#8B949E;font-size:11px;margin-left:8px;">Facility #${review.facilityFid}</span>
                             </div>
                             ${review.comment ? `<p style="color:#F5F5F5;font-size:13px;margin-bottom:8px;">${review.comment}</p>` : ''}
-                            ${photosHtml ? `<div style="margin-bottom:8px;">${photosHtml}</div>` : ''}
+                            ${photosHtml}
                             <button class="btn btn-reject" style="flex:none;width:100%;"
                                 onclick="deleteReview('${review.id}', this)">
                                 🗑 Delete review
