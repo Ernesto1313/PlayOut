@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ernesto.playout.data.location.LocationDataSource
 import com.ernesto.playout.data.model.CustomFacility
 import com.ernesto.playout.data.model.Proposal
+import com.ernesto.playout.data.remote.AuthDataSource
 import com.ernesto.playout.data.remote.FirebaseStorageDataSource
 import com.ernesto.playout.data.remote.FirestoreDataSource
 import com.ernesto.playout.data.remote.UploadStatusTracker
@@ -27,6 +28,7 @@ class AddFacilityViewModel @Inject constructor(
     private val locationDataSource: LocationDataSource,
     private val firestoreDataSource: FirestoreDataSource,
     private val storageDataSource: FirebaseStorageDataSource,
+    private val authDataSource: AuthDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -162,6 +164,8 @@ class AddFacilityViewModel @Inject constructor(
                             if (url.isNotEmpty()) uploadedUrls.add(url)
                         }
                     }
+                    val userId = authDataSource.currentUserId ?: ""
+                    val profile = authDataSource.getUserProfile()
                     val proposal = Proposal(
                         sport = sport.value ?: "",
                         description = description.value,
@@ -173,7 +177,9 @@ class AddFacilityViewModel @Inject constructor(
                         latitude = pinLatLng.value?.latitude ?: 0.0,
                         photoUrls = uploadedUrls,
                         status = "pending",
-                        localFid = newFid
+                        localFid = newFid,
+                        userId = userId,
+                        username = profile?.username ?: ""
                     )
                     firestoreDataSource.submitProposal(proposal)
                     Log.d("PlayOut_Firebase", "Proposal submitted for fid $newFid")

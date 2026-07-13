@@ -22,9 +22,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,6 +39,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -46,9 +53,11 @@ import com.ernesto.playout.ui.detail.DetailScreen
 import com.ernesto.playout.ui.feed.FeedScreen
 import com.ernesto.playout.ui.map.MapScreen
 import com.ernesto.playout.ui.reviews.MyReviewsScreen
+import com.ernesto.playout.ui.settings.AuthViewModel
 import com.ernesto.playout.ui.settings.SettingsScreen
 import com.ernesto.playout.ui.theme.PlayOutTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
     object Map : Screen("map")
@@ -64,13 +73,20 @@ sealed class Screen(val route: String) {
 fun MapListScaffold(
     currentRoute: String,
     navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel(),
     content: @Composable (PaddingValues) -> Unit
 ) {
     val onMap = currentRoute == Screen.Map.route
     val onFeed = currentRoute == Screen.Feed.route
     val showTopBar = currentRoute == Screen.Map.route || currentRoute == Screen.Feed.route
 
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val isEmailVerified by authViewModel.isEmailVerified.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             if (showTopBar) {
                 CenterAlignedTopAppBar(
@@ -130,7 +146,17 @@ fun MapListScaffold(
                     contentAlignment = Alignment.Center
                 ) {
                     FloatingActionButton(
-                        onClick = { navController.navigate("add") },
+                        onClick = {
+                            when {
+                                !isLoggedIn -> scope.launch {
+                                    snackbarHostState.showSnackbar("Sign in from Settings to propose a facility")
+                                }
+                                !isEmailVerified -> scope.launch {
+                                    snackbarHostState.showSnackbar("Verify your email to propose a facility")
+                                }
+                                else -> navController.navigate("add")
+                            }
+                        },
                         modifier = Modifier.size(48.dp),
                         containerColor = Color(0xFF00AEFF),
                         contentColor = Color.White

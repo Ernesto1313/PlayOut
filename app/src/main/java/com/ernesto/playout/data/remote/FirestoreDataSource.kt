@@ -62,6 +62,8 @@ class FirestoreDataSource @Inject constructor() {
             "neighbourhood" to proposal.neighbourhood,
             "status" to "pending",
             "localFid" to proposal.localFid,
+            "userId" to proposal.userId,
+            "username" to proposal.username,
             "submittedAt" to com.google.firebase.Timestamp.now()
         )
         val ref = db.collection("proposals").add(data).await()

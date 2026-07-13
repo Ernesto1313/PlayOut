@@ -14,5 +14,7 @@ data class Proposal(
     val photoUrls: List<String> = emptyList(),
     val neighbourhood: String = "",
     val status: String = "pending",
-    val localFid: Int = 0
+    val localFid: Int = 0,
+    val userId: String = "",
+    val username: String = ""
 )
