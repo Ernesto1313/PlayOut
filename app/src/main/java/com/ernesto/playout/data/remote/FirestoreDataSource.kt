@@ -86,6 +86,15 @@ class FirestoreDataSource @Inject constructor() {
         }
     }
 
+    suspend fun isProposalOwner(localFid: Int, userId: String): Boolean {
+        val snapshot = db.collection("proposals")
+            .whereEqualTo("localFid", localFid)
+            .whereEqualTo("userId", userId)
+            .get()
+            .await()
+        return !snapshot.isEmpty
+    }
+
     suspend fun fetchApprovedProposals(): List<Facility> {
         val snapshot = db.collection("proposals")
             .whereEqualTo("status", "approved")

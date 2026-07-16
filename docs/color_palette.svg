@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="white"/>
+  <style>
+    .th { font-family: Arial; font-size: 16px; font-weight: bold; fill: #2C332D; }
+    .ts { font-family: Arial; font-size: 13px; fill: #5B6169; }
+  </style>
+
+  <rect x="30" y="30" width="150" height="150" rx="10" fill="#806B40" stroke="#00000022" stroke-width="1"/>
+  <text class="th" x="30" y="205">Warm Brown</text>
+  <text class="ts" x="30" y="225">#806B40</text>
+
+  <rect x="210" y="30" width="150" height="150" rx="10" fill="#00AEFF" stroke="#00000022" stroke-width="1"/>
+  <text class="th" x="210" y="205">Fresh Sky Blue</text>
+  <text class="ts" x="210" y="225">#00AEFF</text>
+
+  <rect x="390" y="30" width="150" height="150" rx="10" fill="#F5F5F5" stroke="#00000044" stroke-width="1"/>
+  <text class="th" x="390" y="205">White Smoke</text>
+  <text class="ts" x="390" y="225">#F5F5F5</text>
+
+  <rect x="570" y="30" width="150" height="150" rx="10" fill="#2C332D" stroke="#00000022" stroke-width="1"/>
+  <text class="th" x="570" y="205">Charcoal Dark</text>
+  <text class="ts" x="570" y="225">#2C332D</text>
+
+  <rect x="750" y="30" width="120" height="150" rx="10" fill="#8B949E" stroke="#00000022" stroke-width="1"/>
+  <text class="th" x="750" y="205">Muted Grey</text>
+  <text class="ts" x="750" y="225">#8B949E</text>
+</svg>

@@ -11,6 +11,7 @@ import com.ernesto.playout.data.model.Facility
 import com.ernesto.playout.data.model.Review
 import com.ernesto.playout.data.remote.AuthDataSource
 import com.ernesto.playout.data.remote.FirebaseStorageDataSource
+import com.ernesto.playout.data.remote.FirestoreDataSource
 import com.ernesto.playout.data.remote.ReviewsDataSource
 import com.ernesto.playout.data.repository.FacilityRepository
 import com.ernesto.playout.data.util.RatingCalculator
@@ -30,6 +31,7 @@ class DetailViewModel @Inject constructor(
     private val locationDataSource: LocationDataSource,
     private val reviewsDataSource: ReviewsDataSource,
     private val authDataSource: AuthDataSource,
+    private val firestoreDataSource: FirestoreDataSource,
     private val storageDataSource: FirebaseStorageDataSource,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -90,7 +92,10 @@ class DetailViewModel @Inject constructor(
                 _userExistingReview.value = existing
                 // Can review if logged in, verified, not the proposer,
                 // and hasn't reviewed yet (or can edit existing)
-                _canReview.value = authDataSource.isEmailVerified
+                val isFacilityProposedByCurrentUser = firestoreDataSource.isProposalOwner(fid, userId)
+                _canReview.value = authDataSource.isEmailVerified &&
+                    existing == null &&
+                    !isFacilityProposedByCurrentUser
             } else {
                 _canReview.value = false
             }

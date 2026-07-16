@@ -8,13 +8,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ernesto.playout.data.model.CustomFacility
 import com.ernesto.playout.data.model.Facility
 
-@Database(entities = [Facility::class, CustomFacility::class], version = 8, exportSchema = false)
+@Database(entities = [Facility::class, CustomFacility::class], version = 9, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun facilityDao(): FacilityDao
     abstract fun customFacilityDao(): CustomFacilityDao
 
     companion object {
-        const val DATABASE_NAME = "playout26.db"
+        const val DATABASE_NAME = "playout27.db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {

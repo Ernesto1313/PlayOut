@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1120" viewBox="0 0 960 1120">
+  <rect width="960" height="1120" fill="white"/>
+  <style>
+    .lbl { font-family: Arial; font-size: 14px; }
+    .hdr { font-family: Arial; font-size: 17px; font-weight: bold; fill: #2C332D; }
+    .small { font-family: Arial; font-size: 12px; fill: #5B6169; }
+  </style>
+
+  <!-- UI LAYER -->
+  <rect x="30" y="40" width="900" height="330" rx="14" fill="none" stroke="#806B40" stroke-width="2"/>
+  <text class="hdr" x="55" y="72">UI Layer — Jetpack Compose</text>
+
+  <!-- Screens -->
+  <g>
+    <rect x="55" y="95" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="135" y="122" text-anchor="middle" fill="#042C53">MapScreen</text>
+    <rect x="230" y="95" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="310" y="122" text-anchor="middle" fill="#042C53">FeedScreen</text>
+    <rect x="405" y="95" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="485" y="122" text-anchor="middle" fill="#042C53">DetailScreen</text>
+    <rect x="580" y="95" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="660" y="122" text-anchor="middle" fill="#042C53">Add/EditScreen</text>
+    <rect x="755" y="95" width="150" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="830" y="122" text-anchor="middle" fill="#042C53">SettingsScreen</text>
+    <rect x="55" y="150" width="160" height="44" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="135" y="177" text-anchor="middle" fill="#042C53">MyReviewsScreen</text>
+  </g>
+
+  <!-- ViewModels -->
+  <g>
+    <rect x="55" y="250" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="135" y="277" text-anchor="middle" fill="#04342C">MapViewModel</text>
+    <rect x="230" y="250" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="310" y="277" text-anchor="middle" fill="#04342C">ListViewModel</text>
+    <rect x="405" y="250" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="485" y="277" text-anchor="middle" fill="#04342C">DetailViewModel</text>
+    <rect x="580" y="250" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="660" y="277" text-anchor="middle" fill="#04342C">Add/EditViewModel</text>
+    <rect x="755" y="250" width="150" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="830" y="277" text-anchor="middle" fill="#04342C">SettingsViewModel</text>
+    <rect x="55" y="305" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="135" y="332" text-anchor="middle" fill="#04342C">MyReviewsVM</text>
+    <rect x="230" y="305" width="160" height="44" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="310" y="332" text-anchor="middle" fill="#04342C">AuthViewModel</text>
+  </g>
+
+  <!-- screen->vm arrows -->
+  <g stroke="#5B6169" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="135" y1="139" x2="135" y2="248"/>
+    <line x1="310" y1="139" x2="310" y2="248"/>
+    <line x1="485" y1="139" x2="485" y2="248"/>
+    <line x1="660" y1="139" x2="660" y2="248"/>
+    <line x1="830" y1="139" x2="830" y2="248"/>
+  </g>
+
+  <!-- DATA LAYER -->
+  <rect x="30" y="410" width="900" height="290" rx="14" fill="none" stroke="#806B40" stroke-width="2"/>
+  <text class="hdr" x="55" y="442">Data Layer</text>
+
+  <rect x="340" y="458" width="280" height="50" rx="10" fill="#FAEEDA" stroke="#854F0B"/>
+  <text class="hdr" x="480" y="489" text-anchor="middle" fill="#412402">FacilityRepository</text>
+
+  <g>
+    <rect x="55" y="560" width="150" height="44" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="130" y="587" text-anchor="middle" fill="#2A1A55">FacilityDao</text>
+    <rect x="220" y="560" width="160" height="44" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="300" y="587" text-anchor="middle" fill="#2A1A55">CustomFacilityDao</text>
+    <rect x="395" y="560" width="160" height="44" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="475" y="587" text-anchor="middle" fill="#2A1A55">FirestoreDataSrc</text>
+    <rect x="570" y="560" width="150" height="44" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="645" y="587" text-anchor="middle" fill="#2A1A55">ReviewsDataSrc</text>
+    <rect x="735" y="560" width="170" height="44" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="820" y="587" text-anchor="middle" fill="#2A1A55">AuthDataSrc</text>
+    <rect x="220" y="620" width="180" height="40" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="310" y="645" text-anchor="middle" fill="#2A1A55">StorageDataSrc</text>
+    <rect x="415" y="620" width="200" height="40" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="515" y="645" text-anchor="middle" fill="#2A1A55">FirebaseSyncManager</text>
+    <rect x="630" y="620" width="170" height="40" rx="8" fill="#EFE9FB" stroke="#5A3FA0"/><text class="lbl" x="715" y="645" text-anchor="middle" fill="#2A1A55">LocationDataSrc</text>
+  </g>
+
+  <!-- vm->repo -->
+  <g stroke="#5B6169" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="135" y1="349" x2="420" y2="456"/>
+    <line x1="485" y1="294" x2="480" y2="456"/>
+    <line x1="830" y1="349" x2="560" y2="456"/>
+  </g>
+  <!-- repo->sources -->
+  <g stroke="#5B6169" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="420" y1="508" x2="150" y2="558"/>
+    <line x1="450" y1="508" x2="300" y2="558"/>
+    <line x1="490" y1="508" x2="475" y2="558"/>
+  </g>
+
+  <!-- BACKEND -->
+  <rect x="30" y="740" width="900" height="330" rx="14" fill="none" stroke="#806B40" stroke-width="2"/>
+  <text class="hdr" x="55" y="772">Persistence &amp; Backend</text>
+
+  <rect x="80" y="800" width="220" height="70" rx="10" fill="#EEEEEC" stroke="#888780" stroke-dasharray="5 3"/>
+  <text class="hdr" x="190" y="832" text-anchor="middle" fill="#2C332D">Room (SQLite)</text>
+  <text class="small" x="190" y="854" text-anchor="middle">local cache</text>
+
+  <rect x="360" y="800" width="180" height="70" rx="10" fill="#E6F1FB" stroke="#185FA5"/>
+  <text class="hdr" x="450" y="832" text-anchor="middle" fill="#042C53">Cloud Firestore</text>
+  <text class="small" x="450" y="854" text-anchor="middle">4 collections</text>
+
+  <rect x="580" y="800" width="140" height="70" rx="10" fill="#E1F5EE" stroke="#0F6E56"/>
+  <text class="hdr" x="650" y="832" text-anchor="middle" fill="#04342C">Storage</text>
+  <text class="small" x="650" y="854" text-anchor="middle">photos</text>
+
+  <rect x="750" y="800" width="150" height="70" rx="10" fill="#EFE9FB" stroke="#5A3FA0"/>
+  <text class="hdr" x="825" y="832" text-anchor="middle" fill="#2A1A55">Authentication</text>
+  <text class="small" x="825" y="854" text-anchor="middle">accounts</text>
+
+  <g stroke="#5B6169" stroke-width="1.5" marker-end="url(#a)">
+    <line x1="300" y1="660" x2="200" y2="798"/>
+    <line x1="475" y1="604" x2="450" y2="798"/>
+    <line x1="645" y1="604" x2="650" y2="798"/>
+    <line x1="820" y1="604" x2="825" y2="798"/>
+  </g>
+
+  <text class="small" x="480" y="1090" text-anchor="middle">All dependencies are provided by Hilt (dependency injection)</text>
+
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M2 1 L8 5 L2 9" fill="none" stroke="#5B6169" stroke-width="1.4"/>
+    </marker>
+  </defs>
+</svg>

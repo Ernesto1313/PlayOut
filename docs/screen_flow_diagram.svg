@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="820" viewBox="0 0 900 820">
+  <rect width="900" height="820" fill="white"/>
+  <style>
+    .lbl { font-family: Arial; font-size: 14px; font-weight: bold; }
+    .small { font-family: Arial; font-size: 12px; fill: #5B6169; }
+  </style>
+
+  <rect x="40" y="50" width="820" height="110" rx="14" fill="none" stroke="#806B40" stroke-width="2"/>
+  <text class="small" x="65" y="78">Bottom navigation bar + central action button</text>
+
+  <rect x="90" y="95" width="170" height="50" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="175" y="125" text-anchor="middle" fill="#042C53">Map (home)</text>
+  <rect x="300" y="95" width="150" height="50" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="375" y="125" text-anchor="middle" fill="#042C53">List</text>
+  <rect x="500" y="95" width="130" height="50" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="565" y="125" text-anchor="middle" fill="#04342C">Add</text>
+  <rect x="680" y="95" width="150" height="50" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="755" y="125" text-anchor="middle" fill="#042C53">Settings</text>
+
+  <rect x="190" y="320" width="220" height="54" rx="8" fill="#FAEEDA" stroke="#854F0B"/><text class="lbl" x="300" y="352" text-anchor="middle" fill="#412402">Facility Detail</text>
+
+  <rect x="60" y="450" width="180" height="50" rx="8" fill="#EEEEEC" stroke="#888780" stroke-dasharray="5 3"/><text class="lbl" x="150" y="480" text-anchor="middle" fill="#2C332D">Google Maps</text>
+  <rect x="290" y="450" width="200" height="50" rx="8" fill="#FBE9E7" stroke="#B0442F"/><text class="lbl" x="390" y="480" text-anchor="middle" fill="#5A1B10">Review dialog</text>
+
+  <rect x="660" y="320" width="170" height="54" rx="8" fill="#E6F1FB" stroke="#185FA5"/><text class="lbl" x="745" y="352" text-anchor="middle" fill="#042C53">Settings hub</text>
+  <rect x="660" y="450" width="170" height="50" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="745" y="480" text-anchor="middle" fill="#04342C">My Reviews</text>
+  <rect x="660" y="570" width="170" height="50" rx="8" fill="#E1F5EE" stroke="#0F6E56"/><text class="lbl" x="745" y="600" text-anchor="middle" fill="#04342C">Edit Facility</text>
+
+  <g stroke="#5B6169" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <path d="M175 145 L175 260 L260 260 L285 318"/>
+    <path d="M375 145 L375 260 L330 318"/>
+    <path d="M240 374 L165 448"/>
+    <path d="M320 374 L370 448"/>
+    <path d="M565 145 L565 200 L745 200 L745 318"/>
+    <path d="M755 145 L755 200"/>
+    <path d="M745 374 L745 448"/>
+    <path d="M710 500 L710 568"/>
+    <path d="M660 490 L450 490 L410 376" stroke-dasharray="5 3"/>
+  </g>
+
+  <text class="small" x="230" y="245">tap facility</text>
+  <text class="small" x="140" y="425">navigate</text>
+  <text class="small" x="430" y="425">if signed in</text>
+  <text class="small" x="560" y="530">reviews</text>
+  <text class="small" x="530" y="600">tap review → facility</text>
+
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M2 1 L8 5 L2 9" fill="none" stroke="#5B6169" stroke-width="1.4"/>
+    </marker>
+  </defs>
+</svg>
